@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oliver Foundations — Your First Decision</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:      #1A2B3C;
+    --teal:      #028090;
+    --teal-light:#02C39A;
+    --teal-bg:   #e8f7f5;
+    --text:      #1A2B3C;
+    --muted:     #5a6a7a;
+    --border:    #d0dde6;
+    --white:     #ffffff;
+    --correct-bg:#0A2E1E;
+    --correct-border: #02C39A;
+    --warn-bg:   #1c2a38;
+    --warn-border:#028090;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #f4f7fa;
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 3rem;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(26,43,60,0.10);
+    max-width: 680px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background: var(--navy);
+    padding: 1.5rem 2rem 1.25rem;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--teal-light);
+    color: var(--navy);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-header h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-header p {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.5;
+  }
+
+  .card-body {
+    padding: 1.75rem 2rem;
+  }
+
+  .prompt {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 1.25rem;
+    line-height: 1.4;
+  }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .choice-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.18s, background 0.18s, transform 0.12s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--teal);
+    background: var(--teal-bg);
+    transform: translateY(-1px);
+  }
+
+  .choice-btn:disabled {
+    cursor: default;
+  }
+
+  .choice-letter {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: #e8eff5;
+    color: var(--navy);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.05rem;
+    transition: background 0.18s, color 0.18s;
+  }
+
+  .choice-text {
+    font-size: 0.9375rem;
+    color: var(--text);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  /* Selected state */
+  .choice-btn.selected {
+    border-color: var(--teal-light);
+    background: var(--teal-bg);
+  }
+
+  .choice-btn.selected .choice-letter {
+    background: var(--teal-light);
+    color: var(--navy);
+  }
+
+  /* Faded (not selected, after answer) */
+  .choice-btn.faded {
+    opacity: 0.42;
+    border-color: var(--border);
+    background: var(--white);
+  }
+
+  /* Feedback panel */
+  .feedback {
+    display: none;
+    margin-top: 1.25rem;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback.show {
+    display: block;
+  }
+
+  .feedback-inner {
+    background: var(--correct-bg);
+    border: 1.5px solid var(--correct-border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .feedback-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--teal-light);
+    margin-bottom: 0.6rem;
+  }
+
+  .feedback-headline {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+    line-height: 1.35;
+  }
+
+  .feedback-body {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.6;
+  }
+
+  .feedback-body strong {
+    color: var(--teal-light);
+  }
+
+  .feedback-reveal {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(2,192,154,0.2);
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.6;
+  }
+
+  .feedback-reveal strong {
+    color: var(--white);
+  }
+
+  /* Continue prompt */
+  .continue-prompt {
+    display: none;
+    margin-top: 1.25rem;
+    padding: 1rem 1.25rem;
+    background: var(--teal-bg);
+    border-radius: 10px;
+    border-left: 4px solid var(--teal-light);
+    font-size: 0.875rem;
+    color: var(--navy);
+    font-weight: 500;
+    line-height: 1.5;
+    animation: fadeIn 0.3s ease 0.2s both;
+  }
+
+  .continue-prompt.show {
+    display: block;
+  }
+
+  /* Footer */
+  .card-footer {
+    padding: 1rem 2rem 1.5rem;
+    text-align: center;
+    font-size: 0.775rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 520px) {
+    .card-body { padding: 1.25rem 1.25rem; }
+    .card-header { padding: 1.25rem 1.25rem 1rem; }
+    .card-header h1 { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="card-header">
+    <div class="badge">🧩 Your First Decision</div>
+    <h1>The Situation</h1>
+    <p>A benefits administrator manages 45 contributing employers, thousands of members, pension and health benefits, and strict compliance requirements — every month, manually.</p>
+  </div>
+
+  <div class="card-body">
+
+    <p class="prompt">Where does the biggest operational risk come from?</p>
+
+    <div class="choices" id="choices">
+
+      <button class="choice-btn" onclick="handleChoice(this, 'A')" id="btn-A">
+        <div class="choice-letter">A</div>
+        <div class="choice-text">Errors caused by manual work and disconnected systems</div>
+      </button>
+
+      <button class="choice-btn" onclick="handleChoice(this, 'B')" id="btn-B">
+        <div class="choice-letter">B</div>
+        <div class="choice-text">No single source of truth — different people hold different data</div>
+      </button>
+
+      <button class="choice-btn" onclick="handleChoice(this, 'C')" id="btn-C">
+        <div class="choice-letter">C</div>
+        <div class="choice-text">No visibility for members and employers — they can't get answers without calling</div>
+      </button>
+
+    </div>
+
+    <!-- Feedback for A -->
+    <div class="feedback" id="feedback-A">
+      <div class="feedback-inner">
+        <div class="feedback-tag">✓ Real risk — and you're right</div>
+        <div class="feedback-headline">Manual work is where errors enter the system.</div>
+        <div class="feedback-body">
+          When contributions are reconciled manually across 45 employers, one missed update — a salary change, a late termination — cascades. Invoices go out wrong. Carriers receive incorrect eligibility. Audits become painful.
+          <br><br>
+          <strong>But it's not the only risk.</strong> Manual errors create the data problem. And the data problem creates the visibility problem.
+        </div>
+        <div class="feedback-reveal">
+          <strong>All three risks are connected</strong> — and they're all symptoms of the same underlying problem: fragmented administration with no single system holding the truth. That's what Oliver was built to fix.
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback for B -->
+    <div class="feedback" id="feedback-B">
+      <div class="feedback-inner">
+        <div class="feedback-tag">✓ Real risk — and you're right</div>
+        <div class="feedback-headline">No single source of truth means every decision is uncertain.</div>
+        <div class="feedback-body">
+          When eligibility lives in one system, billing in another, and remittances in a spreadsheet, no one has the full picture. One team approves a member. Another team's data says they're not eligible. By the time the error surfaces, the damage is done.
+          <br><br>
+          <strong>But it's not the only risk.</strong> The data gap is the engine — but it runs on manual work, and it shows up as visibility failures for the people who need answers.
+        </div>
+        <div class="feedback-reveal">
+          <strong>All three risks are connected</strong> — and they're all symptoms of the same underlying problem: fragmented administration with no single system holding the truth. That's what Oliver was built to fix.
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback for C -->
+    <div class="feedback" id="feedback-C">
+      <div class="feedback-inner">
+        <div class="feedback-tag">✓ Real risk — and you're right</div>
+        <div class="feedback-headline">When members can't get answers, trust erodes fast.</div>
+        <div class="feedback-body">
+          Employers calling to check contribution status. Members asking whether their coverage is active. Trustees requesting audit reports. Every unanswered question or delayed response is a signal that the system isn't working.
+          <br><br>
+          <strong>But it's not the only risk.</strong> Visibility problems are the symptom that clients feel — but they're caused by the data fragmentation underneath, which is caused by manual, disconnected processes.
+        </div>
+        <div class="feedback-reveal">
+          <strong>All three risks are connected</strong> — and they're all symptoms of the same underlying problem: fragmented administration with no single system holding the truth. That's what Oliver was built to fix.
+        </div>
+      </div>
+    </div>
+
+    <!-- Continue prompt (shown after any answer) -->
+    <div class="continue-prompt" id="continue-prompt">
+      👇 Keep scrolling — the next section shows how Oliver addresses all three.
+    </div>
+
+  </div>
+
+  <div class="card-footer">
+    Oliver Enablement Program &nbsp;·&nbsp; Oliver Foundations &nbsp;·&nbsp; 2026
+  </div>
+
+</div>
+
+<script>
+  let answered = false;
+
+  function handleChoice(btn, choice) {
+    if (answered) return;
+    answered = true;
+
+    // Mark selected
+    btn.classList.add('selected');
+
+    // Fade all others
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (b !== btn) b.classList.add('faded');
+      b.disabled = true;
+    });
+
+    // Show matching feedback
+    const fb = document.getElementById('feedback-' + choice);
+    fb.classList.add('show');
+
+    // Show continue prompt
+    document.getElementById('continue-prompt').classList.add('show');
+  }
+</script>
+
+</body>
+</html>
