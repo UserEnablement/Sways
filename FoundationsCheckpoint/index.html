@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oliver Foundations — Quick Check</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:           #1A2B3C;
+    --teal:           #028090;
+    --teal-light:     #02C39A;
+    --teal-bg:        #e8f7f5;
+    --text:           #1A2B3C;
+    --muted:          #5a6a7a;
+    --border:         #d0dde6;
+    --white:          #ffffff;
+    --correct-bg:     #0A2E1E;
+    --correct-border: #02C39A;
+    --wrong-bg:       #2A1010;
+    --wrong-border:   #E85D2A;
+    --wrong-accent:   #E85D2A;
+    --bg-page:        #f4f7fa;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-page);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 3rem;
+  }
+
+  .shell {
+    max-width: 660px;
+    width: 100%;
+  }
+
+  /* Header */
+  .shell-header {
+    background: var(--navy);
+    border-radius: 16px 16px 0 0;
+    padding: 1.4rem 2rem 1.2rem;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--teal-light);
+    color: var(--navy);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    margin-bottom: 0.65rem;
+  }
+
+  .shell-header h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.3;
+    margin-bottom: 0.35rem;
+  }
+
+  .shell-header p {
+    font-size: 0.83rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.5;
+  }
+
+  /* Progress dots */
+  .dots-wrap {
+    background: rgba(255,255,255,0.08);
+    padding: 0.7rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    transition: background 0.25s;
+    flex-shrink: 0;
+  }
+
+  .dot.active   { background: var(--teal-light); }
+  .dot.done     { background: rgba(2,195,154,0.45); }
+
+  .dot-label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    margin-left: 0.5rem;
+    font-weight: 500;
+  }
+
+  /* Panel */
+  .q-panel {
+    background: var(--white);
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 24px rgba(26,43,60,0.10);
+    overflow: hidden;
+  }
+
+  .q-body {
+    padding: 1.6rem 2rem;
+  }
+
+  /* True/False pill row */
+  .tf-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.8rem;
+  }
+
+  .statement-box {
+    background: #f0f5f9;
+    border-left: 4px solid var(--teal);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    font-size: 0.925rem;
+    font-weight: 500;
+    color: var(--navy);
+    line-height: 1.55;
+    margin-bottom: 1.25rem;
+  }
+
+  .tf-prompt {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 0.9rem;
+  }
+
+  .tf-row {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .tf-btn {
+    flex: 1;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .tf-btn:hover:not(:disabled) {
+    border-color: var(--teal);
+    background: var(--teal-bg);
+    transform: translateY(-1px);
+  }
+
+  .tf-btn:disabled { cursor: default; }
+
+  .tf-btn.correct-selected {
+    border-color: var(--teal-light);
+    background: var(--teal-bg);
+    color: var(--navy);
+  }
+
+  .tf-btn.wrong-selected {
+    border-color: var(--wrong-accent);
+    background: #fff5f0;
+    color: var(--wrong-accent);
+  }
+
+  .tf-btn.faded {
+    opacity: 0.35;
+  }
+
+  /* Feedback */
+  .feedback {
+    display: none;
+    margin-top: 1rem;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeUp 0.28s ease;
+  }
+
+  .feedback.show { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(7px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback-inner {
+    padding: 1rem 1.35rem;
+    border-radius: 10px;
+    border: 1.5px solid;
+  }
+
+  .feedback-inner.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct-border);
+  }
+
+  .feedback-inner.wrong {
+    background: var(--wrong-bg);
+    border-color: var(--wrong-border);
+  }
+
+  .feedback-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+  }
+
+  .correct .feedback-tag { color: var(--teal-light); }
+  .wrong   .feedback-tag { color: var(--wrong-accent); }
+
+  .feedback-headline {
+    font-size: 0.9125rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 0.35rem;
+    line-height: 1.35;
+  }
+
+  .feedback-body {
+    font-size: 0.84rem;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+  }
+
+  .feedback-body strong { color: var(--teal-light); }
+  .wrong .feedback-body strong { color: var(--wrong-accent); }
+
+  /* Next button */
+  .next-btn {
+    display: none;
+    margin-top: 1rem;
+    width: 100%;
+    background: var(--teal);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 0.8rem 1.25rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .next-btn:hover { background: #026e7a; transform: translateY(-1px); }
+  .next-btn.show  { display: block; animation: fadeUp 0.25s ease 0.15s both; }
+
+  /* Complete screen */
+  .complete-screen {
+    display: none;
+    padding: 2rem 2rem 2.25rem;
+    text-align: center;
+    animation: fadeUp 0.3s ease;
+  }
+
+  .complete-screen.show { display: block; }
+
+  .complete-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .complete-headline {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+  }
+
+  .complete-body {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto 1.25rem;
+  }
+
+  .score-pills {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .score-pill {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+  }
+
+  .score-pill.right {
+    background: var(--teal-bg);
+    color: var(--teal);
+    border: 1.5px solid var(--teal-light);
+  }
+
+  .score-pill.wrong {
+    background: #fff0ec;
+    color: var(--wrong-accent);
+    border: 1.5px solid var(--wrong-accent);
+  }
+
+  .continue-tip {
+    background: var(--teal-bg);
+    border-left: 4px solid var(--teal-light);
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.85rem;
+    color: var(--navy);
+    text-align: left;
+    line-height: 1.55;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* Footer */
+  .card-footer {
+    padding: 0.8rem 2rem 1rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 480px) {
+    .q-body { padding: 1.25rem 1.1rem; }
+    .shell-header { padding: 1.1rem 1.1rem 0.9rem; }
+    .dots-wrap { padding: 0.6rem 1.1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="shell-header">
+    <div class="badge">⚡ Quick Check</div>
+    <h1>Before you move on — three quick ones</h1>
+    <p>True or False. No score pressure — this is about making sure the foundations are solid before the next section.</p>
+  </div>
+
+  <div class="dots-wrap">
+    <div class="dot active" id="dot-0"></div>
+    <div class="dot" id="dot-1"></div>
+    <div class="dot" id="dot-2"></div>
+    <span class="dot-label" id="dot-label">Question 1 of 3</span>
+  </div>
+
+  <div class="q-panel">
+    <div class="q-body" id="q-body"></div>
+
+    <div class="complete-screen" id="complete-screen">
+      <div class="complete-icon" id="complete-icon">✅</div>
+      <div class="complete-headline" id="complete-headline"></div>
+      <div class="score-pills" id="score-pills"></div>
+      <div class="complete-body" id="complete-body"></div>
+      <div class="continue-tip">
+        👇 Keep scrolling — the next section shows what sets Oliver apart from the competition.
+      </div>
+    </div>
+
+    <div class="card-footer">
+      Oliver Enablement Program &nbsp;·&nbsp; Oliver Foundations &nbsp;·&nbsp; 2026
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    statement: "Oliver Admin can only serve a single employer — it is not designed for groups or associations with multiple member companies.",
+    correct: false,
+    feedback: {
+      true: {
+        type: "wrong",
+        tag: "✗ Not quite",
+        headline: "Admin handles groups and associations too.",
+        body: "<strong>Oliver Admin is built for group billing with core and optional benefits</strong> — that includes single employers and groups or associations where multiple companies share a plan. The key is the plan type, not the employer count. If there are no hour banks, pension funds, or other complex fund types involved, Admin is the fit."
+      },
+      false: {
+        type: "correct",
+        tag: "✓ Correct",
+        headline: "Right — Admin serves single employers and groups/associations.",
+        body: "<strong>Oliver Admin handles group billing with core and optional benefits</strong> for single employers and multi-employer groups or associations alike. What triggers MultiPlan isn't the number of employers — it's the presence of complex fund types like hour banks, pension, or dollar banks."
+      }
+    }
+  },
+  {
+    statement: "A union trust fund with an hour bank and a pension component should be administered in Oliver Admin.",
+    correct: false,
+    feedback: {
+      true: {
+        type: "wrong",
+        tag: "✗ Not quite — this is the most important boundary",
+        headline: "Hour banks and pension funds belong in MultiPlan.",
+        body: "<strong>MultiPlan is designed for plans that combine multiple fund types</strong> — hour banks, dollar banks, pension, and other funds in the same plan. That's the union trust fund environment. Admin handles group billing with core and optional benefits — it doesn't support the fund-type complexity this environment requires."
+      },
+      false: {
+        type: "correct",
+        tag: "✓ Correct — and this is the key boundary to know",
+        headline: "Right — hour banks and pension funds go to MultiPlan.",
+        body: "<strong>When a plan combines multiple fund types — hour banks, pension, dollar banks</strong> — that's MultiPlan territory. Same platform architecture as Admin, completely different configuration. Admin handles core and optional group benefits billing. MultiPlan handles the fund-type complexity of union environments."
+      }
+    }
+  },
+  {
+    statement: "Ollie is a separate software product — it is an alternative to Oliver Admin and MultiPlan, not an addition to them.",
+    correct: false,
+    feedback: {
+      true: {
+        type: "wrong",
+        tag: "✗ Not quite",
+        headline: "Ollie adds outsourced operations on top of the platform — it doesn't replace it.",
+        body: "<strong>Ollie is Oliver's platform-powered administration service</strong> — it combines the Oliver platform (Admin or MultiPlan) with outsourced back-office operations. The client gets the technology and a team to run it. Ollie doesn't replace the platform choice — it adds the operational layer on top of it."
+      },
+      false: {
+        type: "correct",
+        tag: "✓ Correct",
+        headline: "Right — Ollie adds the operational layer, it doesn't replace the platform.",
+        body: "<strong>Ollie combines Oliver's platform with outsourced administration services</strong> — back-office processing, carrier coordination, accounting, reporting, and optionally full-service support. A client using Ollie is still using Admin or MultiPlan underneath. The difference is that Oliver's team runs the day-to-day operations alongside the technology."
+      }
+    }
+  }
+];
+
+let current = 0;
+let score = 0;
+let results = [];
+
+function updateDots() {
+  for (let i = 0; i < 3; i++) {
+    const d = document.getElementById('dot-' + i);
+    d.className = 'dot';
+    if (i < current) d.classList.add('done');
+    else if (i === current) d.classList.add('active');
+  }
+  const label = document.getElementById('dot-label');
+  if (current < 3) {
+    label.textContent = 'Question ' + (current + 1) + ' of 3';
+  } else {
+    label.textContent = 'Complete';
+  }
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  updateDots();
+
+  document.getElementById('q-body').innerHTML = `
+    <div class="tf-label">True or False?</div>
+    <div class="statement-box">${q.statement}</div>
+    <div class="tf-prompt">Is this statement correct?</div>
+    <div class="tf-row">
+      <button class="tf-btn" onclick="handleTF(true)" id="btn-true">
+        <span>✓</span> True
+      </button>
+      <button class="tf-btn" onclick="handleTF(false)" id="btn-false">
+        <span>✗</span> False
+      </button>
+    </div>
+    <div class="feedback" id="feedback-panel"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">
+      ${current < 2 ? 'Next question →' : 'See summary →'}
+    </button>
+  `;
+}
+
+function handleTF(chosen) {
+  const q = questions[current];
+  const isCorrect = (chosen === q.correct);
+  if (isCorrect) score++;
+  results.push({ correct: isCorrect, statement: q.statement });
+
+  // Style buttons
+  const btnTrue  = document.getElementById('btn-true');
+  const btnFalse = document.getElementById('btn-false');
+  btnTrue.disabled  = true;
+  btnFalse.disabled = true;
+
+  const chosenBtn = chosen ? btnTrue : btnFalse;
+  const otherBtn  = chosen ? btnFalse : btnTrue;
+
+  chosenBtn.classList.add(isCorrect ? 'correct-selected' : 'wrong-selected');
+  otherBtn.classList.add('faded');
+
+  // Show feedback
+  const fb = q.feedback[chosen ? 'true' : 'false'];
+  const panel = document.getElementById('feedback-panel');
+  panel.innerHTML = `
+    <div class="feedback-inner ${fb.type}">
+      <div class="feedback-tag">${fb.tag}</div>
+      <div class="feedback-headline">${fb.headline}</div>
+      <div class="feedback-body">${fb.body}</div>
+    </div>
+  `;
+  panel.classList.add('show');
+
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showComplete();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showComplete() {
+  updateDots();
+  document.getElementById('q-body').style.display = 'none';
+  const cs = document.getElementById('complete-screen');
+  cs.classList.add('show');
+
+  // Score pills
+  const pillsHTML = results.map((r, i) => `
+    <span class="score-pill ${r.correct ? 'right' : 'wrong'}">
+      Q${i + 1} ${r.correct ? '✓' : '✗'}
+    </span>
+  `).join('');
+  document.getElementById('score-pills').innerHTML = pillsHTML;
+
+  let icon, headline, body;
+  if (score === 3) {
+    icon = '✅';
+    headline = 'Solid foundations — all three correct.';
+    body = 'You have the core product distinctions. The next section builds on this — what sets Oliver apart from the competition and why it matters.';
+  } else if (score === 2) {
+    icon = '👍';
+    headline = 'Good — two out of three.';
+    body = 'You have most of the foundations. Review the question you answered differently — the explanation shows the exact distinction. Then keep going.';
+  } else if (score === 1) {
+    icon = '🔄';
+    headline = 'One correct — worth a quick review.';
+    body = 'Read back through the feedback for the two questions you answered differently before moving on. The product boundaries are the most important thing to carry forward from this section.';
+  } else {
+    icon = '🔄';
+    headline = 'All three need a second look — that\'s fine.';
+    body = 'This is exactly what this checkpoint is for. Read back through each feedback explanation — they give you the precise distinctions between products. Then keep scrolling.';
+  }
+
+  document.getElementById('complete-icon').textContent = icon;
+  document.getElementById('complete-headline').textContent = headline;
+  document.getElementById('complete-body').textContent = body;
+}
+
+// Init
+renderQuestion();
+</script>
+
+</body>
+</html>
