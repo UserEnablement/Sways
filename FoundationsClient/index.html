@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oliver Foundations — Match the Client</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:           #1A2B3C;
+    --teal:           #028090;
+    --teal-light:     #02C39A;
+    --teal-bg:        #e8f7f5;
+    --text:           #1A2B3C;
+    --muted:          #5a6a7a;
+    --border:         #d0dde6;
+    --white:          #ffffff;
+    --correct-bg:     #0A2E1E;
+    --correct-border: #02C39A;
+    --wrong-bg:       #2A1010;
+    --wrong-border:   #E85D2A;
+    --wrong-accent:   #E85D2A;
+    --bg-page:        #f4f7fa;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-page);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 3rem;
+  }
+
+  .shell {
+    max-width: 700px;
+    width: 100%;
+  }
+
+  /* ── Header ── */
+  .shell-header {
+    background: var(--navy);
+    border-radius: 16px 16px 0 0;
+    padding: 1.5rem 2rem 1.25rem;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--teal-light);
+    color: var(--navy);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    margin-bottom: 0.75rem;
+  }
+
+  .shell-header h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.3;
+    margin-bottom: 0.4rem;
+  }
+
+  .shell-header p {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.68);
+    line-height: 1.5;
+  }
+
+  /* ── Progress bar ── */
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.12);
+    height: 4px;
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--teal-light);
+    transition: width 0.4s ease;
+    border-radius: 0;
+  }
+
+  /* ── Question panel ── */
+  .q-panel {
+    background: var(--white);
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 24px rgba(26,43,60,0.10);
+    overflow: hidden;
+  }
+
+  .q-body {
+    padding: 1.75rem 2rem;
+  }
+
+  /* Scenario block */
+  .scenario-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.6rem;
+  }
+
+  .scenario-box {
+    background: #f0f5f9;
+    border-left: 4px solid var(--teal);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--navy);
+    line-height: 1.6;
+  }
+
+  .scenario-box strong {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+    font-size: 0.9375rem;
+  }
+
+  /* Question */
+  .q-prompt {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 1.1rem;
+  }
+
+  /* Choices */
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .choice-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    background: var(--white);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--teal);
+    background: var(--teal-bg);
+    transform: translateY(-1px);
+  }
+
+  .choice-btn:disabled { cursor: default; }
+
+  .choice-letter {
+    flex-shrink: 0;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: #e8eff5;
+    color: var(--navy);
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .choice-text {
+    font-size: 0.9125rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .choice-sub {
+    font-size: 0.775rem;
+    color: var(--muted);
+    font-weight: 400;
+    margin-top: 0.15rem;
+  }
+
+  /* States */
+  .choice-btn.correct-selected {
+    border-color: var(--teal-light);
+    background: var(--teal-bg);
+  }
+  .choice-btn.correct-selected .choice-letter {
+    background: var(--teal-light);
+    color: var(--navy);
+  }
+
+  .choice-btn.wrong-selected {
+    border-color: var(--wrong-accent);
+    background: #fff5f0;
+  }
+  .choice-btn.wrong-selected .choice-letter {
+    background: var(--wrong-accent);
+    color: var(--white);
+  }
+
+  .choice-btn.faded {
+    opacity: 0.38;
+  }
+
+  /* Feedback */
+  .feedback {
+    display: none;
+    margin-top: 1.1rem;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeUp 0.28s ease;
+  }
+  .feedback.show { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback-inner {
+    padding: 1.1rem 1.4rem;
+    border-radius: 10px;
+    border: 1.5px solid;
+  }
+
+  .feedback-inner.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct-border);
+  }
+
+  .feedback-inner.wrong {
+    background: var(--wrong-bg);
+    border-color: var(--wrong-border);
+  }
+
+  .feedback-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 0.45rem;
+  }
+
+  .correct .feedback-tag { color: var(--teal-light); }
+  .wrong .feedback-tag   { color: var(--wrong-accent); }
+
+  .feedback-headline {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+    line-height: 1.35;
+  }
+
+  .feedback-body {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.6;
+  }
+
+  .feedback-body strong { color: var(--teal-light); }
+  .wrong .feedback-body strong { color: var(--wrong-accent); }
+
+  /* Next button */
+  .next-btn {
+    display: none;
+    margin-top: 1.1rem;
+    width: 100%;
+    background: var(--teal);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 0.85rem 1.25rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    text-align: center;
+  }
+  .next-btn:hover { background: #026e7a; transform: translateY(-1px); }
+  .next-btn.show  { display: block; animation: fadeUp 0.25s ease 0.15s both; }
+
+  /* ── Score / Complete screen ── */
+  .complete-screen {
+    display: none;
+    padding: 2rem 2rem 2.5rem;
+    text-align: center;
+    animation: fadeUp 0.35s ease;
+  }
+
+  .complete-screen.show { display: block; }
+
+  .score-ring {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: var(--teal-bg);
+    border: 4px solid var(--teal-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+  }
+
+  .score-number {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+  }
+
+  .score-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 0.1rem;
+  }
+
+  .complete-headline {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 0.5rem;
+  }
+
+  .complete-body {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 420px;
+    margin: 0 auto 1.5rem;
+  }
+
+  .complete-tip {
+    background: var(--teal-bg);
+    border-left: 4px solid var(--teal-light);
+    border-radius: 0 8px 8px 0;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.85rem;
+    color: var(--navy);
+    text-align: left;
+    line-height: 1.55;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .complete-tip strong { font-weight: 700; }
+
+  /* Footer */
+  .card-footer {
+    padding: 0.85rem 2rem 1.1rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* Q counter */
+  .q-counter {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 520px) {
+    .q-body { padding: 1.25rem 1.1rem; }
+    .shell-header { padding: 1.25rem 1.1rem 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <div class="shell-header">
+    <div class="badge">🎯 Match the Client</div>
+    <h1>Which Oliver product fits?</h1>
+    <p>Three client situations. Read each one carefully — then choose the product that fits best.</p>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+  </div>
+
+  <!-- Question panel -->
+  <div class="q-panel">
+    <div class="q-body" id="q-body">
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- Complete screen (hidden until end) -->
+    <div class="complete-screen" id="complete-screen">
+      <div class="score-ring">
+        <div class="score-number" id="score-display">0/3</div>
+        <div class="score-label">correct</div>
+      </div>
+      <div class="complete-headline" id="complete-headline">Well done.</div>
+      <div class="complete-body" id="complete-body"></div>
+      <div class="complete-tip">
+        <strong>The rule to remember:</strong><br>
+        The question isn't "how many employers?" — it's "what plan types are involved?"<br>
+        Group billing with core & optional benefits → <strong>Admin</strong> (single employer or groups/associations).<br>
+        Hour banks, pension, dollar banks, or multiple fund types in one plan → <strong>MultiPlan</strong>.
+      </div>
+    </div>
+
+    <div class="card-footer">
+      Oliver Enablement Program &nbsp;·&nbsp; Oliver Foundations &nbsp;·&nbsp; 2026
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    id: 1,
+    scenario: {
+      title: "A professional association with 8 member companies",
+      body: "The association offers group benefits to all member companies under one plan. Members need core benefits — life, extended health, dental — plus some optional add-ons employees can choose. They need monthly billing, eligibility tracking, and carrier reconciliation. No pension. No hour banks."
+    },
+    prompt: "Which Oliver product is the right fit?",
+    correct: "A",
+    choices: {
+      A: { text: "Oliver Admin",        sub: "Group billing & benefits — core & optional benefits, single or multi-employer" },
+      B: { text: "Oliver MultiPlan",    sub: "Multiple plan types — hour banks, pension, other funds in one plan" },
+      C: { text: "Ollie",               sub: "Platform-powered admin — outsourced administration" },
+      D: { text: "GH / WEBS",           sub: "Portals & web access — GH clients & members" }
+    },
+    feedback: {
+      A: {
+        type: "correct",
+        tag: "✓ Correct",
+        headline: "Oliver Admin is built for exactly this.",
+        body: "<strong>Admin handles group billing with core and optional benefits</strong> — whether the plan covers one employer or a group of employers like this association. Monthly billing, eligibility, carrier reconciliation, optional benefit elections — all of it lives in Admin. No pension, no hour banks means no reason to go to MultiPlan."
+      },
+      B: {
+        type: "wrong",
+        tag: "✗ Not quite — this is a common mix-up",
+        headline: "MultiPlan is triggered by plan type complexity, not employer count.",
+        body: "<strong>MultiPlan is for plans that combine multiple fund types</strong> — hour banks, dollar banks, pension, and other funds in the same plan. That's the union environment. This association has multiple employers, but the plan is straightforward group billing with core and optional benefits. That's Admin."
+      },
+      C: {
+        type: "wrong",
+        tag: "✗ Not quite",
+        headline: "Ollie adds outsourced operations — that's not what this client needs.",
+        body: "<strong>Ollie combines Oliver's platform with outsourced administration services</strong> — back-office operations, carrier coordination, accounting, full-service support. This association just needs group billing and eligibility managed through the platform. Oliver Admin does that without the full-service layer."
+      },
+      D: {
+        type: "wrong",
+        tag: "✗ Not quite",
+        headline: "GH / WEBS is specific to Group Health clients.",
+        body: "<strong>GH / WEBS is Oliver's portal and web-access layer for Group Health</strong> — an existing family company client with its own member base. It's not the product for a new association client needing group billing. Oliver Admin is the right fit here."
+      }
+    }
+  },
+  {
+    id: 2,
+    scenario: {
+      title: "A construction union trust fund",
+      body: "48 contributing employers. A shared pension plan and an hour-bank health benefit. Contributions vary month to month based on hours worked. The trustees need accurate contribution tracking, pension calculations, and audit-ready reporting."
+    },
+    prompt: "Which Oliver product is the right fit?",
+    correct: "B",
+    choices: {
+      A: { text: "Oliver Admin",        sub: "Group billing & benefits — core & optional benefits, single or multi-employer" },
+      B: { text: "Oliver MultiPlan",    sub: "Multiple plan types — hour banks, pension, other funds in one plan" },
+      C: { text: "Ollie",               sub: "Platform-powered admin — outsourced administration" },
+      D: { text: "GH / WEBS",           sub: "Portals & web access — GH clients & members" }
+    },
+    feedback: {
+      A: {
+        type: "wrong",
+        tag: "✗ Not quite — this is the critical boundary",
+        headline: "Admin handles group billing — but this plan has fund types Admin doesn't cover.",
+        body: "Admin can handle multiple employers in one plan — that's not the issue here. <strong>The issue is the plan type.</strong> Hour banks, pension funds, and dollar banks in the same plan are MultiPlan territory. When you see those fund types combined, that's the signal. Admin is for core and optional group benefits billing."
+      },
+      B: {
+        type: "correct",
+        tag: "✓ Correct — and this is the most important boundary to know",
+        headline: "Oliver MultiPlan is built for exactly this environment.",
+        body: "<strong>Multiple plan types in one plan — hour banks, pension, health and welfare funds</strong> — that's what MultiPlan handles. Same platform architecture as Admin, completely different configuration. When you hear 'hour bank' or 'pension fund' alongside 'union,' think MultiPlan."
+      },
+      C: {
+        type: "wrong",
+        tag: "✗ Not quite",
+        headline: "Ollie is about who does the administration — not the plan type.",
+        body: "<strong>Ollie adds a layer of outsourced operational services</strong> on top of Oliver's platform. The question here is which product handles the plan type — and for a union with hour banks and pension, that's MultiPlan. Ollie could be layered on top if the client also wanted to outsource operations, but it doesn't replace the platform choice."
+      },
+      D: {
+        type: "wrong",
+        tag: "✗ Not quite",
+        headline: "GH / WEBS is specific to Group Health clients.",
+        body: "<strong>GH / WEBS is the portal and web-access layer maintained for Group Health</strong> — it's not the product for a union client needing pension and hour-bank administration. Oliver MultiPlan is the right fit here."
+      }
+    }
+  },
+  {
+    id: 3,
+    scenario: {
+      title: "A regional advisory firm",
+      body: "They manage group benefits for 30 employer clients. They want to keep their client relationships — they'll still talk to employers and members directly. But they want Oliver to handle the back-office: eligibility processing, billing, remittances, carrier coordination, accounting, and reporting. They don't want to build an internal admin team."
+    },
+    prompt: "Which Oliver product is the right fit?",
+    correct: "C",
+    choices: {
+      A: { text: "Oliver Admin",        sub: "Group billing & benefits — core & optional benefits, single or multi-employer" },
+      B: { text: "Oliver MultiPlan",    sub: "Multiple plan types — hour banks, pension, other funds in one plan" },
+      C: { text: "Ollie",               sub: "Platform-powered admin — outsourced administration" },
+      D: { text: "GH / WEBS",           sub: "Portals & web access — GH clients & members" }
+    },
+    feedback: {
+      A: {
+        type: "wrong",
+        tag: "✗ Close — but Admin is the platform, not the service",
+        headline: "Admin gives them the software. It doesn't give them the people.",
+        body: "Oliver Admin is a platform — the advisor's team would still need to run the billing, reconciliation, and carrier files themselves. <strong>This firm wants the operational work taken off their plate entirely.</strong> That's what Ollie does — it combines the platform with outsourced back-office administration."
+      },
+      B: {
+        type: "wrong",
+        tag: "✗ Not quite",
+        headline: "MultiPlan is for multi-employer plan environments — that's a different question.",
+        body: "The 30 employer clients here are separate single-employer groups, not contributors to a shared fund. MultiPlan isn't the fit. <strong>The real need is outsourced administration</strong> — the firm wants Oliver to run the operations behind the scenes while they keep the client relationship. That's Ollie."
+      },
+      C: {
+        type: "correct",
+        tag: "✓ Correct — and this is Ollie's defining use case",
+        headline: "Ollie delivers the platform and the back-office operations.",
+        body: "<strong>Ollie is Oliver's platform-powered administration service</strong> — built for clients who want modern technology and outsourced execution. The advisory firm keeps ownership of the client relationship. Oliver handles eligibility, billing, remittances, carrier coordination, accounting, and reporting behind the scenes. That's exactly what this firm is describing."
+      },
+      D: {
+        type: "wrong",
+        tag: "✗ Not quite",
+        headline: "GH / WEBS is specific to Group Health clients.",
+        body: "<strong>GH / WEBS is the portal and web-access layer for Group Health</strong> — an existing family company, not a new advisory firm client. The right fit here is Ollie, which combines Oliver's platform with outsourced back-office administration."
+      }
+    }
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+function updateProgress() {
+  const pct = (current / questions.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[current];
+  updateProgress();
+
+  const choiceKeys = Object.keys(q.choices);
+  const choicesHTML = choiceKeys.map(k => `
+    <button class="choice-btn" onclick="handleChoice('${k}')" id="btn-${k}">
+      <div class="choice-letter">${k}</div>
+      <div>
+        <div class="choice-text">${q.choices[k].text}</div>
+        <div class="choice-sub">${q.choices[k].sub}</div>
+      </div>
+    </button>
+  `).join('');
+
+  const feedbacksHTML = choiceKeys.map(k => {
+    const fb = q.feedback[k];
+    return `
+      <div class="feedback" id="feedback-${k}">
+        <div class="feedback-inner ${fb.type}">
+          <div class="feedback-tag">${fb.tag}</div>
+          <div class="feedback-headline">${fb.headline}</div>
+          <div class="feedback-body">${fb.body}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('q-body').innerHTML = `
+    <div class="q-counter">Question ${q.id} of ${questions.length}</div>
+    <div class="scenario-label">The client situation</div>
+    <div class="scenario-box">
+      <strong>${q.scenario.title}</strong>
+      ${q.scenario.body}
+    </div>
+    <div class="q-prompt">${q.prompt}</div>
+    <div class="choices" id="choices">${choicesHTML}</div>
+    ${feedbacksHTML}
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">
+      ${current < questions.length - 1 ? 'Next situation →' : 'See your results →'}
+    </button>
+  `;
+}
+
+function handleChoice(chosen) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[current];
+  const isCorrect = chosen === q.correct;
+  if (isCorrect) score++;
+
+  // Style buttons
+  document.querySelectorAll('.choice-btn').forEach(b => {
+    b.disabled = true;
+    const letter = b.querySelector('.choice-letter').textContent.trim();
+    if (letter === chosen) {
+      b.classList.add(isCorrect ? 'correct-selected' : 'wrong-selected');
+    } else {
+      b.classList.add('faded');
+    }
+  });
+
+  // Show feedback
+  document.getElementById('feedback-' + chosen).classList.add('show');
+
+  // Show next button
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showComplete();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showComplete() {
+  document.getElementById('progress-bar').style.width = '100%';
+  document.getElementById('q-body').style.display = 'none';
+  const cs = document.getElementById('complete-screen');
+  cs.classList.add('show');
+
+  document.getElementById('score-display').textContent = score + '/3';
+
+  let headline, body;
+  if (score === 3) {
+    headline = "Excellent — all three correct.";
+    body = "You can already identify which Oliver product fits a client situation. That's the foundation for every conversation you'll have about what we do and who we serve.";
+  } else if (score === 2) {
+    headline = "Good — two out of three.";
+    body = "You have the core boundaries. Review the scenario where you chose differently — the explanation shows you the exact line between those two products.";
+  } else if (score === 1) {
+    headline = "One correct — a good start.";
+    body = "The product boundaries are the most important thing to take away from this section. Read back through the feedback from each question before moving on.";
+  } else {
+    headline = "No correct answers — that's fine.";
+    body = "This is exactly what this activity is for. Read back through each feedback panel carefully — the explanations tell you the exact line between products. You'll use this knowledge throughout Oliver Foundations.";
+  }
+
+  document.getElementById('complete-headline').textContent = headline;
+  document.getElementById('complete-body').textContent = body;
+}
+
+// Init
+renderQuestion();
+</script>
+
+</body>
+</html>
