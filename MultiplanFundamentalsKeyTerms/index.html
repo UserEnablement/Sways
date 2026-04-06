@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oliver Multiplan — Key Terms</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1A2B3C; --teal:#028090; --bteal:#02C39A; --sand:#F5F0E8;
+  --white:#fff; --border:#D4DCE5; --mid:#8B9AAB; --text:#1A2B3C;
+  --correct:#0A2E1E; --clight:#e6f4ee; --wrong:#2A1010; --wlight:#fdf0ed;
+  --orange:#E85D2A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);
+  display:flex;flex-direction:column;height:100vh;}
+
+/* HEADER */
+.hdr{background:var(--navy);border-bottom:3px solid var(--bteal);flex-shrink:0;}
+.hdr-inner{max-width:760px;margin:0 auto;padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.badge{background:var(--teal);color:#fff;font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:3px;}
+.hdr-title{font-family:'DM Serif Display',serif;color:#fff;font-size:16px;}
+.prog-wrap{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.prog-label{font-size:12px;color:rgba(255,255,255,.5);white-space:nowrap;}
+.prog-track{width:100px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--bteal);border-radius:2px;transition:width .4s ease;}
+
+/* SCREEN CONTAINER */
+.screens{flex:1;position:relative;overflow:hidden;}
+.screen{
+  position:absolute;inset:0;overflow-y:auto;
+  display:none;flex-direction:column;
+  padding:0 0 80px;
+}
+.screen.active{display:flex;}
+
+/* INTRO SCREEN */
+.intro-wrap{max-width:680px;margin:48px auto 0;padding:0 24px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:10px;}
+.intro-h{font-family:'DM Serif Display',serif;font-size:36px;line-height:1.15;
+  letter-spacing:-.02em;color:var(--navy);margin-bottom:14px;}
+.intro-body{font-size:16px;color:#3d4f62;line-height:1.7;max-width:520px;margin-bottom:24px;}
+.meta{display:flex;gap:20px;font-size:13px;color:var(--mid);margin-bottom:36px;flex-wrap:wrap;}
+.meta span{display:flex;align-items:center;gap:5px;}
+
+/* TERM LIST on intro */
+.term-list{display:flex;flex-direction:column;gap:10px;max-width:520px;margin-bottom:36px;}
+.tl-row{display:flex;align-items:center;gap:14px;padding:12px 16px;
+  background:#fff;border:1px solid var(--border);border-radius:8px;}
+.tl-num{background:var(--teal);color:#fff;font-size:11px;font-weight:700;
+  padding:3px 8px;border-radius:3px;flex-shrink:0;}
+.tl-name{font-weight:600;font-size:15px;color:var(--navy);}
+
+/* START BTN */
+.btn-start{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;
+  border:none;cursor:pointer;transition:background .2s;
+}
+.btn-start:hover{background:#026d7a;}
+
+/* TERM SCREEN */
+.term-wrap{max-width:680px;margin:0 auto;padding:36px 24px 0;}
+
+.tc-header{
+  background:var(--navy);border-radius:10px 10px 0 0;
+  padding:20px 26px;display:flex;align-items:center;gap:14px;margin-bottom:0;
+}
+.tc-num{background:var(--teal);color:#fff;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;flex-shrink:0;}
+.tc-term{font-family:'DM Serif Display',serif;font-size:24px;color:#fff;letter-spacing:-.01em;}
+
+.tc-body{background:#fff;border:1px solid var(--border);border-top:none;
+  border-radius:0 0 10px 10px;padding:26px;}
+
+.context{font-size:14px;color:#3d4f62;line-height:1.65;background:var(--sand);
+  border-left:4px solid var(--teal);padding:12px 16px;border-radius:0 6px 6px 0;
+  margin-bottom:22px;}
+.context em{font-style:italic;color:var(--navy);}
+
+.q-label{font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px;line-height:1.5;}
+
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;
+  border:2px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;
+  font-family:'DM Sans',sans-serif;transition:border-color .15s,background .15s,transform .12s;
+  text-align:left;width:100%;}
+.opt:hover:not(:disabled){border-color:var(--teal);background:#f0fbfc;transform:translateX(2px);}
+.opt:focus{outline:2px solid var(--teal);outline-offset:2px;}
+.opt-mark{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--mid);flex-shrink:0;transition:all .15s;}
+.opt:hover:not(:disabled) .opt-mark{border-color:var(--teal);color:var(--teal);}
+.opt-text{font-size:15px;color:var(--text);line-height:1.55;padding-top:3px;}
+.opt.is-correct{border-color:var(--bteal);background:var(--clight);pointer-events:none;}
+.opt.is-correct .opt-mark{background:var(--bteal);border-color:var(--bteal);color:#fff;}
+.opt.is-wrong{border-color:var(--orange);background:var(--wlight);pointer-events:none;}
+.opt.is-wrong .opt-mark{background:var(--orange);border-color:var(--orange);color:#fff;}
+.opt.is-dim{opacity:.38;pointer-events:none;}
+
+/* FEEDBACK */
+.feedback{display:none;margin-top:18px;border-radius:8px;overflow:hidden;
+  animation:slideIn .3s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.feedback.show{display:block;}
+.fb-banner{padding:13px 18px;display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.fb-icon{font-size:16px;}
+.feedback.ok .fb-banner{background:var(--correct);color:var(--bteal);}
+.feedback.no .fb-banner{background:var(--wrong);color:var(--orange);}
+.fb-body{padding:18px 18px 20px;background:#f7f9fb;
+  border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;}
+.fb-body p{font-size:15px;line-height:1.7;color:#2d3e50;margin-bottom:10px;}
+.fb-body p:last-child{margin:0;}
+.fb-body strong{color:var(--navy);}
+
+/* CHAIN DIAGRAM */
+.chain{display:flex;align-items:stretch;margin:14px 0 6px;flex-wrap:wrap;gap:0;}
+.chain-step{background:var(--navy);color:#fff;padding:8px 14px;
+  font-size:13px;font-weight:600;line-height:1.3;text-align:center;min-width:90px;}
+.chain-step span{display:block;font-size:10px;font-weight:400;opacity:.65;
+  text-transform:uppercase;letter-spacing:.07em;}
+.chain-step.hl{background:var(--teal);}
+.chain-step:first-child{border-radius:6px 0 0 6px;}
+.chain-step:last-child{border-radius:0 6px 6px 0;}
+.chain-arr{background:var(--teal);color:#fff;padding:8px 10px;
+  display:flex;align-items:center;font-size:15px;}
+.chain-note{font-size:12px;color:var(--mid);margin-bottom:10px;}
+
+/* NEXT BUTTON — fixed bottom */
+.next-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(245,240,232,.95);backdrop-filter:blur(8px);
+  border-top:1px solid var(--border);
+  padding:14px 24px;display:none;
+  justify-content:flex-end;align-items:center;gap:16px;
+  z-index:30;
+}
+.next-bar.show{display:flex;}
+.next-hint{font-size:13px;color:var(--mid);}
+.btn-next{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:600;padding:12px 24px;border-radius:8px;
+  border:none;cursor:pointer;transition:background .2s;
+}
+.btn-next:hover{background:#026d7a;}
+.btn-next.final{background:var(--correct);}
+.btn-next.final:hover{background:#082418;}
+
+/* SUMMARY SCREEN */
+.sum-wrap{max-width:680px;margin:48px auto 0;padding:0 24px 40px;}
+.sum-block{background:var(--navy);border-radius:12px;padding:36px;}
+.sum-eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--bteal);margin-bottom:10px;}
+.sum-h{font-family:'DM Serif Display',serif;font-size:28px;color:#fff;
+  letter-spacing:-.01em;margin-bottom:14px;line-height:1.3;}
+.sum-p{font-size:15px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:24px;max-width:520px;}
+.glossary{display:flex;flex-direction:column;gap:10px;}
+.gl-row{display:flex;gap:14px;padding:13px 16px;
+  background:rgba(255,255,255,.06);border-radius:6px;border-left:3px solid var(--bteal);}
+.gl-term{font-weight:600;font-size:14px;color:var(--bteal);min-width:140px;flex-shrink:0;}
+.gl-def{font-size:14px;color:rgba(255,255,255,.8);line-height:1.55;}
+.sum-close{margin-top:22px;font-size:13px;color:rgba(255,255,255,.4);font-style:italic;}
+
+@media(max-width:580px){
+  .intro-h{font-size:26px;}
+  .tc-term{font-size:19px;}
+  .prog-track{width:64px;}
+  .chain{flex-direction:column;}
+  .chain-step:first-child{border-radius:6px 6px 0 0;}
+  .chain-step:last-child{border-radius:0 0 6px 6px;}
+  .chain-arr{transform:rotate(90deg);align-self:flex-start;margin-left:24px;}
+  .sum-block{padding:24px 18px;}
+  .gl-row{flex-direction:column;gap:4px;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <span class="badge">Oliver Product Fundamentals</span>
+      <span class="hdr-title">Multiplan — Key Terms</span>
+    </div>
+    <div class="prog-wrap">
+      <span class="prog-label" id="progLabel">1 of 5</span>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="screens" id="screens">
+
+  <!-- ═══ INTRO ═══════════════════════════════════════════════════ -->
+  <div class="screen active" id="s0">
+    <div class="intro-wrap">
+      <p class="eyebrow">Industry Knowledge</p>
+      <h1 class="intro-h">Multiplan.<br>Key Terms.</h1>
+      <p class="intro-body">These terms come up in real Multiplan conversations. Read the context for each one, then pick the definition that fits.</p>
+      <div class="meta">
+        <span>⏱ About 3 minutes</span>
+        <span>💬 Explanation after each answer</span>
+              </div>
+      <div class="term-list">
+        <div class="tl-row"><span class="tl-num">1</span><span class="tl-name">Hour Bank</span></div>
+        <div class="tl-row"><span class="tl-num">2</span><span class="tl-name">Eligibility Month</span></div>
+        <div class="tl-row"><span class="tl-num">3</span><span class="tl-name">Dollar Bank</span></div>
+        <div class="tl-row"><span class="tl-num">4</span><span class="tl-name">Reciprocity</span></div>
+        <div class="tl-row"><span class="tl-num">5</span><span class="tl-name">Pension (DB / DC)</span></div>
+      </div>
+      <button class="btn-start" onclick="goTo(1)">Start →</button>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 1 — HOUR BANK ═══════════════════════════════════ -->
+  <div class="screen" id="s1">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 1 of 5</div>
+        <div class="tc-term">Hour Bank</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          A construction union member works <em>200 hours in January</em> — well above her plan's threshold. In February, the sites go quiet and she only works <em>40 hours</em>. Her plan requires 150 hours per month to be eligible.
+        </div>
+        <p class="q-label">She stays covered in March even though February was a short month. Why?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(1,this,false,'w1a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">Group billing covers members continuously — as long as she's enrolled, she stays eligible regardless of hours.</div>
+          </button>
+          <button class="opt" onclick="pick(1,this,true,'c1')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">Her surplus hours from January were banked — she draws on that balance when a month falls short.</div>
+          </button>
+          <button class="opt" onclick="pick(1,this,false,'w1b')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">The plan grants a one-month grace period automatically for members who fall below the threshold.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s1-c1">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — that's what the bank is for</div>
+          <div class="fb-body">
+            <p><strong>Hour Bank eligibility is month-to-month — but balances carry forward.</strong> When a member works more hours than the plan requires, the surplus goes into their bank. When a quiet month comes, they draw on that balance to stay covered.</p>
+            <p>This is the fundamental difference from group billing, where coverage is continuous by enrolment. In Hour Bank plans, <strong>coverage has to be earned each cycle</strong> — the bank just smooths out the gaps. Once the bank is empty, coverage stops unless the member self-pays or a subsidy applies.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s1-w1a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Group billing works differently</div>
+          <div class="fb-body">
+            <p>Group billing is continuous — enrolled means covered, and coverage doesn't depend on hours. <strong>Hour Bank is not continuous.</strong> Eligibility must be earned each month through hours worked. The reason she stays covered after a short month is that <strong>surplus hours from busier months are banked</strong> and drawn on when needed.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s1-w1b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> There's no automatic grace period — there's a bank</div>
+          <div class="fb-body">
+            <p>Hour Bank plans don't grant grace periods. What they do is allow members to <strong>bank surplus hours</strong> from months when they work above the threshold. In January she worked 200 hours against a 150-hour requirement — those 50 surplus hours went into her bank. February's 40 hours weren't enough on their own, but <strong>the banked hours made up the difference.</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 2 — ELIGIBILITY MONTH ══════════════════════════ -->
+  <div class="screen" id="s2">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 2 of 5</div>
+        <div class="tc-term">Eligibility Month</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          Ellie works 160 hours in <em>January</em>. At the end of January, Oliver sends her hours to the insurance company. The insurer processes them during <em>February</em>. Her coverage is confirmed for <em>March</em>.
+        </div>
+        <p class="q-label">In Multiplan, March is called her Eligibility Month. Which definition fits?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(2,this,false,'w2a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">The month a member works their hours — January in this example.</div>
+          </button>
+          <button class="opt" onclick="pick(2,this,false,'w2b')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">The month the employer submits contribution data to the administrator — February in this example.</div>
+          </button>
+          <button class="opt" onclick="pick(2,this,true,'c2')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">The coverage month that results from prior work — typically two months after the hours are worked.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s2-c2">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — and the two-month gap is the part worth remembering</div>
+          <div class="fb-body">
+            <p><strong>Eligibility Month is the coverage month</strong> — the outcome at the end of a three-step chain:</p>
+            <div class="chain">
+              <div class="chain-step"><span>Step 1</span>Work month<br><small>Hours earned</small></div>
+              <div class="chain-arr">→</div>
+              <div class="chain-step"><span>Step 2</span>Process month<br><small>Employer submits</small></div>
+              <div class="chain-arr">→</div>
+              <div class="chain-step hl"><span>Step 3</span>Eligibility month<br><small>Coverage confirmed</small></div>
+            </div>
+            <p class="chain-note">Work in January → submitted in February → eligible for March.</p>
+            <p>This is why a late employer submission doesn't just affect this month — it affects the month after next. And it's why Multiplan tracks three separate dates for every member, every month.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s2-w2a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> That's the work month, not the eligibility month</div>
+          <div class="fb-body">
+            <p><strong>January is the work month</strong> — when hours are earned. The Eligibility Month comes two steps later, after employer submission and insurer processing. Work in January → submitted in February → <strong>eligible in March.</strong> March is the Eligibility Month.</p>
+            <div class="chain">
+              <div class="chain-step"><span>Step 1</span>Work month</div>
+              <div class="chain-arr">→</div>
+              <div class="chain-step"><span>Step 2</span>Process month</div>
+              <div class="chain-arr">→</div>
+              <div class="chain-step hl"><span>Step 3</span>Eligibility month</div>
+            </div>
+          </div>
+        </div>
+        <div class="feedback no" id="s2-w2b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> That's the process month, not the eligibility month</div>
+          <div class="fb-body">
+            <p><strong>February is the process month</strong> — when the employer submits and the insurer processes. The Eligibility Month is one step further: when coverage is actually confirmed. In Sharmila's case, that's <strong>March</strong> — two months after the hours were worked.</p>
+            <div class="chain">
+              <div class="chain-step"><span>Step 1</span>Work month</div>
+              <div class="chain-arr">→</div>
+              <div class="chain-step"><span>Step 2</span>Process month</div>
+              <div class="chain-arr">→</div>
+              <div class="chain-step hl"><span>Step 3</span>Eligibility month</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 3 — DOLLAR BANK ═════════════════════════════════ -->
+  <div class="screen" id="s3">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 3 of 5</div>
+        <div class="tc-term">Dollar Bank</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          Two members, same union, same trust fund. <em>Member A's</em> plan tracks the hours she works each month — work enough hours, stay covered. <em>Member B's</em> plan works differently: his employer pays <em>$2.30 per hour worked</em> into a running balance. When that balance reaches the plan's dollar threshold, he's eligible.
+        </div>
+        <p class="q-label">Member B is on a Dollar Bank plan. What's the key difference from Member A's Hour Bank?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(3,this,false,'w3a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">Dollar Bank is continuous — as long as contributions arrive, Member B stays covered automatically.</div>
+          </button>
+          <button class="opt" onclick="pick(3,this,false,'w3b')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">Dollar Bank members pay a flat monthly premium, like a standard group billing plan.</div>
+          </button>
+          <button class="opt" onclick="pick(3,this,true,'c3')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">The unit tracked is dollars contributed rather than hours worked — same month-to-month eligibility logic, different currency.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s3-c3">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — same engine, different unit</div>
+          <div class="fb-body">
+            <p>Hour Bank and Dollar Bank share exactly the same logic: <strong>eligibility is earned month to month, balances carry forward, and a threshold must be met.</strong> The only difference is what gets counted — hours worked versus dollars contributed (typically hours × an agreed contribution rate).</p>
+            <p>Both plan types can exist within the same union trust fund for different member categories. Multiplan handles both in the same platform, which is part of what makes it suited to complex union environments.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s3-w3a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Dollar Bank is not continuous</div>
+          <div class="fb-body">
+            <p>Continuous eligibility is how <strong>group billing</strong> works — enrolled means covered. Dollar Bank is month-to-month, just like Hour Bank. The employer contributes dollars based on hours worked each period. If those dollars don't meet the plan's threshold, Member B isn't eligible that cycle. <strong>The balance carries forward — but doesn't guarantee coverage.</strong></p>
+          </div>
+        </div>
+        <div class="feedback no" id="s3-w3b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Dollar Bank is not a flat premium</div>
+          <div class="fb-body">
+            <p>A flat monthly premium is group billing — fixed cost, continuous coverage. Dollar Bank contributions vary with hours worked: the employer pays a rate per hour (e.g. $2.30), so a busy month means more dollars in the bank. <strong>It's still month-to-month</strong>, still has a threshold, and still carries forward unused balances — just like Hour Bank, but counted in dollars.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 4 — RECIPROCITY ══════════════════════════════════ -->
+  <div class="screen" id="s4">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 4 of 5</div>
+        <div class="tc-term">Reciprocity</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          An electrical worker belongs to <em>Local 402</em> in Vancouver. This month, her employer sends her to a job site in Calgary — Local <em>687</em> territory. The employer submits all her hours to Local 402, but the work happened under Local 687's jurisdiction.
+        </div>
+        <p class="q-label">What does reciprocity do here?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(4,this,false,'w4a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">It lets the worker choose which local to contribute to each month, based on where she worked.</div>
+          </button>
+          <button class="opt" onclick="pick(4,this,false,'w4b')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">It merges Local 402 and Local 687 into one combined plan for workers who cross regions.</div>
+          </button>
+          <button class="opt" onclick="pick(4,this,true,'c4')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">It automatically transfers the contributions from the collecting local to the correct home local — so nothing is lost.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s4-c4">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — contributions follow the member</div>
+          <div class="fb-body">
+            <p>Reciprocity is an <strong>agreement between union locals</strong> that allows contributions to be transferred between plans when a member works across jurisdictions. Local 402 collects the hours and contributions — then sends the relevant portion to Local 687, where the work actually happened.</p>
+            <p>Without reciprocity, a member could lose contributions made to the wrong plan. <strong>Multiplan processes this automatically</strong> — no manual transfer, no action needed from the member. It's also why a single employer may submit hours to one local on behalf of workers who actually belong to several.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s4-w4a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> The transfer is automatic — the worker doesn't choose</div>
+          <div class="fb-body">
+            <p>Reciprocity is an agreement between locals, not a member-facing choice. <strong>The collecting local receives the contribution and transfers the relevant portion automatically.</strong> The member doesn't need to do anything — and Multiplan handles the processing without manual intervention.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s4-w4b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Reciprocity transfers — it doesn't merge plans</div>
+          <div class="fb-body">
+            <p>Local 402 and Local 687 remain separate plans with their own rules, rates, and eligibility calculations. Reciprocity creates a mechanism for <strong>moving contributions between them</strong> when a member works across locals — not combining the plans into one.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 5 — PENSION DB/DC ════════════════════════════════ -->
+  <div class="screen" id="s5">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 5 of 5</div>
+        <div class="tc-term">Pension (DB / DC)</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          Two union members are approaching retirement. <em>Member A</em> knows exactly what she'll receive — her pension is calculated from her years of service and final salary, set by the employer. <em>Member B</em> isn't sure of the exact amount — it depends on what he and his employers contributed over the years, and how those contributions have grown.
+        </div>
+        <p class="q-label">Member A is on a Defined Benefit plan. Member B is on a Defined Contribution plan. Which statement is accurate?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(5,this,false,'w5a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">DB and DC both depend on how much the member contributes — the difference is just the contribution rate.</div>
+          </button>
+          <button class="opt" onclick="pick(5,this,false,'w5b')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">DC gives members a guaranteed payout at retirement; DB accumulates a pot whose final value is unknown.</div>
+          </button>
+          <button class="opt" onclick="pick(5,this,true,'c5')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">DB defines the retirement benefit upfront — calculated from service and salary. DC accumulates contributions toward a retirement pot whose final value depends on what went in.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s5-c5">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — the difference is where the certainty sits</div>
+          <div class="fb-body">
+            <p><strong>Defined Benefit (DB):</strong> the retirement payout is defined in advance — typically based on years of service and final salary. The employer bears the investment risk. Member A knows what she'll get.</p>
+            <p><strong>Defined Contribution (DC):</strong> the contribution going in is defined — but the final retirement amount depends on what was contributed and how it performed. Member B accumulated a pot; the value at retirement is the outcome.</p>
+            <p>Both types are tracked in Multiplan, often for the same union members. A retroactive rate change on a DB plan can require recalculating contributions going back decades — which is exactly why Multiplan stores and processes historical data from the 1960s and 70s.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s5-w5a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> The distinction isn't the contribution rate</div>
+          <div class="fb-body">
+            <p>The difference between DB and DC is about <strong>where certainty sits</strong> — not the rate. In a <strong>DB</strong> plan, the retirement payout is defined in advance (from service and salary). In a <strong>DC</strong> plan, the contribution going in is defined — but the final retirement value depends on what accumulated over time. Member A knows what she'll receive; Member B knows what went in, not what will come out.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s5-w5b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Those descriptions are reversed</div>
+          <div class="fb-body">
+            <p>It's the other way around. <strong>DB (Defined Benefit)</strong> gives a guaranteed payout — Member A knows her retirement income because it's calculated from service and salary. <strong>DC (Defined Contribution)</strong> accumulates a pot from contributions — Member B doesn't know the final amount until retirement, because it depends on what went in and when.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SUMMARY ══════════════════════════════════════════════ -->
+  <div class="screen" id="s6">
+    <div class="sum-wrap">
+      <div class="sum-block">
+        <p class="sum-eye">All five terms done</p>
+        <h2 class="sum-h">You're ready for the feature activity.</h2>
+        <p class="sum-p">These terms will come up again — in the Match Activity next, and in real Multiplan conversations. Here's the quick version to carry with you.</p>
+        <div class="glossary">
+          <div class="gl-row">
+            <div class="gl-term">Hour Bank</div>
+            <div class="gl-def">Month-to-month eligibility earned through hours worked. Surplus hours bank for future coverage. Not continuous — not group billing.</div>
+          </div>
+          <div class="gl-row">
+            <div class="gl-term">Eligibility Month</div>
+            <div class="gl-def">The coverage month — typically two months after the hours are worked. Work → submit → eligible.</div>
+          </div>
+          <div class="gl-row">
+            <div class="gl-term">Dollar Bank</div>
+            <div class="gl-def">Same logic as Hour Bank. Unit tracked is dollars contributed, not hours worked.</div>
+          </div>
+          <div class="gl-row">
+            <div class="gl-term">Reciprocity</div>
+            <div class="gl-def">Contributions follow the member between union locals. Automatic in Multiplan. Nothing is lost when a member works across jurisdictions.</div>
+          </div>
+          <div class="gl-row">
+            <div class="gl-term">Pension (DB / DC)</div>
+            <div class="gl-def">DB: retirement benefit defined upfront from service and salary. DC: contributions defined; final value accumulates over time.</div>
+          </div>
+        </div>
+        <p class="sum-close">Close this tab and return to the Sway lesson to continue →</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /screens -->
+
+<!-- NEXT BAR -->
+<div class="next-bar" id="nextBar">
+  <span class="next-hint" id="nextHint"></span>
+  <button class="btn-next" id="nextBtn" onclick="advance()">Continue →</button>
+</div>
+
+<script>
+const TOTAL = 5;
+let current = 0;           // 0 = intro, 1-5 = terms, 6 = summary
+const answered = {};       // term index → true/false
+
+function goTo(n) {
+  document.getElementById(`s${current}`).classList.remove('active');
+  current = n;
+  document.getElementById(`s${current}`).classList.add('active');
+  window.scrollTo(0,0);
+  updateProgress();
+  updateNextBar();
+  // scroll screen to top
+  document.getElementById(`s${current}`).scrollTop = 0;
+}
+
+function advance() {
+  if (current < 6) goTo(current + 1);
+}
+
+function pick(termIdx, btn, isCorrect, fbId) {
+  if (answered[termIdx]) return;
+  answered[termIdx] = true;
+
+  const screen = document.getElementById(`s${termIdx}`);
+  screen.querySelectorAll('.opt').forEach(o => {
+    if (o === btn) {
+      o.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
+      o.querySelector('.opt-mark').textContent = isCorrect ? '✓' : '✗';
+    } else {
+      o.classList.add('is-dim');
+    }
+    o.disabled = true;
+  });
+
+  const fb = document.getElementById(`s${termIdx}-${fbId}`);
+  fb.classList.add('show', isCorrect ? 'ok' : 'no');
+  setTimeout(() => fb.scrollIntoView({ behavior:'smooth', block:'nearest' }), 60);
+
+  updateNextBar();
+}
+
+function updateProgress() {
+  const pct = current === 0 ? 0 : current === 6 ? 100 : ((current - 1) / TOTAL) * 100;
+  document.getElementById('progFill').style.width = pct + '%';
+  if (current === 0) {
+    document.getElementById('progLabel').textContent = '1 of 5';
+  } else if (current <= 5) {
+    document.getElementById('progLabel').textContent = `${current} of ${TOTAL}`;
+  } else {
+    document.getElementById('progLabel').textContent = 'Complete';
+  }
+}
+
+function updateNextBar() {
+  const bar = document.getElementById('nextBar');
+  const btn = document.getElementById('nextBtn');
+  const hint = document.getElementById('nextHint');
+
+  if (current === 0 || current === 6) {
+    bar.classList.remove('show');
+    return;
+  }
+
+  // show bar only after answering
+  if (!answered[current]) {
+    bar.classList.remove('show');
+    return;
+  }
+
+  bar.classList.add('show');
+
+  if (current < 5) {
+    hint.textContent = `Term ${current} done`;
+    btn.textContent = `Next term →`;
+    btn.className = 'btn-next';
+  } else {
+    hint.textContent = 'All five terms done';
+    btn.textContent = 'See summary →';
+    btn.className = 'btn-next final';
+  }
+}
+
+// init
+updateProgress();
+</script>
+</body>
+</html>
