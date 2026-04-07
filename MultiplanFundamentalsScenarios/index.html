@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oliver Multiplan — Apply What You Know</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1A2B3C;
+    --teal: #028090;
+    --bright-teal: #02C39A;
+    --correct: #0A2E1E;
+    --correct-light: #e6f4ee;
+    --wrong: #2A1010;
+    --wrong-light: #fdf0ed;
+    --orange: #E85D2A;
+    --sand: #F5F0E8;
+    --mid: #8B9AAB;
+    --white: #FFFFFF;
+    --text: #1A2B3C;
+    --border: #D4DCE5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--bright-teal);
+  }
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-badge {
+    background: var(--teal);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+  .header-title {
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── PROGRESS PIPS ── */
+  .progress-track { display: flex; align-items: center; gap: 8px; }
+  .progress-pip {
+    width: 28px; height: 5px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.2);
+    transition: background 0.4s ease;
+  }
+  .progress-pip.active { background: var(--bright-teal); }
+  .progress-pip.done   { background: rgba(2,195,154,0.5); }
+
+  /* ── MAIN ── */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── INTRO ── */
+  .intro-block { margin-bottom: 48px; }
+  .intro-block.hidden { display: none; }
+
+  .intro-eyebrow {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 12px;
+  }
+  .intro-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: 38px; line-height: 1.15;
+    color: var(--navy); margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .intro-body {
+    font-size: 17px; color: #3d4f62;
+    max-width: 620px; line-height: 1.7;
+  }
+  .intro-meta {
+    margin-top: 20px;
+    display: flex; gap: 24px;
+    font-size: 13px; color: var(--mid);
+    flex-wrap: wrap;
+  }
+  .intro-meta span { display: flex; align-items: center; gap: 6px; }
+
+  .start-btn {
+    margin-top: 28px;
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--teal); color: white;
+    border: none; border-radius: 8px;
+    padding: 14px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    letter-spacing: 0.01em;
+  }
+  .start-btn:hover { background: #026e7a; transform: translateY(-2px); }
+
+  /* ── STEP LABEL ── */
+  .step-label {
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 16px;
+    display: none;
+  }
+  .step-label.visible { display: block; }
+
+  /* ── SCENARIO CARD ── */
+  .scenario {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 12px rgba(26,43,60,0.06);
+    display: none;
+  }
+  .scenario.active {
+    display: block;
+    animation: slideIn 0.45s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .scenario-header {
+    background: var(--navy);
+    padding: 20px 28px;
+    display: flex; align-items: flex-start; gap: 16px;
+  }
+  .scenario-num {
+    background: var(--teal); color: white;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 3px;
+    white-space: nowrap; margin-top: 2px; flex-shrink: 0;
+  }
+  .scenario-context-label {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--bright-teal); margin-bottom: 8px;
+  }
+  .scenario-situation {
+    font-size: 16px; color: rgba(255,255,255,0.92);
+    line-height: 1.65; font-style: italic;
+  }
+  .scenario-situation strong {
+    color: white; font-style: normal; font-weight: 600;
+  }
+
+  .scenario-body { padding: 28px; }
+
+  .scenario-question {
+    font-size: 17px; font-weight: 600;
+    color: var(--navy); margin-bottom: 20px; line-height: 1.5;
+  }
+
+  /* ── CHOICES ── */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 18px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+    text-align: left; width: 100%;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .choice:hover:not(:disabled) {
+    border-color: var(--teal);
+    background: #f0fbfc;
+    transform: translateX(2px);
+  }
+  .choice:focus { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+  .choice-marker {
+    width: 28px; height: 28px;
+    border-radius: 50%; border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--mid);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+  .choice:hover:not(:disabled) .choice-marker {
+    border-color: var(--teal); color: var(--teal);
+  }
+
+  .choice-text { font-size: 15px; color: var(--text); line-height: 1.55; padding-top: 4px; }
+  .choice-text .choice-label { font-weight: 600; display: block; margin-bottom: 2px; }
+  .choice-text .choice-sub   { font-size: 13px; color: var(--mid); }
+
+  .choice.correct {
+    border-color: var(--bright-teal); background: var(--correct-light);
+    pointer-events: none;
+  }
+  .choice.correct .choice-marker {
+    background: var(--bright-teal); border-color: var(--bright-teal); color: white;
+  }
+  .choice.wrong-selected {
+    border-color: var(--orange); background: var(--wrong-light);
+    pointer-events: none;
+  }
+  .choice.wrong-selected .choice-marker {
+    background: var(--orange); border-color: var(--orange); color: white;
+  }
+  .choice.wrong-dim { opacity: 0.45; pointer-events: none; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    display: none; margin-top: 20px;
+    border-radius: 8px; overflow: hidden;
+    animation: slideDown 0.35s ease;
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .feedback.show { display: block; }
+
+  .feedback-banner {
+    padding: 14px 20px; font-size: 14px; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .feedback.is-correct .feedback-banner { background: var(--correct); color: var(--bright-teal); }
+  .feedback.is-wrong   .feedback-banner { background: var(--wrong);   color: var(--orange); }
+  .feedback-icon { font-size: 18px; line-height: 1; }
+
+  .feedback-body {
+    padding: 20px 20px 24px;
+    background: #f7f9fb;
+    border: 1px solid var(--border); border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+  .feedback-body p { font-size: 15px; line-height: 1.7; color: #2d3e50; margin-bottom: 12px; }
+  .feedback-body p:last-child { margin-bottom: 0; }
+  .feedback-body strong { color: var(--navy); }
+
+  .why-it-matters {
+    margin-top: 16px; padding: 14px 16px;
+    background: white;
+    border-left: 4px solid var(--teal);
+    border-radius: 0 6px 6px 0;
+  }
+  .why-it-matters .wim-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--teal); margin-bottom: 6px;
+  }
+  .why-it-matters p { font-size: 14px; color: #3d4f62; margin: 0 !important; }
+
+  /* ── NEXT BUTTON ── */
+  .next-wrap {
+    display: none; margin-top: 28px; justify-content: flex-end;
+  }
+  .next-wrap.show {
+    display: flex;
+    animation: fadeUp 0.3s ease 0.2s both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .next-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--navy); color: white;
+    border: none; border-radius: 8px;
+    padding: 14px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .next-btn:hover { background: #0e1f2e; transform: translateY(-2px); }
+  .next-btn .arrow { font-size: 18px; }
+
+  /* ── SUMMARY ── */
+  .summary {
+    display: none;
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 40px;
+    color: white;
+  }
+  .summary.show {
+    display: block;
+    animation: slideIn 0.45s cubic-bezier(0.22,1,0.36,1);
+  }
+  .summary-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--bright-teal); margin-bottom: 12px;
+  }
+  .summary h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; margin-bottom: 20px;
+    letter-spacing: -0.01em; line-height: 1.3;
+  }
+
+  .score-row { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+  .score-pill {
+    padding: 6px 16px; border-radius: 999px;
+    font-size: 13px; font-weight: 700; border: 1.5px solid;
+  }
+  .score-pill.right  { background: rgba(2,195,154,0.15); border-color: var(--bright-teal); color: var(--bright-teal); }
+  .score-pill.wrong  { background: rgba(232,93,42,0.15);  border-color: var(--orange);      color: var(--orange); }
+
+  .summary p {
+    font-size: 16px; color: rgba(255,255,255,0.8);
+    line-height: 1.7; margin-bottom: 12px; max-width: 600px;
+  }
+  .summary p:last-child { margin-bottom: 0; }
+
+  .summary-rule {
+    margin-top: 28px; padding: 20px 22px;
+    background: rgba(2,195,154,0.12);
+    border: 1px solid rgba(2,195,154,0.3);
+    border-radius: 8px;
+    font-size: 15px; color: rgba(255,255,255,0.9); line-height: 1.65;
+  }
+  .summary-rule strong { color: var(--bright-teal); }
+  .summary-close {
+    margin-top: 28px; font-size: 14px;
+    color: rgba(255,255,255,0.5); font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .intro-heading { font-size: 28px; }
+    .scenario-header { padding: 16px 18px; }
+    .scenario-body { padding: 20px 18px; }
+    .summary { padding: 28px 20px; }
+    .header-inner { padding: 14px 16px; }
+    .progress-track { display: none; }
+    .intro-meta { gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <span class="header-badge">Oliver Product Fundamentals</span>
+      <span class="header-title">Multiplan Administration</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-pip" id="pip1"></div>
+      <div class="progress-pip" id="pip2"></div>
+      <div class="progress-pip" id="pip3"></div>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- ══ INTRO ══ -->
+  <div class="intro-block" id="introBlock">
+    <p class="intro-eyebrow">Apply What You Know</p>
+    <h1 class="intro-heading">Three situations.<br>You decide.</h1>
+    <p class="intro-body">These aren't recognition questions — there's no feature list to match against. Each scenario asks you to reason through a real situation and make a call. Read carefully. The nuance is intentional.</p>
+    <div class="intro-meta">
+      <span>⏱ About 5 minutes</span>
+      <span>💬 Explanations after each answer</span>
+      <span>✓ No score — just the thinking</span>
+    </div>
+    <button class="start-btn" onclick="startActivity()">Start — Scenario 1 of 3 <span>→</span></button>
+  </div>
+
+  <!-- step counter above card -->
+  <div class="step-label" id="stepLabel"></div>
+
+  <!-- ══════════════════════
+       SCENARIO 1
+  ══════════════════════ -->
+  <div class="scenario" id="s1">
+    <div class="scenario-header">
+      <div class="scenario-num">Scenario 1 of 3</div>
+      <div>
+        <div class="scenario-context-label">New client conversation</div>
+        <p class="scenario-situation">
+          A prospect gets in touch. They manage benefits for <strong>22 employers</strong> — a mix of retail and hospitality businesses. All 22 use straightforward group billing: core benefits, some optional dental and vision add-ons, monthly invoicing. <strong>No pension. No hour bank. No union involvement.</strong> They want a single platform to manage all of them.
+        </p>
+      </div>
+    </div>
+    <div class="scenario-body">
+      <p class="scenario-question">Which product do you recommend — and what's the reasoning that gets you there?</p>
+      <div class="choices" role="group" aria-label="Scenario 1 choices">
+        <button class="choice" onclick="handleChoice('s1', this, false, 's1-wrong1')">
+          <div class="choice-marker">A</div>
+          <div class="choice-text">
+            <span class="choice-label">Oliver Multiplan Administration</span>
+            <span class="choice-sub">22 employers contributing to one platform sounds like a multi-employer environment</span>
+          </div>
+        </button>
+        <button class="choice" onclick="handleChoice('s1', this, true, 's1-correct1')">
+          <div class="choice-marker">B</div>
+          <div class="choice-text">
+            <span class="choice-label">Oliver Admin (Group Benefit)</span>
+            <span class="choice-sub">Group billing with core and optional benefits — single employer or groups and associations</span>
+          </div>
+        </button>
+        <button class="choice" onclick="handleChoice('s1', this, false, 's1-wrong2')">
+          <div class="choice-marker">C</div>
+          <div class="choice-text">
+            <span class="choice-label">Either could work — depends on membership volume</span>
+            <span class="choice-sub">More employers means more complexity, so Multiplan might be safer</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="feedback" id="s1-correct1">
+        <div class="feedback-banner"><span class="feedback-icon">✓</span> Correct — and the reasoning is what matters here</div>
+        <div class="feedback-body">
+          <p><strong>Oliver Admin is right.</strong> The trigger for Multiplan is never employer count — it's <em>plan type complexity</em>. This prospect has 22 employers, but all 22 are using straightforward group billing with core and optional benefits. That's exactly what Oliver Admin is built for.</p>
+          <p>Multiplan exists for clients that have <em>multiple plan types in the same plan</em> — pension, hour-bank or dollar-bank eligibility, other funds. None of those are present here.</p>
+          <div class="why-it-matters">
+            <div class="wim-label">Why this matters in scoping</div>
+            <p>Putting this client in Multiplan would bring them all the complexity of union trust fund administration they don't need. The scoping error runs the other way too — a union trust fund with 22 contributing employers belongs in Multiplan, not Admin. The question is always: what plan types does the client need?</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback" id="s1-wrong1">
+        <div class="feedback-banner"><span class="feedback-icon">✗</span> Not quite — the employer count is a red herring</div>
+        <div class="feedback-body">
+          <p><strong>The correct answer is Oliver Admin.</strong> Having 22 employers doesn't make a client a Multiplan candidate. The trigger for Multiplan is <em>plan type complexity</em> — clients who need multiple plan types in the same plan: pension, hour-bank or dollar-bank eligibility, union funds.</p>
+          <p>This prospect uses straightforward group billing with core and optional benefits across all 22 employers. That's an Admin environment, whether it's 1 employer or 100.</p>
+          <div class="why-it-matters">
+            <div class="wim-label">The rule to remember</div>
+            <p>Oliver Admin handles group billing with core and optional benefits — for a single employer <em>or</em> groups and associations with multiple employers. The question is never how many employers. It's always what plan types they need.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback" id="s1-wrong2">
+        <div class="feedback-banner"><span class="feedback-icon">✗</span> Volume doesn't drive the product decision</div>
+        <div class="feedback-body">
+          <p><strong>The correct answer is Oliver Admin.</strong> Membership volume and employer count don't determine the product. The deciding factor is <em>plan type</em>: does the client need pension administration, hour-bank or dollar-bank eligibility, or union trust fund management? If none of those apply, this is an Admin environment regardless of scale.</p>
+          <div class="why-it-matters">
+            <div class="wim-label">The rule to remember</div>
+            <p>Group billing with core and optional benefits → Oliver Admin. Multiple plan types together (pension, hour bank, dollar bank) → Oliver Multiplan. Scale is irrelevant to this decision.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-wrap" id="next-s1">
+        <button class="next-btn" onclick="showScenario(2)">Next — Scenario 2 of 3 <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════
+       SCENARIO 2
+  ══════════════════════ -->
+  <div class="scenario" id="s2">
+    <div class="scenario-header">
+      <div class="scenario-num">Scenario 2 of 3</div>
+      <div>
+        <div class="scenario-context-label">Support call — existing Multiplan client</div>
+        <p class="scenario-situation">
+          A member services administrator calls. One of their members — a construction worker — had a quiet month in February. <strong>His hours fell below the plan's threshold.</strong> He's expecting to be covered in April but the report shows him as not eligible. The administrator wants to know: <strong>can he stay covered?</strong> He's willing to pay himself. The plan also has a hardship provision.
+        </p>
+      </div>
+    </div>
+    <div class="scenario-body">
+      <p class="scenario-question">What's the right response — and which part of Multiplan is relevant here?</p>
+      <div class="choices" role="group" aria-label="Scenario 2 choices">
+        <button class="choice" onclick="handleChoice('s2', this, false, 's2-wrong1')">
+          <div class="choice-marker">A</div>
+          <div class="choice-text">
+            <span class="choice-label">No — his eligibility lapsed because he didn't work enough hours. Nothing can be done until next month.</span>
+            <span class="choice-sub">Hour-bank eligibility is the system of record; it's not overridable</span>
+          </div>
+        </button>
+        <button class="choice" onclick="handleChoice('s2', this, false, 's2-wrong2')">
+          <div class="choice-marker">B</div>
+          <div class="choice-text">
+            <span class="choice-label">Yes — his previously banked hours will carry forward and cover him automatically</span>
+            <span class="choice-sub">Hour banks accumulate over time and cover gaps without any action needed</span>
+          </div>
+        </button>
+        <button class="choice" onclick="handleChoice('s2', this, true, 's2-correct1')">
+          <div class="choice-marker">C</div>
+          <div class="choice-text">
+            <span class="choice-label">Possibly yes — self-pay lets him maintain coverage himself, and the hardship provision may apply too</span>
+            <span class="choice-sub">Two Multiplan features are relevant: self-pay and subsidy management</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="feedback" id="s2-correct1">
+        <div class="feedback-banner"><span class="feedback-icon">✓</span> Correct — two features, not one</div>
+        <div class="feedback-body">
+          <p><strong>Self-pay and subsidy management</strong> are both relevant here. Self-pay allows a member whose hour bank has run dry to pay the premium themselves and maintain eligibility. Whether that's available depends on the plan rules.</p>
+          <p>The hardship provision is the subsidy function: if the member can't cover the full amount themselves, the plan can apply a subsidy to make up the shortfall. Plan-dependent — but this is exactly the feature that exists for situations like this.</p>
+          <div class="why-it-matters">
+            <div class="wim-label">Why this matters in support</div>
+            <p>Knowing these two features exist — and that they're separate from hour-bank eligibility — means you can give a useful first response on a call like this, rather than saying "I'll need to check."</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback" id="s2-wrong1">
+        <div class="feedback-banner"><span class="feedback-icon">✗</span> There's more available than this</div>
+        <div class="feedback-body">
+          <p><strong>The correct answer is C.</strong> Hour-bank eligibility determines coverage based on hours worked — but when a member's bank runs dry, that's not necessarily the end. Oliver Multiplan has two features specifically designed for this situation.</p>
+          <p><strong>Self-pay</strong> lets a member maintain eligibility by paying the premium themselves. <strong>Subsidy management</strong> allows the plan to cover any shortfall — relevant here because the plan has a hardship provision.</p>
+          <div class="why-it-matters">
+            <div class="wim-label">The distinction to hold onto</div>
+            <p>Hour-bank eligibility is the standard route to coverage. Self-pay and subsidy management are what Multiplan offers when that standard route is unavailable. They're sequential, not the same thing.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback" id="s2-wrong2">
+        <div class="feedback-banner"><span class="feedback-icon">✗</span> Carry-forward works differently to this</div>
+        <div class="feedback-body">
+          <p><strong>The correct answer is C.</strong> Hour banks do carry forward — surplus hours from good months go into the bank for future eligibility. But in this scenario, the member's bank has already run dry. There are no banked hours left to draw on. Carry-forward doesn't generate coverage from nothing.</p>
+          <p>What's available when the bank is empty is <strong>self-pay</strong> and <strong>subsidy management</strong>. Both are part of Multiplan — and both are relevant here.</p>
+          <div class="why-it-matters">
+            <div class="wim-label">The distinction to hold onto</div>
+            <p>Carry-forward is how banked hours accumulate over good months. Self-pay and subsidy management are what happens when the bank is exhausted. Different mechanisms, different moments.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-wrap" id="next-s2">
+        <button class="next-btn" onclick="showScenario(3)">Next — Scenario 3 of 3 <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════
+       SCENARIO 3
+  ══════════════════════ -->
+  <div class="scenario" id="s3">
+    <div class="scenario-header">
+      <div class="scenario-num">Scenario 3 of 3</div>
+      <div>
+        <div class="scenario-context-label">Internal conversation — new colleague</div>
+        <p class="scenario-situation">
+          A new joiner asks you: <em>"I get that Multiplan is complex — but why do clients <strong>stay</strong>? Couldn't they move to a competitor if they were unhappy?"</em> You want to give them an honest, useful answer — not just a sales line.
+        </p>
+      </div>
+    </div>
+    <div class="scenario-body">
+      <p class="scenario-question">Which answer is most accurate — and most useful for a new joiner to understand?</p>
+      <div class="choices" role="group" aria-label="Scenario 3 choices">
+        <button class="choice" onclick="handleChoice('s3', this, false, 's3-wrong1')">
+          <div class="choice-marker">A</div>
+          <div class="choice-text">
+            <span class="choice-label">Clients stay because Multiplan is the best product on the market — competitors can't match its features</span>
+            <span class="choice-sub">Superior functionality creates loyalty</span>
+          </div>
+        </button>
+        <button class="choice" onclick="handleChoice('s3', this, true, 's3-correct1')">
+          <div class="choice-marker">B</div>
+          <div class="choice-text">
+            <span class="choice-label">Clients stay because switching would mean moving decades of pension and contribution data — and almost none do</span>
+            <span class="choice-sub">Data depth and embedded operations create structural stickiness, not just satisfaction</span>
+          </div>
+        </button>
+        <button class="choice" onclick="handleChoice('s3', this, false, 's3-wrong2')">
+          <div class="choice-marker">C</div>
+          <div class="choice-text">
+            <span class="choice-label">Clients stay because of long-term SaaS contracts with high exit fees</span>
+            <span class="choice-sub">Contract terms lock clients in place regardless of satisfaction</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="feedback" id="s3-correct1">
+        <div class="feedback-banner"><span class="feedback-icon">✓</span> Correct — and this is worth understanding deeply</div>
+        <div class="feedback-body">
+          <p><strong>Data depth is the real answer.</strong> A union trust fund on Multiplan for 20 years has 20 years of pension contribution history, eligibility records, retroactive calculations, and audit trails inside the platform. Moving that data to a competitor — accurately, traceably, legally — is an enormous undertaking. Most clients conclude it's not worth it.</p>
+          <p>This is what's meant when Multiplan is described as Oliver's "deepest competitive moat." It's not primarily about features. It's about the accumulation of irreplaceable, hard-to-migrate data over decades of use.</p>
+          <div class="why-it-matters">
+            <div class="wim-label">The revenue connection</div>
+            <p>Clients don't just stay because they're happy — they stay because leaving is structurally difficult. That creates predictable, durable recurring revenue for Oliver. Every implementation done well today compounds in value over years, not just months.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback" id="s3-wrong1">
+        <div class="feedback-banner"><span class="feedback-icon">✗</span> Feature quality is part of the story, but not the core one</div>
+        <div class="feedback-body">
+          <p><strong>The correct answer is B.</strong> Multiplan does handle things that competitors rarely match. But the primary reason clients stay isn't feature comparison — it's <em>switching cost</em>.</p>
+          <p>A client with 30 years of pension contribution history faces an enormous task if they want to move: migrating decades of legally accountable data, accurately, to a new system. Most decide that's not worth attempting — regardless of what a competitor offers.</p>
+          <div class="why-it-matters">
+            <div class="wim-label">Why this framing matters</div>
+            <p>Understanding retention as a product of data depth means you understand why Multiplan implementations need to be done well. Every year a client stays, the switching cost grows. Getting it right at implementation creates compounding loyalty.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback" id="s3-wrong2">
+        <div class="feedback-banner"><span class="feedback-icon">✗</span> Contracts matter, but they're not the real answer</div>
+        <div class="feedback-body">
+          <p><strong>The correct answer is B.</strong> Contract terms shape pricing and commitment — but contract length isn't what keeps Multiplan clients in place. Data is.</p>
+          <p>A union trust fund with decades of pension history, eligibility records, and audit trails faces a structural challenge in moving: that data has to go somewhere, and migrating it accurately is genuinely difficult. That stickiness is far more durable than any contractual term.</p>
+          <div class="why-it-matters">
+            <div class="wim-label">The honest version</div>
+            <p>Clients stay because switching means taking on a high-risk, high-cost data migration for no guaranteed improvement. The SaaS model means Oliver earns recurring revenue as long as that data lives in the platform — which is usually a very long time.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-wrap" id="next-s3">
+        <button class="next-btn" onclick="showSummary()">See results <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ SUMMARY ══ -->
+  <div class="summary" id="summary">
+    <p class="summary-eyebrow">All three done</p>
+    <h2 id="summaryHeadline">You've reasoned through it — not just recognised it.</h2>
+    <div class="score-row" id="scoreRow"></div>
+    <p>The three situations here covered the decisions that come up most in real Oliver work: routing a client to the right product, understanding what Multiplan offers beyond basic eligibility, and explaining the business case to a new colleague.</p>
+    <p>The knowledge check below tests recall. This was about application — and that's the harder, more useful kind.</p>
+    <div class="summary-rule">
+      <strong>The rule that ties all three together:</strong> The trigger for Multiplan is never employer count — it's <strong>plan type</strong>. And client retention isn't primarily about satisfaction — it's about <strong>data depth that makes switching structurally difficult</strong>. Both of those are things you can explain to anyone at Oliver now.
+    </div>
+    <p class="summary-close">Close this tab and return to the Sway lesson for the knowledge check →</p>
+  </div>
+
+</main>
+
+<script>
+  const state = {
+    current: 0,
+    results: {}
+  };
+
+  function startActivity() {
+    document.getElementById('introBlock').classList.add('hidden');
+    showScenario(1);
+  }
+
+  function showScenario(n) {
+    [1,2,3].forEach(i => document.getElementById('s'+i).classList.remove('active'));
+    document.getElementById('summary').classList.remove('show');
+
+    state.current = n;
+    updatePips();
+
+    const stepLabel = document.getElementById('stepLabel');
+    stepLabel.textContent = 'Scenario ' + n + ' of 3';
+    stepLabel.classList.add('visible');
+
+    document.getElementById('s'+n).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleChoice(scenarioId, btn, isCorrect, feedbackId) {
+    if (state.results.hasOwnProperty(scenarioId)) return;
+    state.results[scenarioId] = isCorrect;
+
+    const scenario = document.getElementById(scenarioId);
+    scenario.querySelectorAll('.choice').forEach(c => {
+      if (c === btn) {
+        c.classList.add(isCorrect ? 'correct' : 'wrong-selected');
+        c.querySelector('.choice-marker').textContent = isCorrect ? '✓' : '✗';
+      } else {
+        c.classList.add('wrong-dim');
+      }
+      c.disabled = true;
+    });
+
+    const fb = document.getElementById(feedbackId);
+    fb.classList.add('show', isCorrect ? 'is-correct' : 'is-wrong');
+    fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    document.getElementById('next-' + scenarioId).classList.add('show');
+  }
+
+  function updatePips() {
+    for (let i = 1; i <= 3; i++) {
+      const pip = document.getElementById('pip' + i);
+      if      (i < state.current)  pip.className = 'progress-pip done';
+      else if (i === state.current) pip.className = 'progress-pip active';
+      else                          pip.className = 'progress-pip';
+    }
+  }
+
+  function showSummary() {
+    [1,2,3].forEach(i => document.getElementById('s'+i).classList.remove('active'));
+
+    document.getElementById('stepLabel').textContent = 'Complete';
+    [1,2,3].forEach(i => document.getElementById('pip'+i).className = 'progress-pip done');
+
+    const scoreRow = document.getElementById('scoreRow');
+    const labels = { s1: 'Scenario 1', s2: 'Scenario 2', s3: 'Scenario 3' };
+    let correct = 0;
+    scoreRow.innerHTML = '';
+
+    ['s1','s2','s3'].forEach(key => {
+      const res = state.results[key];
+      if (res) correct++;
+      const pill = document.createElement('span');
+      pill.className = 'score-pill ' + (res ? 'right' : 'wrong');
+      pill.textContent = labels[key] + ' ' + (res ? '✓' : '✗');
+      scoreRow.appendChild(pill);
+    });
+
+    const hl = document.getElementById('summaryHeadline');
+    if      (correct === 3) hl.textContent = "All three correct — you reasoned through it, not just recognised it.";
+    else if (correct === 2) hl.textContent = "Two out of three — solid reasoning. Review the one you missed.";
+    else if (correct === 1) hl.textContent = "One correct — read back through the feedback before moving on.";
+    else                    hl.textContent = "Zero correct this time — the feedback above shows exactly where the distinctions lie.";
+
+    document.getElementById('summary').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
