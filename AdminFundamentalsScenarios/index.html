@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oliver Admin — Apply What You Know</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1A2B3C; --teal:#028090; --bteal:#02C39A; --sand:#F5F0E8;
+  --white:#fff; --border:#D4DCE5; --mid:#8B9AAB; --text:#1A2B3C;
+  --correct:#0A2E1E; --clight:#e6f4ee; --wrong:#2A1010; --wlight:#fdf0ed;
+  --orange:#E85D2A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);
+  display:flex;flex-direction:column;height:100vh;}
+
+/* HEADER */
+.hdr{background:var(--navy);border-bottom:3px solid var(--bteal);flex-shrink:0;}
+.hdr-inner{max-width:760px;margin:0 auto;padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.badge{background:var(--teal);color:#fff;font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:3px;}
+.hdr-title{font-family:'DM Serif Display',serif;color:#fff;font-size:16px;}
+.prog-wrap{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.prog-label{font-size:12px;color:rgba(255,255,255,.5);white-space:nowrap;}
+.prog-track{width:100px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--bteal);border-radius:2px;transition:width .4s ease;}
+
+/* SCREENS */
+.screens{flex:1;position:relative;overflow:hidden;}
+.screen{position:absolute;inset:0;overflow-y:auto;display:none;flex-direction:column;padding:0 0 100px;}
+.screen.active{display:flex;}
+
+/* INTRO */
+.intro-wrap{max-width:680px;margin:48px auto 0;padding:0 24px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:10px;}
+.intro-h{font-family:'DM Serif Display',serif;font-size:36px;line-height:1.15;
+  letter-spacing:-.02em;color:var(--navy);margin-bottom:14px;}
+.intro-body{font-size:16px;color:#3d4f62;line-height:1.7;max-width:520px;margin-bottom:24px;}
+.meta{display:flex;gap:20px;font-size:13px;color:var(--mid);margin-bottom:36px;flex-wrap:wrap;}
+.meta span{display:flex;align-items:center;gap:5px;}
+.prompt-list{display:flex;flex-direction:column;gap:10px;max-width:520px;margin-bottom:36px;}
+.pl-row{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;
+  background:#fff;border:1px solid var(--border);border-radius:8px;}
+.pl-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.pl-text{font-size:14px;color:#3d4f62;line-height:1.5;}
+.btn-start{display:inline-flex;align-items:center;gap:8px;
+  background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;
+  border:none;cursor:pointer;transition:background .2s;}
+.btn-start:hover{background:#026d7a;}
+
+/* SCENARIO SCREEN */
+.sc-wrap{max-width:680px;margin:0 auto;padding:36px 24px 0;}
+
+.sc-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:8px;}
+.sc-title{font-family:'DM Serif Display',serif;font-size:24px;color:var(--navy);
+  margin-bottom:20px;line-height:1.3;}
+
+.sc-situation{background:var(--navy);border-radius:10px;padding:24px 28px;margin-bottom:24px;}
+.sc-sit-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--bteal);margin-bottom:10px;}
+.sc-sit-text{font-size:15px;color:rgba(255,255,255,.88);line-height:1.7;}
+.sc-sit-text em{color:var(--bteal);font-style:normal;font-weight:600;}
+
+.sc-q{font-size:16px;font-weight:600;color:var(--navy);margin-bottom:18px;line-height:1.5;}
+
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;
+  border:2px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;
+  font-family:'DM Sans',sans-serif;transition:border-color .15s,background .15s,transform .12s;
+  text-align:left;width:100%;}
+.opt:hover:not(:disabled){border-color:var(--teal);background:#f0fbfc;transform:translateX(2px);}
+.opt:focus{outline:2px solid var(--teal);outline-offset:2px;}
+.opt-mark{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--mid);flex-shrink:0;transition:all .15s;}
+.opt:hover:not(:disabled) .opt-mark{border-color:var(--teal);color:var(--teal);}
+.opt-text{font-size:15px;color:var(--text);line-height:1.55;padding-top:3px;}
+.opt.is-correct{border-color:var(--bteal);background:var(--clight);pointer-events:none;}
+.opt.is-correct .opt-mark{background:var(--bteal);border-color:var(--bteal);color:#fff;}
+.opt.is-wrong{border-color:var(--orange);background:var(--wlight);pointer-events:none;}
+.opt.is-wrong .opt-mark{background:var(--orange);border-color:var(--orange);color:#fff;}
+.opt.is-dim{opacity:.38;pointer-events:none;}
+
+/* FEEDBACK */
+.feedback{display:none;margin-top:18px;border-radius:8px;overflow:hidden;animation:slideIn .3s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.feedback.show{display:block;}
+.fb-banner{padding:13px 18px;display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.fb-icon{font-size:16px;}
+.feedback.ok .fb-banner{background:var(--correct);color:var(--bteal);}
+.feedback.no .fb-banner{background:var(--wrong);color:var(--orange);}
+.fb-body{padding:18px 18px 20px;background:#f7f9fb;
+  border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;}
+.fb-body p{font-size:15px;line-height:1.7;color:#2d3e50;margin-bottom:12px;}
+.fb-body p:last-child{margin:0;}
+.fb-body strong{color:var(--navy);}
+.why-matters{background:var(--sand);border-left:4px solid var(--teal);
+  padding:12px 16px;border-radius:0 6px 6px 0;margin-top:14px;}
+.why-matters p{font-size:14px;color:#3d4f62;line-height:1.65;margin:0;}
+.why-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:6px;}
+
+/* NEXT BAR */
+.next-bar{position:fixed;bottom:0;left:0;right:0;
+  background:rgba(245,240,232,.95);backdrop-filter:blur(8px);
+  border-top:1px solid var(--border);
+  padding:14px 24px;display:none;
+  justify-content:flex-end;align-items:center;gap:16px;z-index:30;}
+.next-bar.show{display:flex;}
+.next-hint{font-size:13px;color:var(--mid);}
+.btn-next{display:inline-flex;align-items:center;gap:8px;
+  background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:600;padding:12px 24px;border-radius:8px;
+  border:none;cursor:pointer;transition:background .2s;}
+.btn-next:hover{background:#026d7a;}
+.btn-next.final{background:var(--correct);}
+.btn-next.final:hover{background:#082418;}
+
+/* SUMMARY */
+.sum-wrap{max-width:680px;margin:48px auto 0;padding:0 24px 40px;}
+.sum-block{background:var(--navy);border-radius:12px;padding:36px;}
+.sum-eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--bteal);margin-bottom:10px;}
+.sum-h{font-family:'DM Serif Display',serif;font-size:28px;color:#fff;
+  letter-spacing:-.01em;margin-bottom:14px;line-height:1.3;}
+.sum-p{font-size:15px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:24px;max-width:520px;}
+.rule-list{display:flex;flex-direction:column;gap:10px;}
+.rule-row{display:flex;gap:14px;padding:14px 16px;
+  background:rgba(255,255,255,.06);border-radius:6px;border-left:3px solid var(--bteal);}
+.rule-icon{font-size:18px;flex-shrink:0;}
+.rule-text{font-size:14px;color:rgba(255,255,255,.85);line-height:1.6;}
+.rule-text strong{color:var(--bteal);}
+.sum-close{margin-top:22px;font-size:13px;color:rgba(255,255,255,.4);font-style:italic;}
+
+@media(max-width:580px){
+  .intro-h{font-size:26px;}
+  .sc-title{font-size:19px;}
+  .prog-track{width:64px;}
+  .sum-block{padding:24px 18px;}
+  .sc-situation{padding:18px 20px;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <span class="badge">Oliver Product Fundamentals</span>
+      <span class="hdr-title">Admin — Apply What You Know</span>
+    </div>
+    <div class="prog-wrap">
+      <span class="prog-label" id="progLabel">1 of 3</span>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="screens">
+
+  <!-- ═══ INTRO ══════════════════════════════════════════════════ -->
+  <div class="screen active" id="s0">
+    <div class="intro-wrap">
+      <p class="eyebrow">Formative Assessment</p>
+      <h1 class="intro-h">Three situations.<br>You decide.</h1>
+      <p class="intro-body">These aren't recognition questions — there's no feature list to match against. Each scenario asks you to reason through a real situation and make a call. Read carefully. The nuance is intentional.</p>
+      <div class="meta">
+        <span>⏱ About 5 minutes</span>
+        <span>💬 Explanations after each answer</span>
+        <span>✓ No score — just the thinking</span>
+      </div>
+      <div class="prompt-list">
+        <div class="pl-row">
+          <div class="pl-icon">💡</div>
+          <div class="pl-text">Don't just pick an answer. Ask yourself: <em>what is actually happening in this situation?</em></div>
+        </div>
+        <div class="pl-row">
+          <div class="pl-icon">🎯</div>
+          <div class="pl-text">Each scenario tests something different — product boundaries, feature purpose, or system of record logic.</div>
+        </div>
+        <div class="pl-row">
+          <div class="pl-icon">📝</div>
+          <div class="pl-text">If something surprises you, note it in your workbook before moving on.</div>
+        </div>
+      </div>
+      <button class="btn-start" onclick="goTo(1)">Start →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCENARIO 1 — Product boundary call ═══════════════════ -->
+  <div class="screen" id="s1">
+    <div class="sc-wrap">
+      <p class="sc-label">Scenario 1 of 3</p>
+      <h2 class="sc-title">Scoping a new client</h2>
+
+      <div class="sc-situation">
+        <p class="sc-sit-label">The situation</p>
+        <p class="sc-sit-text">
+          A prospect gets in touch. They're a regional advisory firm managing group benefits for <em>18 employer clients</em> — a mix of professional services and healthcare businesses. All 18 use standard group billing: core benefits, some optional dental and vision, monthly invoicing to employers. <em>No pension. No hour bank. No union involvement.</em> They want one platform to run all their administration.
+        </p>
+      </div>
+
+      <p class="sc-q">Which Oliver product is the right fit — and what's the reasoning that gets you there?</p>
+
+      <div class="options">
+        <button class="opt" onclick="pick(1,this,false,'w1a')">
+          <div class="opt-mark">A</div>
+          <div class="opt-text">Oliver MultiPlan Administration — 18 employers on one platform sounds like a multi-employer environment.</div>
+        </button>
+        <button class="opt" onclick="pick(1,this,true,'c1')">
+          <div class="opt-mark">B</div>
+          <div class="opt-text">Oliver Admin (Group Benefit) — group billing with core and optional benefits, whether it's one employer or a group of 18.</div>
+        </button>
+        <button class="opt" onclick="pick(1,this,false,'w1c')">
+          <div class="opt-mark">C</div>
+          <div class="opt-text">Either could work — you'd need to know the total membership volume before deciding.</div>
+        </button>
+      </div>
+
+      <div class="feedback ok" id="s1-c1">
+        <div class="fb-banner"><span class="fb-icon">✓</span> Correct — and the reasoning is what matters here</div>
+        <div class="fb-body">
+          <p><strong>Oliver Admin is right.</strong> The trigger for MultiPlan is never employer count — it's plan type. This firm has 18 employers, but all 18 use straightforward group billing with core and optional benefits. That's exactly what Oliver Admin is built for: group billing with core and optional (voluntary/individual) benefits, whether the client is a single employer or a group of associations.</p>
+          <p>MultiPlan exists for clients that need multiple plan types in the same arrangement — pension, hour-bank or dollar-bank eligibility, other funds. None of those are present here.</p>
+          <div class="why-matters">
+            <p class="why-label">Why this matters in scoping</p>
+            <p>Putting this client in MultiPlan brings them all the complexity of union trust fund administration they don't need. The scoping error runs the other way too — a union trust fund with contributing employers belongs in MultiPlan, not Admin. <strong>The question is always: what plan types does the client need?</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback no" id="s1-w1a">
+        <div class="fb-banner"><span class="fb-icon">✗</span> The employer count is a red herring</div>
+        <div class="fb-body">
+          <p>The correct answer is Oliver Admin. Having 18 employers doesn't make a client a MultiPlan candidate. <strong>The trigger for MultiPlan is plan type complexity</strong> — specifically, clients who need multiple plan types in the same plan: pension, hour-bank or dollar-bank eligibility, union funds. None of those apply here.</p>
+          <p>This firm uses straightforward group billing with core and optional benefits across all 18 employers. That's an Admin environment, whether it's 1 employer or 100.</p>
+          <div class="why-matters">
+            <p class="why-label">The rule to remember</p>
+            <p>Oliver Admin handles group billing with core and optional (voluntary/individual) benefits — for a single employer or groups and associations with multiple employers. <strong>The question is never how many employers. It's always what plan types they need.</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback no" id="s1-w1c">
+        <div class="fb-banner"><span class="fb-icon">✗</span> Volume doesn't drive the product decision</div>
+        <div class="fb-body">
+          <p>The correct answer is Oliver Admin. Membership volume and employer count don't determine the product. <strong>The deciding factor is plan type:</strong> does the client need pension administration, hour-bank or dollar-bank eligibility, or union trust fund management? If none of those apply, this is an Admin environment regardless of scale.</p>
+          <div class="why-matters">
+            <p class="why-label">The rule to remember</p>
+            <p>The question is never how many employers — it is always what plan types does the client need. <strong>Group billing with core and optional benefits → Oliver Admin. Multiple plan types together → Oliver MultiPlan.</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCENARIO 2 — System of record + eligibility logic ════ -->
+  <div class="screen" id="s2">
+    <div class="sc-wrap">
+      <p class="sc-label">Scenario 2 of 3</p>
+      <h2 class="sc-title">An implementation question</h2>
+
+      <div class="sc-situation">
+        <p class="sc-sit-label">The situation</p>
+        <p class="sc-sit-text">
+          You're onboarding a new Oliver Admin client — a TPA managing benefits for 12 employers. Implementation is almost complete. A colleague on the project says: <em>"We need to set up the member portal as part of the Admin setup before go-live."</em> They're treating the portal as a step within the Oliver Admin implementation.
+        </p>
+      </div>
+
+      <p class="sc-q">Is your colleague correct — and what would you say to them?</p>
+
+      <div class="options">
+        <button class="opt" onclick="pick(2,this,false,'w2a')">
+          <div class="opt-mark">A</div>
+          <div class="opt-text">Yes — the member and employer portals are included in Oliver Admin and activate once the platform is configured.</div>
+        </button>
+        <button class="opt" onclick="pick(2,this,false,'w2b')">
+          <div class="opt-mark">B</div>
+          <div class="opt-text">Yes — but only the employer portal is included. The member portal requires a separate discussion.</div>
+        </button>
+        <button class="opt" onclick="pick(2,this,true,'c2')">
+          <div class="opt-mark">C</div>
+          <div class="opt-text">No — the Oliver Portal (CX layer) is a separate product with its own contract. It doesn't come automatically with Oliver Admin.</div>
+        </button>
+      </div>
+
+      <div class="feedback ok" id="s2-c2">
+        <div class="fb-banner"><span class="fb-icon">✓</span> Correct — and this is one of the most common internal mix-ups</div>
+        <div class="fb-body">
+          <p><strong>The Oliver Portal is a separate product with its own contract.</strong> Oliver Admin is the back-end system of record — the platform where billing rules live, eligibility is managed, and every transaction is logged. The member and employer portals are a separate CX layer that sits on top, and they require a separate agreement.</p>
+          <p>This distinction matters at implementation: clients can have Oliver Admin without the portal, and clients can have the portal without certain Admin features. They're bundled as a package deal in many cases — but they're not the same thing, and one doesn't come automatically with the other.</p>
+          <div class="why-matters">
+            <p class="why-label">Why this matters in your role</p>
+            <p>Assuming the portal is included in Admin is one of the most common sources of scope misalignment on new implementations. <strong>If a client expects a member-facing portal and it isn't scoped, that's a gap that surfaces at go-live</strong> — the worst possible moment.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback no" id="s2-w2a">
+        <div class="fb-banner"><span class="fb-icon">✗</span> The portals are not part of Oliver Admin</div>
+        <div class="fb-body">
+          <p>The correct answer is C. <strong>The Oliver Portal (CX layer) is a separate product with its own contract.</strong> Oliver Admin is the back-end administration platform — where billing rules are configured, eligibility is tracked, and invoices are produced. The member and employer portals are a separate experience layer. They can be sold together, but one doesn't activate automatically with the other.</p>
+          <div class="why-matters">
+            <p class="why-label">Why this matters</p>
+            <p>This distinction needs to be clear before scoping starts. A client who expects portal access but hasn't contracted for it will discover the gap at exactly the wrong time — usually during go-live or when a member tries to log in.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback no" id="s2-w2b">
+        <div class="fb-banner"><span class="fb-icon">✗</span> Neither portal is included automatically</div>
+        <div class="fb-body">
+          <p>The correct answer is C. <strong>Both the member and employer portals are part of the Oliver Portal (CX layer) — a separate product, separate contract, separate scoping conversation.</strong> Oliver Admin is the back-end system of record. The portal sits on top of it but is not part of it.</p>
+          <p>This isn't about which portal comes first — it's that neither is bundled into Oliver Admin by default. Any portal access needs to be identified, scoped, and contracted separately.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCENARIO 3 — Audit trail + system of record in action ═ -->
+  <div class="screen" id="s3">
+    <div class="sc-wrap">
+      <p class="sc-label">Scenario 3 of 3</p>
+      <h2 class="sc-title">A support call — existing client</h2>
+
+      <div class="sc-situation">
+        <p class="sc-sit-label">The situation</p>
+        <p class="sc-sit-text">
+          A TPA administrator calls your support team. One of their employer groups is disputing an invoice from two months ago. The employer says a member was terminated on <em>15 March</em> but was still charged for the full month of March and all of April. The employer wants a credit and wants to see proof of what happened. <em>The TPA's own records are unclear — the administrator who processed the termination has left the company.</em>
+        </p>
+      </div>
+
+      <p class="sc-q">What should your first response be — and which part of Oliver Admin is relevant?</p>
+
+      <div class="options">
+        <button class="opt" onclick="pick(3,this,false,'w3a')">
+          <div class="opt-mark">A</div>
+          <div class="opt-text">Ask the employer to provide their own records of when they notified the TPA of the termination — Oliver Admin can't answer for events that happened outside the system.</div>
+        </button>
+        <button class="opt" onclick="pick(3,this,false,'w3b')">
+          <div class="opt-mark">B</div>
+          <div class="opt-text">Advise the TPA to rerun the March and April invoices and compare them against what was billed — the difference will show whether a credit is owed.</div>
+        </button>
+        <button class="opt" onclick="pick(3,this,true,'c3')">
+          <div class="opt-mark">C</div>
+          <div class="opt-text">Open Oliver Admin's audit trail for that member — it will show exactly when the termination was entered, who entered it, and what the eligibility record showed before and after.</div>
+        </button>
+      </div>
+
+      <div class="feedback ok" id="s3-c3">
+        <div class="fb-banner"><span class="fb-icon">✓</span> Correct — the audit trail answers questions the TPA's own records can't</div>
+        <div class="fb-body">
+          <p><strong>This is exactly what the audit trail is for.</strong> Every action in Oliver Admin — every eligibility update, every termination, every invoice — is logged with a timestamp and the identity of whoever made the change. The fact that the administrator has left the company doesn't matter. The record is in the system.</p>
+          <p>In this case, the audit trail will show: when the termination was entered into Oliver Admin, who entered it, and what the eligibility record showed before and after. If the termination was entered late — after the billing cycle had already run — that's visible. If it was entered on time and billing still ran incorrectly, that's visible too. Either way, Oliver Admin has the answer.</p>
+          <div class="why-matters">
+            <p class="why-label">Why this matters in support</p>
+            <p>Knowing that the audit trail exists — and that it's timestamped, complete, and always available — means you can respond to a call like this with confidence rather than uncertainty. <strong>You don't need the TPA's internal records. You don't need the person who made the change. You need Oliver Admin.</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feedback no" id="s3-w3a">
+        <div class="fb-banner"><span class="fb-icon">✗</span> Oliver Admin already has the answer — you don't need the employer's records</div>
+        <div class="fb-body">
+          <p>The correct answer is C. Oliver Admin doesn't depend on what happened outside the system — <strong>it records what happened inside it.</strong> Every termination entered into Oliver Admin is logged with a timestamp and user identity. The question isn't "when did the employer notify the TPA?" — it's "when was the termination entered into Oliver Admin, and did billing run before or after that?"</p>
+          <p>The audit trail answers that question directly. You don't need external records. Oliver Admin is the system of record.</p>
+        </div>
+      </div>
+
+      <div class="feedback no" id="s3-w3b">
+        <div class="fb-banner"><span class="fb-icon">✗</span> Rerunning invoices doesn't explain what happened</div>
+        <div class="fb-body">
+          <p>The correct answer is C. Rerunning invoices might show a difference in amount, but it won't explain <em>why</em> the member was charged or when the termination was recorded. <strong>The audit trail does.</strong></p>
+          <p>The audit trail gives you a timestamped history of every action taken on that member's record: when the termination was entered, by whom, and what eligibility showed before and after. That's the information the employer needs, the TPA needs, and an auditor would need. It's already in the system — you don't need to reconstruct it.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SUMMARY ═══════════════════════════════════════════════ -->
+  <div class="screen" id="s4">
+    <div class="sum-wrap">
+      <div class="sum-block">
+        <p class="sum-eye">All three scenarios done</p>
+        <h2 class="sum-h">Three rules worth keeping</h2>
+        <p class="sum-p">Each scenario tested a different edge of what you've learned about Oliver Admin. Here's the reasoning that connects them.</p>
+        <div class="rule-list">
+          <div class="rule-row">
+            <div class="rule-icon">🧭</div>
+            <div class="rule-text"><strong>The product question is always plan type, not employer count.</strong> Group billing with core and optional benefits → Admin. Multiple plan types in one plan (pension, hour bank, dollar bank, funds) → MultiPlan. Scale is irrelevant to this decision.</div>
+          </div>
+          <div class="rule-row">
+            <div class="rule-icon">🔗</div>
+            <div class="rule-text"><strong>The Oliver Portal is separate from Oliver Admin.</strong> Admin is the back-end system of record. The member and employer portals are a separate product, separate contract, and need to be scoped independently. Don't assume one comes with the other.</div>
+          </div>
+          <div class="rule-row">
+            <div class="rule-icon">🔍</div>
+            <div class="rule-text"><strong>The audit trail makes Oliver Admin a system of record, not just a database.</strong> Every action is logged, timestamped, and attributed. When something goes wrong — or is disputed — the answer is already in the system. You don't need external records. You need Oliver Admin.</div>
+          </div>
+        </div>
+        <p class="sum-close">Close this tab and return to the Sway lesson to continue →</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /screens -->
+
+<!-- NEXT BAR -->
+<div class="next-bar" id="nextBar">
+  <span class="next-hint" id="nextHint"></span>
+  <button class="btn-next" id="nextBtn" onclick="advance()">Continue →</button>
+</div>
+
+<script>
+const TOTAL = 3;
+let current = 0;
+const answered = {};
+
+function goTo(n) {
+  document.getElementById(`s${current}`).classList.remove('active');
+  current = n;
+  document.getElementById(`s${current}`).classList.add('active');
+  window.scrollTo(0,0);
+  updateProgress();
+  updateNextBar();
+  document.getElementById(`s${current}`).scrollTop = 0;
+}
+
+function advance() {
+  if (current < 4) goTo(current + 1);
+}
+
+function pick(scIdx, btn, isCorrect, fbId) {
+  if (answered[scIdx]) return;
+  answered[scIdx] = true;
+
+  const screen = document.getElementById(`s${scIdx}`);
+  screen.querySelectorAll('.opt').forEach(o => {
+    if (o === btn) {
+      o.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
+      o.querySelector('.opt-mark').textContent = isCorrect ? '✓' : '✗';
+    } else {
+      o.classList.add('is-dim');
+    }
+    o.disabled = true;
+  });
+
+  const fb = document.getElementById(`s${scIdx}-${fbId}`);
+  fb.classList.add('show', isCorrect ? 'ok' : 'no');
+  setTimeout(() => fb.scrollIntoView({ behavior:'smooth', block:'nearest' }), 60);
+
+  updateNextBar();
+}
+
+function updateProgress() {
+  const pct = current === 0 ? 0 : current === 4 ? 100 : ((current - 1) / TOTAL) * 100;
+  document.getElementById('progFill').style.width = pct + '%';
+  if (current === 0) {
+    document.getElementById('progLabel').textContent = '1 of 3';
+  } else if (current <= 3) {
+    document.getElementById('progLabel').textContent = `${current} of ${TOTAL}`;
+  } else {
+    document.getElementById('progLabel').textContent = 'Complete';
+  }
+}
+
+function updateNextBar() {
+  const bar = document.getElementById('nextBar');
+  const btn = document.getElementById('nextBtn');
+  const hint = document.getElementById('nextHint');
+
+  if (current === 0 || current === 4) {
+    bar.classList.remove('show');
+    return;
+  }
+
+  if (!answered[current]) {
+    bar.classList.remove('show');
+    return;
+  }
+
+  bar.classList.add('show');
+
+  if (current < 3) {
+    hint.textContent = `Scenario ${current} done`;
+    btn.textContent = `Next scenario →`;
+    btn.className = 'btn-next';
+  } else {
+    hint.textContent = 'All three scenarios done';
+    btn.textContent = 'See summary →';
+    btn.className = 'btn-next final';
+  }
+}
+
+updateProgress();
+</script>
+</body>
+</html>
