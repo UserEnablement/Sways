@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oliver Admin — Key Terms</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1A2B3C; --teal:#028090; --bteal:#02C39A; --sand:#F5F0E8;
+  --white:#fff; --border:#D4DCE5; --mid:#8B9AAB; --text:#1A2B3C;
+  --correct:#0A2E1E; --clight:#e6f4ee; --wrong:#2A1010; --wlight:#fdf0ed;
+  --orange:#E85D2A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);
+  display:flex;flex-direction:column;height:100vh;}
+
+/* HEADER */
+.hdr{background:var(--navy);border-bottom:3px solid var(--bteal);flex-shrink:0;}
+.hdr-inner{max-width:760px;margin:0 auto;padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.badge{background:var(--teal);color:#fff;font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:3px;}
+.hdr-title{font-family:'DM Serif Display',serif;color:#fff;font-size:16px;}
+.prog-wrap{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.prog-label{font-size:12px;color:rgba(255,255,255,.5);white-space:nowrap;}
+.prog-track{width:100px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--bteal);border-radius:2px;transition:width .4s ease;}
+
+/* SCREEN CONTAINER */
+.screens{flex:1;position:relative;overflow:hidden;}
+.screen{
+  position:absolute;inset:0;overflow-y:auto;
+  display:none;flex-direction:column;
+  padding:0 0 80px;
+}
+.screen.active{display:flex;}
+
+/* INTRO SCREEN */
+.intro-wrap{max-width:680px;margin:48px auto 0;padding:0 24px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:10px;}
+.intro-h{font-family:'DM Serif Display',serif;font-size:36px;line-height:1.15;
+  letter-spacing:-.02em;color:var(--navy);margin-bottom:14px;}
+.intro-body{font-size:16px;color:#3d4f62;line-height:1.7;max-width:520px;margin-bottom:24px;}
+.meta{display:flex;gap:20px;font-size:13px;color:var(--mid);margin-bottom:36px;flex-wrap:wrap;}
+.meta span{display:flex;align-items:center;gap:5px;}
+
+/* TERM LIST on intro */
+.term-list{display:flex;flex-direction:column;gap:10px;max-width:520px;margin-bottom:36px;}
+.tl-row{display:flex;align-items:center;gap:14px;padding:12px 16px;
+  background:#fff;border:1px solid var(--border);border-radius:8px;}
+.tl-num{background:var(--teal);color:#fff;font-size:11px;font-weight:700;
+  padding:3px 8px;border-radius:3px;flex-shrink:0;}
+.tl-name{font-weight:600;font-size:15px;color:var(--navy);}
+
+/* START BTN */
+.btn-start{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;
+  border:none;cursor:pointer;transition:background .2s;
+}
+.btn-start:hover{background:#026d7a;}
+
+/* TERM SCREEN */
+.term-wrap{max-width:680px;margin:0 auto;padding:36px 24px 0;}
+
+.tc-header{
+  background:var(--navy);border-radius:10px 10px 0 0;
+  padding:20px 26px;display:flex;align-items:center;gap:14px;margin-bottom:0;
+}
+.tc-num{background:var(--teal);color:#fff;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;flex-shrink:0;}
+.tc-term{font-family:'DM Serif Display',serif;font-size:24px;color:#fff;letter-spacing:-.01em;}
+
+.tc-body{background:#fff;border:1px solid var(--border);border-top:none;
+  border-radius:0 0 10px 10px;padding:26px;}
+
+.context{font-size:14px;color:#3d4f62;line-height:1.65;background:var(--sand);
+  border-left:4px solid var(--teal);padding:12px 16px;border-radius:0 6px 6px 0;
+  margin-bottom:22px;}
+.context em{font-style:italic;color:var(--navy);}
+
+.q-label{font-size:16px;font-weight:600;color:var(--navy);margin-bottom:16px;line-height:1.5;}
+
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;
+  border:2px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;
+  font-family:'DM Sans',sans-serif;transition:border-color .15s,background .15s,transform .12s;
+  text-align:left;width:100%;}
+.opt:hover:not(:disabled){border-color:var(--teal);background:#f0fbfc;transform:translateX(2px);}
+.opt:focus{outline:2px solid var(--teal);outline-offset:2px;}
+.opt-mark{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--mid);flex-shrink:0;transition:all .15s;}
+.opt:hover:not(:disabled) .opt-mark{border-color:var(--teal);color:var(--teal);}
+.opt-text{font-size:15px;color:var(--text);line-height:1.55;padding-top:3px;}
+.opt.is-correct{border-color:var(--bteal);background:var(--clight);pointer-events:none;}
+.opt.is-correct .opt-mark{background:var(--bteal);border-color:var(--bteal);color:#fff;}
+.opt.is-wrong{border-color:var(--orange);background:var(--wlight);pointer-events:none;}
+.opt.is-wrong .opt-mark{background:var(--orange);border-color:var(--orange);color:#fff;}
+.opt.is-dim{opacity:.38;pointer-events:none;}
+
+/* FEEDBACK */
+.feedback{display:none;margin-top:18px;border-radius:8px;overflow:hidden;
+  animation:slideIn .3s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.feedback.show{display:block;}
+.fb-banner{padding:13px 18px;display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.fb-icon{font-size:16px;}
+.feedback.ok .fb-banner{background:var(--correct);color:var(--bteal);}
+.feedback.no .fb-banner{background:var(--wrong);color:var(--orange);}
+.fb-body{padding:18px 18px 20px;background:#f7f9fb;
+  border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;}
+.fb-body p{font-size:15px;line-height:1.7;color:#2d3e50;margin-bottom:10px;}
+.fb-body p:last-child{margin:0;}
+.fb-body strong{color:var(--navy);}
+
+/* NEXT BUTTON — fixed bottom */
+.next-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(245,240,232,.95);backdrop-filter:blur(8px);
+  border-top:1px solid var(--border);
+  padding:14px 24px;display:none;
+  justify-content:flex-end;align-items:center;gap:16px;
+  z-index:30;
+}
+.next-bar.show{display:flex;}
+.next-hint{font-size:13px;color:var(--mid);}
+.btn-next{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:600;padding:12px 24px;border-radius:8px;
+  border:none;cursor:pointer;transition:background .2s;
+}
+.btn-next:hover{background:#026d7a;}
+.btn-next.final{background:var(--correct);}
+.btn-next.final:hover{background:#082418;}
+
+/* SUMMARY SCREEN */
+.sum-wrap{max-width:680px;margin:48px auto 0;padding:0 24px 40px;}
+.sum-block{background:var(--navy);border-radius:12px;padding:36px;}
+.sum-eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--bteal);margin-bottom:10px;}
+.sum-h{font-family:'DM Serif Display',serif;font-size:28px;color:#fff;
+  letter-spacing:-.01em;margin-bottom:14px;line-height:1.3;}
+.sum-p{font-size:15px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:24px;max-width:520px;}
+.glossary{display:flex;flex-direction:column;gap:10px;}
+.gl-row{display:flex;gap:14px;padding:13px 16px;
+  background:rgba(255,255,255,.06);border-radius:6px;border-left:3px solid var(--bteal);}
+.gl-term{font-weight:600;font-size:14px;color:var(--bteal);min-width:160px;flex-shrink:0;}
+.gl-def{font-size:14px;color:rgba(255,255,255,.8);line-height:1.55;}
+.sum-close{margin-top:22px;font-size:13px;color:rgba(255,255,255,.4);font-style:italic;}
+
+@media(max-width:580px){
+  .intro-h{font-size:26px;}
+  .tc-term{font-size:19px;}
+  .prog-track{width:64px;}
+  .sum-block{padding:24px 18px;}
+  .gl-row{flex-direction:column;gap:4px;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <span class="badge">Oliver Product Fundamentals</span>
+      <span class="hdr-title">Admin — Key Terms</span>
+    </div>
+    <div class="prog-wrap">
+      <span class="prog-label" id="progLabel">1 of 6</span>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="screens" id="screens">
+
+  <!-- ═══ INTRO ═══════════════════════════════════════════════════ -->
+  <div class="screen active" id="s0">
+    <div class="intro-wrap">
+      <p class="eyebrow">Before the Feature Activity</p>
+      <h1 class="intro-h">Six terms.<br>One at a time.</h1>
+      <p class="intro-body">These terms appear on your reference card and come up in real Oliver Admin conversations. Read the context for each one, then pick the definition that fits.</p>
+      <div class="meta">
+        <span>⏱ About 4 minutes</span>
+        <span>💬 Explanation after each answer</span>
+        <span>↩ One term per screen</span>
+      </div>
+      <div class="term-list">
+        <div class="tl-row"><span class="tl-num">1</span><span class="tl-name">System of Record</span></div>
+        <div class="tl-row"><span class="tl-num">2</span><span class="tl-name">TPA (Third-Party Administrator)</span></div>
+        <div class="tl-row"><span class="tl-num">3</span><span class="tl-name">Group Billing</span></div>
+        <div class="tl-row"><span class="tl-num">4</span><span class="tl-name">Eligibility</span></div>
+        <div class="tl-row"><span class="tl-num">5</span><span class="tl-name">Remittance</span></div>
+        <div class="tl-row"><span class="tl-num">6</span><span class="tl-name">Audit Trail</span></div>
+      </div>
+      <button class="btn-start" onclick="goTo(1)">Start →</button>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 1 — SYSTEM OF RECORD ═══════════════════════════════ -->
+  <div class="screen" id="s1">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 1 of 6</div>
+        <div class="tc-term">System of Record</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          A member disputes whether they were covered during March. The employer says yes. The carrier says no. The TPA opens Oliver Admin and checks the eligibility record. <em>Whatever Oliver Admin shows is the answer the auditor accepts.</em>
+        </div>
+        <p class="q-label">In this situation, Oliver Admin is acting as the system of record. Which definition fits?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(1,this,false,'w1a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">A backup database that stores copies of data from other systems, used only when a dispute arises.</div>
+          </button>
+          <button class="opt" onclick="pick(1,this,false,'w1b')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">A reporting tool that generates summaries of what other systems have recorded.</div>
+          </button>
+          <button class="opt" onclick="pick(1,this,true,'c1')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">The single authoritative source of truth — if Oliver Admin says a member is eligible, they are eligible. No other version overrides it.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s1-c1">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — and this is one of the most important things to understand about Admin</div>
+          <div class="fb-body">
+            <p><strong>System of record means authoritative.</strong> Not the most recent version, not one view among many — the definitive source. When Oliver Admin records that a member is eligible, that record is what billing, carrier files, and audits are built from.</p>
+            <p>This is why every change in Oliver Admin is logged, timestamped, and traceable. If the system of record is wrong, everything built on top of it is wrong. If it's right, everything flows from a reliable foundation.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s1-w1a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Not a backup — the primary source</div>
+          <div class="fb-body">
+            <p>A backup stores copies of data from elsewhere. <strong>Oliver Admin is not a backup</strong> — it is the primary source. Other systems (employer portals, carrier files, reports) draw from what Admin holds. When there's a dispute, Admin isn't consulted as a secondary check. It's consulted because <strong>it is the answer.</strong></p>
+          </div>
+        </div>
+        <div class="feedback no" id="s1-w1b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Not a reporting layer — the source itself</div>
+          <div class="fb-body">
+            <p>Reporting tools summarise what other systems hold. Oliver Admin <strong>is</strong> what they summarise. It doesn't reflect what happened elsewhere — it records what happened, and those records are authoritative. The reports, invoices, and carrier files are all outputs from the system of record, not the record itself.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 2 — TPA ══════════════════════════════════════════ -->
+  <div class="screen" id="s2">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 2 of 6</div>
+        <div class="tc-term">TPA (Third-Party Administrator)</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          A company wants to offer health benefits to its 200 employees. Rather than managing enrolments, invoices, and carrier files themselves, they hire an external organisation to handle all of it. That organisation uses <em>Oliver Admin as their central platform</em> to run the administration for this company — and 14 others like it.
+        </div>
+        <p class="q-label">The organisation running the benefits administration is a TPA. Which definition fits?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(2,this,false,'w2a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">An insurance carrier that underwrites and pays out claims for employee benefits.</div>
+          </button>
+          <button class="opt" onclick="pick(2,this,true,'c2')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">An organisation that administers group benefits on behalf of employers and their members — handling the operational work without being the insurer.</div>
+          </button>
+          <button class="opt" onclick="pick(2,this,false,'w2b')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">A government regulator that sets the compliance rules for how benefits must be administered.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s2-c2">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — and TPAs are Oliver Admin's most common client type</div>
+          <div class="fb-body">
+            <p><strong>TPAs sit between employers and insurance carriers.</strong> Employers fund the benefits. Carriers underwrite and pay the claims. The TPA manages everything in between: enrolments, eligibility, invoicing, carrier files, reconciliation, and member service.</p>
+            <p>A TPA using Oliver Admin will typically manage benefits for multiple employer groups — sometimes dozens — all through a single platform. That's precisely what Oliver Admin is built for.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s2-w2a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Carriers underwrite — TPAs administer</div>
+          <div class="fb-body">
+            <p>An insurance carrier is the company that underwrites risk and pays out claims — Canada Life, Manulife, Claim Secure. <strong>A TPA is not a carrier.</strong> The TPA manages the administrative layer: who is enrolled, what they're covered for, what the employer owes, and how that data flows to the carrier. Oliver Admin is the platform the TPA uses to do that work.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s2-w2b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Regulators set rules — TPAs operate within them</div>
+          <div class="fb-body">
+            <p>Government regulators set the rules. <strong>TPAs operate within them</strong> — running the day-to-day administration of group benefits on behalf of employers. Oliver Admin helps TPAs do that work accurately, with the audit trail and compliance architecture regulators expect to see.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 3 — GROUP BILLING ══════════════════════════════════ -->
+  <div class="screen" id="s3">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 3 of 6</div>
+        <div class="tc-term">Group Billing</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          At the end of each month, a TPA running Oliver Admin needs to tell 15 employer groups what they owe for their employees' benefits coverage. Each employer has different plan designs, contribution rules, and member counts. The amounts change when members join, leave, or change their coverage. Before Oliver Admin, <em>two people spent a full day doing this manually, every month.</em>
+        </div>
+        <p class="q-label">The monthly process of calculating what each employer owes and generating invoices is called group billing. Which definition fits?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(3,this,false,'w3a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">The process of reconciling payments after an employer has already paid — checking that what was received matches what was approved by the carrier.</div>
+          </button>
+          <button class="opt" onclick="pick(3,this,false,'w3b')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">The process of sending eligibility and coverage data to insurance carriers in their required format.</div>
+          </button>
+          <button class="opt" onclick="pick(3,this,true,'c3')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">The recurring monthly cycle of calculating premiums, generating invoices, and reconciling payments across all employers in a plan.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s3-c3">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — this is the core monthly cycle Oliver Admin automates</div>
+          <div class="fb-body">
+            <p><strong>Group billing is the heartbeat of benefits administration.</strong> Every month: premiums are calculated, invoices are generated, and employer payments are reconciled. Oliver Admin runs this cycle automatically — rules configured once, invoices produced on demand.</p>
+            <p>It's also where errors are most costly. A billing mistake doesn't just affect one line — it cascades across employers, members, and carriers. This is why accurate group billing is central to what Oliver Admin is trusted to do.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s3-w3a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> That's remittance reconciliation — group billing comes first</div>
+          <div class="fb-body">
+            <p>Reconciling payments after they arrive is part of <strong>remittance processing</strong> — a separate step that comes after billing. Group billing is what happens first: calculating what each employer owes and generating the invoice. You can't reconcile a payment until the invoice has been produced.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s3-w3b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> That's carrier file production — a different output</div>
+          <div class="fb-body">
+            <p>Sending eligibility data to insurance carriers is <strong>carrier file production</strong> — a separate process. Group billing is about employer invoices: calculating premiums, generating statements, and reconciling what's owed. Both are outputs Oliver Admin produces, but they serve different purposes and flow in different directions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 4 — ELIGIBILITY ══════════════════════════════════ -->
+  <div class="screen" id="s4">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 4 of 6</div>
+        <div class="tc-term">Eligibility</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          An employee gets married in April and adds their spouse to their plan. Their coverage category changes from individual to couple. Their premium changes. In May, their employer switches them to a different benefit class. <em>Oliver Admin tracks all of this automatically</em> — updating who is covered, for which benefits, from which date.
+        </div>
+        <p class="q-label">Oliver Admin is managing the member's eligibility. Which definition fits?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(4,this,true,'c4')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">Whether a member is covered under a plan, and for which benefits, at a given point in time — determined by rules configured in Oliver Admin.</div>
+          </button>
+          <button class="opt" onclick="pick(4,this,false,'w4a')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">The amount an employer pays each month to cover their employees — calculated from headcount and plan design.</div>
+          </button>
+          <button class="opt" onclick="pick(4,this,false,'w4b')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">The process of matching employer payments against what insurance carriers have approved.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s4-c4">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — and eligibility drives everything else</div>
+          <div class="fb-body">
+            <p><strong>Eligibility is the foundation.</strong> Before a premium can be calculated, an invoice generated, or a carrier file produced, Oliver Admin needs to know: is this member covered? For what? From when?</p>
+            <p>Eligibility rules are configured in the platform once — then applied automatically whenever a life event occurs: a new hire, a marriage, a benefit class change, a termination. The invoice knows. The carrier file knows. The audit trail records it. Eligibility doesn't just feed billing — it feeds everything.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s4-w4a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> That's the premium calculation — eligibility comes first</div>
+          <div class="fb-body">
+            <p>The employer's monthly cost is the premium — part of group billing. <strong>But premiums can only be calculated once eligibility is established.</strong> Eligibility answers who is covered and for what. Once that's confirmed, the premium follows. Eligibility is the input; the invoice amount is the output.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s4-w4b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> That's remittance reconciliation — not eligibility</div>
+          <div class="fb-body">
+            <p>Matching employer payments against carrier approvals is <strong>remittance processing</strong> — a later step in the billing cycle. Eligibility is the earlier question: is this member actually covered? That question is answered by rules configured in Oliver Admin, applied at the member level, and updated whenever coverage changes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 5 — REMITTANCE ══════════════════════════════════ -->
+  <div class="screen" id="s5">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 5 of 6</div>
+        <div class="tc-term">Remittance</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          An employer receives their monthly invoice from the TPA: $42,000 for their 80 enrolled employees. They transfer the funds. On the carrier side, <em>Manulife has approved $41,200</em> worth of coverage for that month — a $800 difference due to a termination processed late. The TPA needs to reconcile these two numbers and ensure the carrier is paid correctly.
+        </div>
+        <p class="q-label">The employer's payment to the plan, reconciled against what the carrier approves, is the remittance process. Which definition fits?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(5,this,false,'w5a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">The invoice sent to employers at the end of each month, showing what they owe for benefits coverage.</div>
+          </button>
+          <button class="opt" onclick="pick(5,this,false,'w5b')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">The eligibility file sent to insurance carriers to confirm which members are covered and for which benefits.</div>
+          </button>
+          <button class="opt" onclick="pick(5,this,true,'c5')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">The employer's payment to the plan administrator, reconciled against what carriers have approved — ensuring every dollar is accounted for.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s5-c5">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — remittance is about money in and accuracy confirmed</div>
+          <div class="fb-body">
+            <p><strong>Remittance closes the billing loop.</strong> The invoice goes out. The employer pays. Oliver Admin reconciles what was billed against what the carrier approved — flagging any differences and creating the audit trail.</p>
+            <p>Discrepancies happen. A late termination, a missed life event, a new hire whose paperwork arrived after billing ran. Remittance processing catches those gaps and ensures the carrier receives what they should — no more, no less.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s5-w5a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> That's the invoice — remittance is what happens after</div>
+          <div class="fb-body">
+            <p>The invoice is generated during group billing — it's what the employer receives telling them what they owe. <strong>Remittance is what happens next:</strong> the employer pays, and Oliver Admin reconciles that payment against what the carrier has approved. Invoice first, remittance after.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s5-w5b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> That's carrier file production — a different output</div>
+          <div class="fb-body">
+            <p>The eligibility file sent to carriers is <strong>carrier file production</strong> — data out to the insurer confirming member coverage. Remittance is money in from the employer, reconciled against what the carrier has approved. Both involve the carrier, but in different directions and for different purposes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TERM 6 — AUDIT TRAIL ══════════════════════════════════ -->
+  <div class="screen" id="s6">
+    <div class="term-wrap">
+      <div class="tc-header">
+        <div class="tc-num">Term 6 of 6</div>
+        <div class="tc-term">Audit Trail</div>
+      </div>
+      <div class="tc-body">
+        <div class="context">
+          An employer disputes an invoice from three months ago. They say a termination was processed too late, and they were charged for a member who had already left. The TPA opens Oliver Admin and finds <em>the exact date the termination was entered, who entered it, and what the coverage showed before and after.</em> The auditor accepts this as documentation.
+        </div>
+        <p class="q-label">Oliver Admin's audit trail made this possible. Which definition fits?</p>
+        <div class="options">
+          <button class="opt" onclick="pick(6,this,false,'w6a')">
+            <div class="opt-mark">A</div>
+            <div class="opt-text">A monthly summary report that administrators can run to check for billing errors before invoices are sent out.</div>
+          </button>
+          <button class="opt" onclick="pick(6,this,true,'c6')">
+            <div class="opt-mark">B</div>
+            <div class="opt-text">A complete, time-stamped record of every transaction and change in the system — who did what, when, and why — that is always present and always accessible.</div>
+          </button>
+          <button class="opt" onclick="pick(6,this,false,'w6b')">
+            <div class="opt-mark">C</div>
+            <div class="opt-text">A compliance checklist that administrators complete manually at the end of each billing cycle.</div>
+          </button>
+        </div>
+        <div class="feedback ok" id="s6-c6">
+          <div class="fb-banner"><span class="fb-icon">✓</span> Correct — and this is what 'system of record' means in practice</div>
+          <div class="fb-body">
+            <p><strong>The audit trail is automatic and always on.</strong> Every change in Oliver Admin — every eligibility update, every invoice, every correction — is logged with a timestamp and the identity of who made the change. It doesn't need to be created. It's already there.</p>
+            <p>This is what makes Oliver Admin a reliable system of record rather than just a database. When a dispute arises, an auditor asks a question, or a client needs documentation — the answer is already in the system. No reconstruction. No memory. Just the record.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s6-w6a">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Not a report — always-on history</div>
+          <div class="fb-body">
+            <p>A monthly pre-billing report is something administrators run on demand. <strong>The audit trail is not run — it just exists.</strong> Every change, every transaction, every correction is logged automatically as it happens. You don't generate the audit trail. You look it up. And it's always there, going back as far as the data in the system.</p>
+          </div>
+        </div>
+        <div class="feedback no" id="s6-w6b">
+          <div class="fb-banner"><span class="fb-icon">✗</span> Not manual — automatic and continuous</div>
+          <div class="fb-body">
+            <p>Manual checklists depend on someone remembering to complete them. <strong>Oliver Admin's audit trail is automatic.</strong> Every action in the system is recorded — timestamp, user, and what changed — without any administrator effort. This is part of what makes it compliant by design, not by intention.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SUMMARY ══════════════════════════════════════════════ -->
+  <div class="screen" id="s7">
+    <div class="sum-wrap">
+      <div class="sum-block">
+        <p class="sum-eye">All six terms done</p>
+        <h2 class="sum-h">Your Admin vocabulary — at a glance</h2>
+        <p class="sum-p">These six terms connect directly to the features you'll see in the lesson. Keep this tab open alongside your workbook, or close it and return to the Sway lesson.</p>
+        <div class="glossary">
+          <div class="gl-row">
+            <div class="gl-term">System of Record</div>
+            <div class="gl-def">The single authoritative source of truth. If Oliver Admin says a member is eligible, they are eligible. Everything else is built from it.</div>
+          </div>
+          <div class="gl-row">
+            <div class="gl-term">TPA</div>
+            <div class="gl-def">Third-Party Administrator. Manages group benefits on behalf of employers — enrolments, invoicing, carrier files, member service. Oliver Admin's most common client type.</div>
+          </div>
+          <div class="gl-row">
+            <div class="gl-term">Group Billing</div>
+            <div class="gl-def">The recurring monthly cycle: calculate premiums, generate invoices, reconcile payments. The heartbeat of benefits administration.</div>
+          </div>
+          <div class="gl-row">
+            <div class="gl-term">Eligibility</div>
+            <div class="gl-def">Whether a member is covered, for which benefits, and from when — determined by plan rules configured in Oliver Admin. Eligibility feeds everything else.</div>
+          </div>
+          <div class="gl-row">
+            <div class="gl-term">Remittance</div>
+            <div class="gl-def">The employer's payment to the plan, reconciled against what carriers have approved. Closes the billing loop and catches discrepancies.</div>
+          </div>
+          <div class="gl-row">
+            <div class="gl-term">Audit Trail</div>
+            <div class="gl-def">Automatic, always-on record of every transaction and change — who did what, when. This is what makes Oliver Admin a reliable system of record.</div>
+          </div>
+        </div>
+        <p class="sum-close">Close this tab and return to the Sway lesson to continue →</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /screens -->
+
+<!-- NEXT BAR -->
+<div class="next-bar" id="nextBar">
+  <span class="next-hint" id="nextHint"></span>
+  <button class="btn-next" id="nextBtn" onclick="advance()">Continue →</button>
+</div>
+
+<script>
+const TOTAL = 6;
+let current = 0;
+const answered = {};
+
+function goTo(n) {
+  document.getElementById(`s${current}`).classList.remove('active');
+  current = n;
+  document.getElementById(`s${current}`).classList.add('active');
+  window.scrollTo(0,0);
+  updateProgress();
+  updateNextBar();
+  document.getElementById(`s${current}`).scrollTop = 0;
+}
+
+function advance() {
+  if (current < 7) goTo(current + 1);
+}
+
+function pick(termIdx, btn, isCorrect, fbId) {
+  if (answered[termIdx]) return;
+  answered[termIdx] = true;
+
+  const screen = document.getElementById(`s${termIdx}`);
+  screen.querySelectorAll('.opt').forEach(o => {
+    if (o === btn) {
+      o.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
+      o.querySelector('.opt-mark').textContent = isCorrect ? '✓' : '✗';
+    } else {
+      o.classList.add('is-dim');
+    }
+    o.disabled = true;
+  });
+
+  const fb = document.getElementById(`s${termIdx}-${fbId}`);
+  fb.classList.add('show', isCorrect ? 'ok' : 'no');
+  setTimeout(() => fb.scrollIntoView({ behavior:'smooth', block:'nearest' }), 60);
+
+  updateNextBar();
+}
+
+function updateProgress() {
+  const pct = current === 0 ? 0 : current === 7 ? 100 : ((current - 1) / TOTAL) * 100;
+  document.getElementById('progFill').style.width = pct + '%';
+  if (current === 0) {
+    document.getElementById('progLabel').textContent = '1 of 6';
+  } else if (current <= 6) {
+    document.getElementById('progLabel').textContent = `${current} of ${TOTAL}`;
+  } else {
+    document.getElementById('progLabel').textContent = 'Complete';
+  }
+}
+
+function updateNextBar() {
+  const bar = document.getElementById('nextBar');
+  const btn = document.getElementById('nextBtn');
+  const hint = document.getElementById('nextHint');
+
+  if (current === 0 || current === 7) {
+    bar.classList.remove('show');
+    return;
+  }
+
+  if (!answered[current]) {
+    bar.classList.remove('show');
+    return;
+  }
+
+  bar.classList.add('show');
+
+  if (current < 6) {
+    hint.textContent = `Term ${current} done`;
+    btn.textContent = `Next term →`;
+    btn.className = 'btn-next';
+  } else {
+    hint.textContent = 'All six terms done';
+    btn.textContent = 'See summary →';
+    btn.className = 'btn-next final';
+  }
+}
+
+updateProgress();
+</script>
+</body>
+</html>
