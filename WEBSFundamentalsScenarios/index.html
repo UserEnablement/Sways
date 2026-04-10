@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Group Health / WEBS — Apply What You Know</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1A2B3C; --teal:#028090; --bteal:#02C39A; --sand:#F5F0E8;
+  --white:#fff; --border:#D4DCE5; --mid:#8B9AAB; --text:#1A2B3C;
+  --correct:#0A2E1E; --clight:#e6f4ee; --wrong:#2A1010; --wlight:#fdf0ed;
+  --orange:#E85D2A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);min-height:100vh;font-size:16px;line-height:1.6;}
+
+.hdr{background:var(--navy);padding:0;position:sticky;top:0;z-index:100;border-bottom:3px solid var(--bteal);}
+.hdr-inner{max-width:860px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.hdr-brand{display:flex;align-items:center;gap:12px;}
+.badge{background:var(--teal);color:#fff;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:3px;}
+.hdr-title{font-family:'DM Serif Display',serif;color:#fff;font-size:18px;letter-spacing:-.01em;}
+.progress-track{display:flex;align-items:center;gap:8px;}
+.pip{width:28px;height:5px;border-radius:3px;background:rgba(255,255,255,.2);transition:background .4s;}
+.pip.active{background:var(--bteal);}
+.pip.done{background:rgba(2,195,154,.5);}
+
+.main{max-width:860px;margin:0 auto;padding:48px 24px 80px;}
+
+.intro-block{margin-bottom:48px;}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;}
+.intro-h{font-family:'DM Serif Display',serif;font-size:38px;line-height:1.15;color:var(--navy);margin-bottom:16px;letter-spacing:-.02em;}
+.intro-body{font-size:17px;color:#3d4f62;max-width:620px;line-height:1.7;}
+.meta{margin-top:20px;display:flex;gap:24px;font-size:13px;color:var(--mid);}
+.meta span{display:flex;align-items:center;gap:6px;}
+
+/* SCENARIO CARD */
+.scenario{background:#fff;border-radius:12px;margin-bottom:32px;overflow:hidden;border:1px solid var(--border);box-shadow:0 2px 12px rgba(26,43,60,.06);transition:box-shadow .3s;}
+.scenario:hover{box-shadow:0 4px 24px rgba(26,43,60,.1);}
+.scenario.revealed{pointer-events:none;}
+
+.sc-header{background:var(--navy);padding:20px 28px;display:flex;align-items:flex-start;gap:16px;}
+.sc-num{background:var(--teal);color:#fff;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;white-space:nowrap;margin-top:2px;}
+.sc-context-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--bteal);margin-bottom:8px;}
+.sc-situation{font-size:16px;color:rgba(255,255,255,.92);line-height:1.65;font-style:italic;}
+.sc-situation strong{color:#fff;font-style:normal;font-weight:600;}
+
+.sc-body{padding:28px;}
+.sc-question{font-size:17px;font-weight:600;color:var(--navy);margin-bottom:20px;line-height:1.5;}
+
+.choices{display:flex;flex-direction:column;gap:10px;}
+.choice{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;background:#fff;text-align:left;width:100%;font-family:'DM Sans',sans-serif;}
+.choice:hover:not(:disabled){border-color:var(--teal);background:#f0fbfc;transform:translateX(2px);}
+.choice:focus{outline:2px solid var(--teal);outline-offset:2px;}
+.choice-marker{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--mid);flex-shrink:0;transition:all .2s;}
+.choice:hover:not(:disabled) .choice-marker{border-color:var(--teal);color:var(--teal);}
+.choice-text{font-size:15px;color:var(--text);line-height:1.55;padding-top:4px;}
+.choice-text .clabel{font-weight:600;display:block;margin-bottom:2px;}
+.choice-text .csub{font-size:13px;color:var(--mid);}
+
+.choice.correct{border-color:var(--bteal);background:var(--clight);pointer-events:none;}
+.choice.correct .choice-marker{background:var(--bteal);border-color:var(--bteal);color:#fff;}
+.choice.wrong-selected{border-color:var(--orange);background:var(--wlight);pointer-events:none;}
+.choice.wrong-selected .choice-marker{background:var(--orange);border-color:var(--orange);color:#fff;}
+.choice.wrong-dim{opacity:.4;pointer-events:none;}
+
+/* FEEDBACK */
+.feedback{display:none;margin-top:20px;border-radius:8px;overflow:hidden;animation:slideDown .35s ease;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.feedback.show{display:block;}
+.fb-banner{padding:14px 20px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;}
+.fb-icon{font-size:18px;}
+.feedback.ok .fb-banner{background:var(--correct);color:var(--bteal);}
+.feedback.no .fb-banner{background:var(--wrong);color:var(--orange);}
+.fb-body{padding:20px;background:#f7f9fb;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;}
+.fb-body p{font-size:15px;line-height:1.7;color:#2d3e50;margin-bottom:10px;}
+.fb-body p:last-child{margin:0;}
+.fb-body strong{color:var(--navy);}
+.fb-rule{margin-top:14px;padding:12px 16px;background:#fff;border:1px solid var(--border);border-left:4px solid var(--teal);border-radius:0 6px 6px 0;font-size:14px;color:#2d3e50;line-height:1.6;}
+.fb-rule strong{color:var(--teal);}
+
+/* SUMMARY */
+.summary{display:none;background:var(--navy);border-radius:12px;padding:40px;margin-top:40px;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.summary.show{display:block;}
+.sum-eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--bteal);margin-bottom:10px;}
+.sum-h{font-family:'DM Serif Display',serif;font-size:28px;color:#fff;margin-bottom:20px;line-height:1.3;}
+.score-bar{background:rgba(255,255,255,.08);border-radius:10px;padding:20px 24px;display:flex;align-items:center;gap:20px;margin-bottom:28px;}
+.score-num{font-family:'DM Serif Display',serif;font-size:52px;color:var(--bteal);line-height:1;}
+.score-detail{font-size:15px;color:rgba(255,255,255,.75);line-height:1.6;}
+.score-detail span{display:block;font-size:13px;color:rgba(255,255,255,.45);margin-top:4px;}
+.sum-takeaways{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.takeaway{display:flex;gap:14px;padding:14px 18px;background:rgba(255,255,255,.07);border-radius:8px;border-left:3px solid var(--bteal);}
+.tk-icon{font-size:18px;flex-shrink:0;}
+.tk-text{font-size:14px;color:rgba(255,255,255,.85);line-height:1.6;}
+.tk-text strong{color:var(--bteal);}
+.sum-close{font-size:13px;color:rgba(255,255,255,.4);font-style:italic;}
+
+@media(max-width:600px){
+  .intro-h{font-size:26px;}
+  .sc-header{flex-direction:column;gap:8px;}
+  .meta{flex-wrap:wrap;gap:12px;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-brand">
+      <span class="badge">Oliver Product Fundamentals</span>
+      <span class="hdr-title">Group Health / WEBS — Apply What You Know</span>
+    </div>
+    <div class="progress-track">
+      <div class="pip" id="pip0"></div>
+      <div class="pip" id="pip1"></div>
+      <div class="pip" id="pip2"></div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="intro-block">
+    <div class="eyebrow">Scenario Assessment</div>
+    <h1 class="intro-h">Three real situations.<br>What would you do?</h1>
+    <p class="intro-body">These scenarios are intentionally trickier than the warm-up. They test whether you can apply what you've learned — not just recall it. Read each situation carefully and choose the best response.</p>
+    <div class="meta">
+      <span>⏱ About 8 minutes</span>
+      <span>💼 3 scenarios</span>
+      <span>🎯 Application, not recall</span>
+    </div>
+  </div>
+
+  <!-- SCENARIO 1 -->
+  <div class="scenario" id="sc0">
+    <div class="sc-header">
+      <span class="sc-num">Scenario 1</span>
+      <div>
+        <div class="sc-context-label">Oliver — Cross-pod conversation</div>
+        <p class="sc-situation">
+          You're in a cross-team meeting. A colleague from the Oliver Admin pod asks: <strong>"Isn't WEBS just Oliver Admin with a different skin? They both do group benefits, right?"</strong>
+          You need to correct this — clearly, without making them feel wrong for asking.
+        </p>
+      </div>
+    </div>
+    <div class="sc-body">
+      <p class="sc-question">What is the most accurate response?</p>
+      <div class="choices" id="choices0">
+        <button class="choice" onclick="choose(0,0)" data-correct="false">
+          <span class="choice-marker">A</span>
+          <span class="choice-text">
+            <span class="clabel">Broadly yes — they cover the same ground.</span>
+            <span class="csub">Both handle group benefits, just for different client types. Admin is for direct clients; WEBS is for GroupHEALTH's clients.</span>
+          </span>
+        </button>
+        <button class="choice" onclick="choose(0,1)" data-correct="true">
+          <span class="choice-marker">B</span>
+          <span class="choice-text">
+            <span class="clabel">Not quite — they're fundamentally different in ownership.</span>
+            <span class="csub">Oliver Admin is Oliver's product, sold to clients. WEBS is GroupHEALTH's platform — Oliver supports, maintains and evolves it, but doesn't own it. The distinction matters when scoping, pricing and explaining Oliver's role.</span>
+          </span>
+        </button>
+        <button class="choice" onclick="choose(0,2)" data-correct="false">
+          <span class="choice-marker">C</span>
+          <span class="choice-text">
+            <span class="clabel">They're identical under the hood — WEBS is just a branded instance of Oliver Admin.</span>
+            <span class="csub">Oliver built both, so the architecture is essentially the same.</span>
+          </span>
+        </button>
+      </div>
+      <div class="feedback" id="fb0">
+        <div class="fb-banner"><span class="fb-icon" id="fb0icon"></span><span id="fb0label"></span></div>
+        <div class="fb-body">
+          <p id="fb0text"></p>
+          <div class="fb-rule"><strong>The rule to carry:</strong> Always ask whether a system is an Oliver product or a client platform Oliver supports. WEBS is the clearest example of the second model. Oliver Admin is the clearest example of the first. They are not the same thing configured differently — they represent two different commercial and operational relationships.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 2 -->
+  <div class="scenario" id="sc1">
+    <div class="sc-header">
+      <span class="sc-num">Scenario 2</span>
+      <div>
+        <div class="sc-context-label">GH Pod — Support ticket</div>
+        <p class="sc-situation">
+          You're supporting the GH pod and receive this message from a GroupHEALTH client services team member: <strong>"One of our plan administrators is panicking — they submitted a class change for an employee this morning and now the record is locked. They think they broke the system. I can't get the record to move. What's happening?"</strong>
+        </p>
+      </div>
+    </div>
+    <div class="sc-body">
+      <p class="sc-question">What is the correct diagnosis and response?</p>
+      <div class="choices" id="choices1">
+        <button class="choice" onclick="choose(1,0)" data-correct="false">
+          <span class="choice-marker">A</span>
+          <span class="choice-text">
+            <span class="clabel">This is likely a data error — escalate to development for a fix.</span>
+            <span class="csub">Locked records after a submission often indicate a validation failure. The development team will need to inspect the database.</span>
+          </span>
+        </button>
+        <button class="choice" onclick="choose(1,1)" data-correct="false">
+          <span class="choice-marker">B</span>
+          <span class="choice-text">
+            <span class="clabel">Ask the plan administrator to try submitting the change again.</span>
+            <span class="csub">Sometimes WEBS gets stuck and a second submission resolves the lock.</span>
+          </span>
+        </button>
+        <button class="choice" onclick="choose(1,2)" data-correct="true">
+          <span class="choice-marker">C</span>
+          <span class="choice-text">
+            <span class="clabel">This is expected WEBS workflow — not an error. Reassure the plan administrator.</span>
+            <span class="csub">When a change is submitted in WEBS, the record locks while GroupHEALTH reviews it. This is normal — the lock protects data integrity during review. It should clear within 24 hours. No action needed from the plan administrator.</span>
+          </span>
+        </button>
+      </div>
+      <div class="feedback" id="fb1">
+        <div class="fb-banner"><span class="fb-icon" id="fb1icon"></span><span id="fb1label"></span></div>
+        <div class="fb-body">
+          <p id="fb1text"></p>
+          <div class="fb-rule"><strong>Key term — Pending / Locked:</strong> A record is locked while a submitted change awaits GroupHEALTH review. This is expected workflow, not an error. Records lock to protect data integrity during review. Changes are typically approved within 24 hours. The most common mistake is treating a locked record as a system failure and escalating unnecessarily — which creates unnecessary work and erodes plan administrator trust.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO 3 -->
+  <div class="scenario" id="sc2">
+    <div class="sc-header">
+      <span class="sc-num">Scenario 3</span>
+      <div>
+        <div class="sc-context-label">Sales / Scoping — New prospect conversation</div>
+        <p class="sc-situation">
+          A sales colleague is preparing for a call with a prospect. The prospect manages group benefits for their employees <strong>and</strong> runs a pension plan and hour-bank arrangement for union members. They say they want <strong>"something like the system GroupHEALTH uses."</strong> Your colleague asks you: <strong>"Can I just point them at WEBS?"</strong>
+        </p>
+      </div>
+    </div>
+    <div class="sc-body">
+      <p class="sc-question">What should your colleague know before that call?</p>
+      <div class="choices" id="choices2">
+        <button class="choice" onclick="choose(2,0)" data-correct="false">
+          <span class="choice-marker">A</span>
+          <span class="choice-text">
+            <span class="clabel">Yes — WEBS covers all of that. Set up a GroupHEALTH demo.</span>
+            <span class="csub">WEBS handles group benefits, pensions, and hour-bank arrangements for GroupHEALTH's clients.</span>
+          </span>
+        </button>
+        <button class="choice" onclick="choose(2,1)" data-correct="false">
+          <span class="choice-marker">B</span>
+          <span class="choice-text">
+            <span class="clabel">WEBS is the right fit for the group benefits — refer the pension and hour-bank piece to GroupHEALTH directly.</span>
+            <span class="csub">GroupHEALTH manages both the group benefits and pension side through WEBS.</span>
+          </span>
+        </button>
+        <button class="choice" onclick="choose(2,2)" data-correct="true">
+          <span class="choice-marker">C</span>
+          <span class="choice-text">
+            <span class="clabel">No — WEBS is not for sale, and it doesn't cover this client's full needs anyway.</span>
+            <span class="csub">WEBS is GroupHEALTH's proprietary platform — not an Oliver product to sell. For group benefits, the conversation is Oliver Admin. For pension and hour-bank, it's Oliver MultiPlan. This prospect likely needs both — and that's a MultiPlan-led conversation.</span>
+          </span>
+        </button>
+      </div>
+      <div class="feedback" id="fb2">
+        <div class="fb-banner"><span class="fb-icon" id="fb2icon"></span><span id="fb2label"></span></div>
+        <div class="fb-body">
+          <p id="fb2text"></p>
+          <div class="fb-rule"><strong>Two rules in one scenario:</strong> (1) <strong>WEBS is not for sale</strong> — it belongs to GroupHEALTH. When a prospect wants group benefits administration, the Oliver conversation is Oliver Admin or Oliver MultiPlan, not WEBS. (2) <strong>Pension + hour-bank = MultiPlan</strong>, not Admin or WEBS. WEBS handles group benefits only; it does not cover pension plans, hour banks, or union trust fund environments. Those belong in Oliver MultiPlan — a separate platform with a different architecture and client base.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary" id="summary">
+    <div class="sum-eye">Assessment Complete</div>
+    <h2 class="sum-h">Here's what these scenarios tested.</h2>
+    <div class="score-bar">
+      <div class="score-num" id="finalScore">0</div>
+      <div class="score-detail">
+        out of 3 correct
+        <span>Review any scenario you got wrong — the explanation tells you the rule behind it.</span>
+      </div>
+    </div>
+    <div class="sum-takeaways">
+      <div class="takeaway">
+        <span class="tk-icon">🏷️</span>
+        <div class="tk-text"><strong>Ownership is everything.</strong> WEBS is GroupHEALTH's platform. Oliver Admin is Oliver's product. They are not the same thing. The distinction determines how you scope, price, and explain Oliver's role in any conversation.</div>
+      </div>
+      <div class="takeaway">
+        <span class="tk-icon">🔒</span>
+        <div class="tk-text"><strong>Locked ≠ broken.</strong> A Pending / Locked record is the system working correctly. Every submitted change goes through GroupHEALTH review before it takes effect. Treat it as expected workflow — and help plan administrators understand the same.</div>
+      </div>
+      <div class="takeaway">
+        <span class="tk-icon">🚧</span>
+        <div class="tk-text"><strong>WEBS has a clear boundary.</strong> Group benefits only — for GroupHEALTH's employer clients. Pension, hour-bank and union trust fund environments belong in Oliver MultiPlan. And WEBS is never for sale — the right product conversation is Oliver Admin or Oliver MultiPlan depending on the client.</div>
+      </div>
+    </div>
+    <p class="sum-close">Close this tab and return to the WEBS lesson in Sway to download your completed reference card.</p>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+const CORRECT = [1, 2, 2]; // correct choice index for each scenario
+const answered = [false, false, false];
+let score = 0;
+
+const FEEDBACK_DATA = [
+  {
+    ok: 'Correct. WEBS is GroupHEALTH\'s platform — GroupHEALTH owns it and administers it. Oliver\'s role is to support, maintain, and evolve it. Oliver Admin is Oliver\'s own product, sold to market. These are two entirely different commercial and operational relationships — not the same system configured differently.',
+    no: (chosen) => chosen === 0
+      ? 'Not quite. Saying "they cover the same ground" misses the most important distinction: ownership. Oliver Admin is an Oliver product sold to clients. WEBS belongs to GroupHEALTH — Oliver supports it. That difference affects everything from how you scope engagements to how you explain Oliver\'s role.'
+      : 'Not quite. WEBS is not a branded instance of Oliver Admin. WEBS is GroupHEALTH\'s platform — GroupHEALTH built it and administers it; Oliver supports and evolves it. The ownership relationship is completely different from Oliver Admin.'
+  },
+  {
+    ok: 'Correct. A locked record after a change submission is expected WEBS behaviour — not an error. The lock is there to protect data integrity while GroupHEALTH reviews the change. It clears within 24 hours. The right response is to reassure the plan administrator and let the review process complete.',
+    no: (chosen) => chosen === 0
+      ? 'Not quite. A locked record after a submission is not a data error — it\'s the expected Pending / Locked state. GroupHEALTH needs to review the change before it takes effect. Escalating to development for a lock that hasn\'t even had 24 hours creates unnecessary work and erodes plan administrator confidence.'
+      : 'Not quite. Asking the plan administrator to submit again won\'t help and could create duplicate changes. The record is locked because it\'s in GroupHEALTH review — that\'s how WEBS is designed to work. The right response is to explain the Pending / Locked workflow and reassure them it will clear within 24 hours.'
+  },
+  {
+    ok: 'Correct. Two important rules here: WEBS is GroupHEALTH\'s proprietary platform — it\'s not for sale. And for this prospect\'s needs, WEBS wouldn\'t cover it anyway — WEBS handles group benefits only. Pension and hour-bank arrangements belong in Oliver MultiPlan. This prospect likely needs a MultiPlan-led conversation.',
+    no: (chosen) => chosen === 0
+      ? 'Not quite — two things are wrong here. First, WEBS is not an Oliver product available for sale. It belongs to GroupHEALTH. Second, WEBS handles group benefits only — it does not cover pensions or hour-bank arrangements. Those require Oliver MultiPlan.'
+      : 'Not quite. WEBS is GroupHEALTH\'s platform — not a product Oliver can direct prospects to, and not something GroupHEALTH administers on behalf of other organisations\' pension or hour-bank needs. For this prospect, the right conversation is Oliver Admin (group benefits) and Oliver MultiPlan (pension and hour-bank).'
+  },
+];
+
+function choose(scenarioIdx, choiceIdx) {
+  if (answered[scenarioIdx]) return;
+  answered[scenarioIdx] = true;
+
+  const choices = document.querySelectorAll(`#choices${scenarioIdx} .choice`);
+  const isCorrect = choiceIdx === CORRECT[scenarioIdx];
+  const fb = document.getElementById('fb' + scenarioIdx);
+  const fbIcon = document.getElementById('fb' + scenarioIdx + 'icon');
+  const fbLabel = document.getElementById('fb' + scenarioIdx + 'label');
+  const fbText = document.getElementById('fb' + scenarioIdx + 'text');
+
+  choices.forEach((c, i) => {
+    if (i === choiceIdx) {
+      c.classList.add(isCorrect ? 'correct' : 'wrong-selected');
+    } else if (i === CORRECT[scenarioIdx] && !isCorrect) {
+      c.classList.add('correct'); // reveal correct
+    } else {
+      c.classList.add('wrong-dim');
+    }
+    c.disabled = true;
+  });
+
+  if (isCorrect) {
+    score++;
+    fb.classList.add('show', 'ok');
+    fbIcon.textContent = '✓';
+    fbLabel.textContent = 'Correct';
+    fbText.textContent = FEEDBACK_DATA[scenarioIdx].ok;
+  } else {
+    fb.classList.add('show', 'no');
+    fbIcon.textContent = '✗';
+    fbLabel.textContent = 'Not quite';
+    fbText.textContent = typeof FEEDBACK_DATA[scenarioIdx].no === 'function'
+      ? FEEDBACK_DATA[scenarioIdx].no(choiceIdx)
+      : FEEDBACK_DATA[scenarioIdx].no;
+  }
+
+  document.getElementById('sc' + scenarioIdx).classList.add('revealed');
+  updatePips();
+
+  if (answered.every(Boolean)) {
+    setTimeout(showSummary, 600);
+  }
+}
+
+function updatePips() {
+  answered.forEach((done, i) => {
+    const pip = document.getElementById('pip' + i);
+    if (done) pip.classList.add('done');
+    else pip.classList.add('active');
+  });
+}
+
+function showSummary() {
+  document.getElementById('finalScore').textContent = score;
+  const sum = document.getElementById('summary');
+  sum.classList.add('show');
+  sum.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
