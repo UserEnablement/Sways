@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Group Health / WEBS — Key Terms</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1A2B3C; --teal:#028090; --bteal:#02C39A; --sand:#F5F0E8;
+  --white:#fff; --border:#D4DCE5; --mid:#8B9AAB; --text:#1A2B3C;
+  --correct:#0A2E1E; --clight:#e6f4ee; --wrong:#2A1010; --wlight:#fdf0ed;
+  --orange:#E85D2A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);min-height:100vh;}
+
+.hdr{background:var(--navy);border-bottom:3px solid var(--bteal);position:sticky;top:0;z-index:100;}
+.hdr-inner{max-width:860px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.badge{background:var(--teal);color:#fff;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:3px;}
+.hdr-title{font-family:'DM Serif Display',serif;color:#fff;font-size:17px;}
+.score-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:13px;font-weight:600;padding:5px 14px;border-radius:20px;}
+
+.main{max-width:860px;margin:0 auto;padding:40px 24px 80px;}
+
+/* INTRO */
+.intro{margin-bottom:40px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+.intro-h{font-family:'DM Serif Display',serif;font-size:36px;line-height:1.15;letter-spacing:-.02em;color:var(--navy);margin-bottom:14px;}
+.intro-body{font-size:16px;color:#3d4f62;line-height:1.7;max-width:580px;margin-bottom:20px;}
+.meta{display:flex;gap:20px;font-size:13px;color:var(--mid);flex-wrap:wrap;}
+.meta span{display:flex;align-items:center;gap:5px;}
+
+/* INSTRUCTIONS */
+.instructions{background:#fff;border:1px solid var(--border);border-left:4px solid var(--bteal);border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:36px;}
+.instructions p{font-size:14px;color:#3d4f62;line-height:1.65;}
+.instructions strong{color:var(--navy);}
+
+/* DRAG AREA */
+.drag-section{margin-bottom:48px;}
+.drag-section-title{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:16px;}
+
+.terms-pool{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px;min-height:56px;padding:14px;background:#fff;border:2px dashed var(--border);border-radius:8px;}
+.terms-pool.drag-over{border-color:var(--teal);background:#f0fbfc;}
+
+.term-chip{
+  background:var(--navy);color:#fff;font-size:14px;font-weight:600;
+  padding:8px 16px;border-radius:6px;cursor:grab;user-select:none;
+  transition:opacity .2s,transform .15s,background .2s;
+  border:2px solid transparent;
+}
+.term-chip:hover{background:var(--teal);transform:translateY(-1px);}
+.term-chip.dragging{opacity:.4;cursor:grabbing;}
+.term-chip.placed{display:none;}
+
+/* DEFINITIONS */
+.def-list{display:flex;flex-direction:column;gap:12px;}
+.def-row{
+  background:#fff;border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;display:flex;align-items:stretch;
+  transition:box-shadow .2s;
+}
+.def-row:hover{box-shadow:0 2px 12px rgba(26,43,60,.08);}
+.def-row.correct{border-color:var(--bteal);}
+.def-row.wrong{border-color:var(--orange);}
+
+.drop-zone{
+  min-width:160px;width:160px;flex-shrink:0;
+  background:var(--sand);border-right:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  padding:12px;min-height:72px;
+  transition:background .2s,border-color .2s;
+  font-size:13px;color:var(--mid);text-align:center;
+  cursor:default;
+}
+.drop-zone.drag-over{background:#e6fbf7;border-color:var(--bteal);}
+.drop-zone.has-chip{background:var(--navy);border-color:var(--navy);}
+.drop-zone.has-chip .drop-hint{display:none;}
+.drop-zone .placed-chip{
+  display:none;font-size:13px;font-weight:600;color:#fff;text-align:center;line-height:1.3;cursor:grab;
+}
+.drop-zone.has-chip .placed-chip{display:block;}
+.drop-zone.correct-state{background:var(--correct);border-color:var(--correct);}
+.drop-zone.wrong-state{background:var(--wrong);border-color:var(--wrong);}
+.drop-hint{font-size:12px;}
+
+.def-content{padding:16px 20px;flex:1;}
+.def-num{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:4px;}
+.def-text{font-size:15px;color:#2d3e50;line-height:1.6;}
+.def-context{font-size:13px;color:var(--mid);font-style:italic;margin-top:4px;}
+
+/* FEEDBACK */
+.row-feedback{display:none;padding:10px 20px 14px 200px;font-size:13px;line-height:1.55;}
+.row-feedback.show{display:block;}
+.row-feedback.ok{background:var(--clight);color:var(--correct);}
+.row-feedback.no{background:var(--wlight);color:#6b2a14;}
+.row-feedback strong{font-weight:700;}
+
+/* BUTTONS */
+.btn-check{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:600;padding:13px 28px;border-radius:8px;
+  border:none;cursor:pointer;transition:background .2s;margin-top:28px;
+}
+.btn-check:hover{background:#026d7a;}
+.btn-check:disabled{background:var(--mid);cursor:not-allowed;}
+.btn-reset{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;color:var(--mid);font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:500;padding:13px 20px;border-radius:8px;
+  border:1px solid var(--border);cursor:pointer;transition:all .2s;margin-top:28px;margin-left:12px;
+}
+.btn-reset:hover{border-color:var(--teal);color:var(--teal);}
+
+/* SUMMARY */
+.summary{display:none;margin-top:40px;background:var(--navy);border-radius:12px;padding:36px;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.summary.show{display:block;}
+.sum-eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--bteal);margin-bottom:10px;}
+.sum-h{font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:14px;line-height:1.3;}
+.sum-p{font-size:15px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:24px;max-width:520px;}
+.glossary{display:flex;flex-direction:column;gap:8px;}
+.gl-row{display:flex;gap:14px;padding:12px 16px;background:rgba(255,255,255,.07);border-radius:6px;border-left:3px solid var(--bteal);}
+.gl-term{font-weight:600;font-size:14px;color:var(--bteal);min-width:160px;flex-shrink:0;}
+.gl-def{font-size:14px;color:rgba(255,255,255,.8);line-height:1.55;}
+.sum-close{margin-top:20px;font-size:13px;color:rgba(255,255,255,.4);font-style:italic;}
+
+.score-bar{background:rgba(255,255,255,.1);border-radius:8px;padding:16px 20px;display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+.score-num{font-family:'DM Serif Display',serif;font-size:40px;color:var(--bteal);line-height:1;}
+.score-label{font-size:14px;color:rgba(255,255,255,.7);line-height:1.5;}
+
+@media(max-width:600px){
+  .intro-h{font-size:26px;}
+  .def-row{flex-direction:column;}
+  .drop-zone{width:100%;min-height:52px;border-right:none;border-bottom:1px solid var(--border);}
+  .row-feedback{padding:10px 16px;}
+  .gl-row{flex-direction:column;gap:4px;}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span class="badge">Oliver Product Fundamentals</span>
+      <span class="hdr-title">Group Health / WEBS — Key Terms</span>
+    </div>
+    <div class="score-pill" id="scorePill">0 / 10 matched</div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="intro">
+    <div class="eyebrow">Key Terms Activity</div>
+    <h1 class="intro-h">Match the term to the definition.</h1>
+    <p class="intro-body">These are the terms that unlock the rest of the WEBS lesson. Drag each term from the pool and drop it onto the matching definition. When you've placed them all, hit <strong>Check Answers</strong>.</p>
+    <div class="meta">
+      <span>⏱ About 5 minutes</span>
+      <span>🔟 10 terms</span>
+      <span>🎯 Focus on understanding, not memorising</span>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <p><strong>How it works:</strong> Drag a term chip from the pool below and drop it onto the grey drop zone on the left of the definition it matches. Changed your mind? Drag it back to the pool or onto a different row. When all 10 are placed, click <strong>Check Answers</strong>.</p>
+  </div>
+
+  <!-- TERMS POOL -->
+  <div class="drag-section">
+    <div class="drag-section-title">Terms — drag from here</div>
+    <div class="terms-pool" id="termsPool" 
+         ondragover="poolDragOver(event)" 
+         ondrop="poolDrop(event)"
+         ondragleave="poolDragLeave(event)">
+      <div class="term-chip" draggable="true" data-term="WEBS" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">WEBS</div>
+      <div class="term-chip" draggable="true" data-term="Plan Administrator" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Plan Administrator</div>
+      <div class="term-chip" draggable="true" data-term="Enrol-ME" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Enrol-ME</div>
+      <div class="term-chip" draggable="true" data-term="Pending / Locked" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Pending / Locked</div>
+      <div class="term-chip" draggable="true" data-term="Ledger" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Ledger</div>
+      <div class="term-chip" draggable="true" data-term="EE (Employee Profile)" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">EE (Employee Profile)</div>
+      <div class="term-chip" draggable="true" data-term="BP (Benefits Profile)" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">BP (Benefits Profile)</div>
+      <div class="term-chip" draggable="true" data-term="COB" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">COB</div>
+      <div class="term-chip" draggable="true" data-term="ERS" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">ERS</div>
+      <div class="term-chip" draggable="true" data-term="BSA" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">BSA</div>
+    </div>
+  </div>
+
+  <!-- DEFINITIONS -->
+  <div class="drag-section">
+    <div class="drag-section-title">Definitions — drop the matching term here</div>
+    <div class="def-list" id="defList">
+
+      <div class="def-row" id="row-WEBS">
+        <div class="drop-zone" id="zone-WEBS"
+             ondragover="zoneDragOver(event,'WEBS')" ondrop="zoneDrop(event,'WEBS')" ondragleave="zoneDragLeave(event,'WEBS')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'WEBS')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 1</div>
+          <div class="def-text">GroupHEALTH's self-service platform for accessing and managing group benefits. GroupHEALTH owns and uses it. Oliver supports, maintains, and evolves it.</div>
+          <div class="def-context">~80% of the GH pod's support work is related to this platform.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-WEBS"></div>
+
+      <div class="def-row" id="row-Plan Administrator">
+        <div class="drop-zone" id="zone-Plan Administrator"
+             ondragover="zoneDragOver(event,'Plan Administrator')" ondrop="zoneDrop(event,'Plan Administrator')" ondragleave="zoneDragLeave(event,'Plan Administrator')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Plan Administrator')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 2</div>
+          <div class="def-text">The employer-side user responsible for managing employee benefits in WEBS — typically the HR lead or office manager. GroupHEALTH holds them responsible for keeping records current and on time.</div>
+          <div class="def-context">This is who used to call GroupHEALTH for every question. Now they go directly to WEBS.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-Plan Administrator"></div>
+
+      <div class="def-row" id="row-Enrol-ME">
+        <div class="drop-zone" id="zone-Enrol-ME"
+             ondragover="zoneDragOver(event,'Enrol-ME')" ondrop="zoneDrop(event,'Enrol-ME')" ondragleave="zoneDragLeave(event,'Enrol-ME')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Enrol-ME')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 3</div>
+          <div class="def-text">WEBS's digital onboarding tool. Sends new employees an email invitation to complete their own benefits application online — replacing paper enrolment cards. Also a selling platform for optional benefits such as Optional CI and Member Advantage.</div>
+          <div class="def-context">No paper form. No manual data entry by HR.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-Enrol-ME"></div>
+
+      <div class="def-row" id="row-Pending / Locked">
+        <div class="drop-zone" id="zone-Pending / Locked"
+             ondragover="zoneDragOver(event,'Pending / Locked')" ondrop="zoneDrop(event,'Pending / Locked')" ondragleave="zoneDragLeave(event,'Pending / Locked')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Pending / Locked')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 4</div>
+          <div class="def-text">A record is locked while a submitted change awaits GroupHEALTH review. This is expected workflow — not an error. Changes are typically approved within 24 hours. The lock protects data integrity during review.</div>
+          <div class="def-context">The most common WEBS misconception: plan administrators often think something has gone wrong.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-Pending / Locked"></div>
+
+      <div class="def-row" id="row-Ledger">
+        <div class="drop-zone" id="zone-Ledger"
+             ondragover="zoneDragOver(event,'Ledger')" ondrop="zoneDrop(event,'Ledger')" ondragleave="zoneDragLeave(event,'Ledger')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Ledger')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 5</div>
+          <div class="def-text">A client billing unit in WEBS. Plan administrators managing benefits for multiple groups switch between these to view, update and download statements for each group separately.</div>
+          <div class="def-context">One employer may have several of these — one per plan design or policy.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-Ledger"></div>
+
+      <div class="def-row" id="row-EE (Employee Profile)">
+        <div class="drop-zone" id="zone-EE (Employee Profile)"
+             ondragover="zoneDragOver(event,'EE (Employee Profile)')" ondrop="zoneDrop(event,'EE (Employee Profile)')" ondragleave="zoneDragLeave(event,'EE (Employee Profile)')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'EE (Employee Profile)')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 6</div>
+          <div class="def-text">The employer-side section of WEBS recording each employee's class, salary, occupation, and employment date. This is the administrative record of who the employee is and what their job details are.</div>
+          <div class="def-context">Distinct from their coverage details — that's a different record type.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-EE (Employee Profile)"></div>
+
+      <div class="def-row" id="row-BP (Benefits Profile)">
+        <div class="drop-zone" id="zone-BP (Benefits Profile)"
+             ondragover="zoneDragOver(event,'BP (Benefits Profile)')" ondrop="zoneDrop(event,'BP (Benefits Profile)')" ondragleave="zoneDragLeave(event,'BP (Benefits Profile)')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'BP (Benefits Profile)')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 7</div>
+          <div class="def-text">The employee-side section of WEBS recording personal information, dependents, beneficiary designations, and coverage details. This is what the member sees as their own benefits record.</div>
+          <div class="def-context">Works alongside the EE Profile — together they form the full member picture in WEBS.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-BP (Benefits Profile)"></div>
+
+      <div class="def-row" id="row-COB">
+        <div class="drop-zone" id="zone-COB"
+             ondragover="zoneDragOver(event,'COB')" ondrop="zoneDrop(event,'COB')" ondragleave="zoneDragLeave(event,'COB')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'COB')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 8</div>
+          <div class="def-text">Coordination of Benefits. The process of recording when a member is covered under more than one insurance plan, so claims are directed to the correct carrier first. Prevents double-payment and ensures correct sequencing.</div>
+          <div class="def-context">Often confused with CBO (Core Benefits Override) — they sound similar but are different processes.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-COB"></div>
+
+      <div class="def-row" id="row-ERS">
+        <div class="drop-zone" id="zone-ERS"
+             ondragover="zoneDragOver(event,'ERS')" ondrop="zoneDrop(event,'ERS')" ondragleave="zoneDragLeave(event,'ERS')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'ERS')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 9</div>
+          <div class="def-text">Experience Reporting System. A reporting tool within WEBS that generates detailed claims and benefits experience reports per group and per ledger, on demand. Used heavily by GroupHEALTH client services teams.</div>
+          <div class="def-context">Generates reports like claims paid vs claims incurred — the data behind how a plan is performing.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-ERS"></div>
+
+      <div class="def-row" id="row-BSA">
+        <div class="drop-zone" id="zone-BSA"
+             ondragover="zoneDragOver(event,'BSA')" ondrop="zoneDrop(event,'BSA')" ondragleave="zoneDragLeave(event,'BSA')">
+          <span class="drop-hint">Drop term here</span>
+          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'BSA')" ondragend="chipDragEnd(event)"></span>
+        </div>
+        <div class="def-content">
+          <div class="def-num">Definition 10</div>
+          <div class="def-text">Billing System Administration. The section of WEBS showing an employee's coverage amounts for each eligible benefit. This is the financial layer — how much coverage a member has for each benefit type.</div>
+          <div class="def-context">Added to WEBS key terms based on SME review — important for billing accuracy checks.</div>
+        </div>
+      </div>
+      <div class="row-feedback" id="fb-BSA"></div>
+
+    </div><!-- /def-list -->
+
+    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:0;">
+      <button class="btn-check" id="btnCheck" onclick="checkAll()" disabled>Check Answers</button>
+      <button class="btn-reset" id="btnReset" onclick="resetAll()">↺ Start Over</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary" id="summary">
+    <div class="sum-eye">Activity Complete</div>
+    <h2 class="sum-h">You've matched all 10 WEBS key terms.</h2>
+    <div class="score-bar">
+      <div class="score-num" id="finalScore">10</div>
+      <div class="score-label">out of 10 correct<br><span style="color:rgba(255,255,255,.5);font-size:12px;">Go back and fix any wrong ones — understanding matters more than the score.</span></div>
+    </div>
+    <p class="sum-p">These are the terms you'll encounter in real GH pod conversations. Go back and re-read any definitions you weren't sure about — then update your workbook.</p>
+    <div class="glossary">
+      <div class="gl-row"><span class="gl-term">WEBS</span><span class="gl-def">GroupHEALTH's self-service platform for group benefits. Oliver supports, maintains, and evolves it.</span></div>
+      <div class="gl-row"><span class="gl-term">Plan Administrator</span><span class="gl-def">Employer-side WEBS user — HR or office manager responsible for keeping benefit records current.</span></div>
+      <div class="gl-row"><span class="gl-term">Enrol-ME</span><span class="gl-def">Digital onboarding tool — email invitation for new employees to self-enrol. Also sells optional benefits.</span></div>
+      <div class="gl-row"><span class="gl-term">Pending / Locked</span><span class="gl-def">Record awaiting GroupHEALTH review after a change is submitted. Expected workflow, not an error. ~24 hours.</span></div>
+      <div class="gl-row"><span class="gl-term">Ledger</span><span class="gl-def">A client billing unit in WEBS. Administrators switch between ledgers to manage multiple groups.</span></div>
+      <div class="gl-row"><span class="gl-term">EE (Employee Profile)</span><span class="gl-def">Employer-side record: class, salary, occupation, employment date.</span></div>
+      <div class="gl-row"><span class="gl-term">BP (Benefits Profile)</span><span class="gl-def">Employee-side record: personal info, dependents, beneficiaries, coverage details.</span></div>
+      <div class="gl-row"><span class="gl-term">COB</span><span class="gl-def">Coordination of Benefits — managing members covered under more than one insurance plan.</span></div>
+      <div class="gl-row"><span class="gl-term">ERS</span><span class="gl-def">Experience Reporting System — generates claims and benefits reports per group and ledger, on demand.</span></div>
+      <div class="gl-row"><span class="gl-term">BSA</span><span class="gl-def">Billing System Administration — shows an employee's coverage amounts for each eligible benefit.</span></div>
+    </div>
+    <p class="sum-close">Close this tab and return to the WEBS lesson in Sway.</p>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+const ANSWERS = {
+  'WEBS': 'WEBS',
+  'Plan Administrator': 'Plan Administrator',
+  'Enrol-ME': 'Enrol-ME',
+  'Pending / Locked': 'Pending / Locked',
+  'Ledger': 'Ledger',
+  'EE (Employee Profile)': 'EE (Employee Profile)',
+  'BP (Benefits Profile)': 'BP (Benefits Profile)',
+  'COB': 'COB',
+  'ERS': 'ERS',
+  'BSA': 'BSA',
+};
+
+const FEEDBACK = {
+  'WEBS': {
+    ok: 'Correct. WEBS is GroupHEALTH\'s platform — not an Oliver product sold to the market. Oliver\'s role is to support, maintain, and evolve it. That ownership distinction is the most important thing to carry from this lesson.',
+    no: 'Not quite. WEBS is the platform name — GroupHEALTH\'s self-service system for group benefits. Remember: GroupHEALTH owns it; Oliver supports it.'
+  },
+  'Plan Administrator': {
+    ok: 'Correct. The Plan Administrator is the HR lead or office manager at the employer — the person who used to call GroupHEALTH for every question. WEBS shifted that responsibility directly to them.',
+    no: 'Not quite. The Plan Administrator is the employer-side user — typically HR or office management — who manages day-to-day benefit records in WEBS.'
+  },
+  'Enrol-ME': {
+    ok: 'Correct. Enrol-ME digitises the new hire onboarding process — no paper forms, no manual HR data entry. It also functions as a selling platform for optional benefits like Optional CI and Member Advantage during the enrolment flow.',
+    no: 'Not quite. Enrol-ME is WEBS\'s digital onboarding tool — it sends new employees an email invitation to self-enrol and can present optional benefits for purchase.'
+  },
+  'Pending / Locked': {
+    ok: 'Correct. A locked record is not an error. It means a submitted change is awaiting GroupHEALTH review — which typically happens within 24 hours. The lock is there to protect data integrity while the record is in review.',
+    no: 'Not quite. Pending / Locked describes the expected state of a WEBS record after a change is submitted. It means GroupHEALTH is reviewing the change — not that something went wrong.'
+  },
+  'Ledger': {
+    ok: 'Correct. A ledger is a client billing unit in WEBS. Plan administrators managing multiple groups switch between ledgers to work with each group\'s billing and coverage data separately.',
+    no: 'Not quite. A Ledger is a billing unit in WEBS — each client group has its own, and administrators switch between them to manage plans and download statements.'
+  },
+  'EE (Employee Profile)': {
+    ok: 'Correct. The EE Profile is the employer-side record in WEBS — it captures who the employee is from an administrative standpoint: their class, salary, occupation and employment date.',
+    no: 'Not quite. EE stands for Employee Profile — the administrative record of an employee\'s class, salary, occupation, and employment date. Not their coverage details — that\'s the BP.'
+  },
+  'BP (Benefits Profile)': {
+    ok: 'Correct. The BP is the employee-facing record — personal information, dependents, beneficiary designations, and coverage details. Think of it as the member\'s own view of their benefits.',
+    no: 'Not quite. BP stands for Benefits Profile — the employee-side record covering personal information, dependents, beneficiaries, and coverage. Pairs with the EE Profile to form the full member picture.'
+  },
+  'COB': {
+    ok: 'Correct. COB — Coordination of Benefits — manages the situation where a member is covered under more than one insurance plan. It ensures claims go to the right carrier first and prevents double-payment.',
+    no: 'Not quite. COB is Coordination of Benefits — it\'s the process for members covered under more than one plan, making sure claims are directed to the correct carrier in the right order. Don\'t confuse it with CBO (Core Benefits Override).'
+  },
+  'ERS': {
+    ok: 'Correct. The Experience Reporting System is WEBS\'s built-in reporting tool — it generates detailed claims and benefits reports per group and ledger. GroupHEALTH client services teams use it to see how plans are performing.',
+    no: 'Not quite. ERS is the Experience Reporting System — a WEBS reporting tool that generates claims and benefits experience reports on demand, per group and per ledger.'
+  },
+  'BSA': {
+    ok: 'Correct. BSA — Billing System Administration — shows an employee\'s coverage amounts for each eligible benefit. It\'s the financial layer: how much coverage a member actually has under each benefit type.',
+    no: 'Not quite. BSA stands for Billing System Administration — the section of WEBS that shows coverage amounts for each eligible benefit for a given employee.'
+  },
+};
+
+let currentDrag = null;
+let dragSource = null; // 'pool' or zone id
+let placed = {}; // zoneId -> termId
+let locked = false;
+
+function getChip(term) {
+  return document.querySelector(`.term-chip[data-term="${CSS.escape(term)}"]`);
+}
+function getZone(id) {
+  return document.getElementById('zone-' + id);
+}
+function getPlacedSpan(id) {
+  return getZone(id)?.querySelector('.placed-chip');
+}
+
+function updateScore() {
+  const count = Object.keys(placed).length;
+  document.getElementById('scorePill').textContent = count + ' / 10 matched';
+  document.getElementById('btnCheck').disabled = (count < 10);
+}
+
+function chipDragStart(e) {
+  if (locked) { e.preventDefault(); return; }
+  currentDrag = e.target.dataset.term || e.target.closest('[data-term]')?.dataset.term;
+  dragSource = 'pool';
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => e.target.classList.add('dragging'), 0);
+}
+
+function placedDragStart(e, zoneId) {
+  if (locked) { e.preventDefault(); return; }
+  currentDrag = placed[zoneId];
+  dragSource = zoneId;
+  e.dataTransfer.effectAllowed = 'move';
+  e.stopPropagation();
+}
+
+function chipDragEnd(e) {
+  document.querySelectorAll('.term-chip').forEach(c => c.classList.remove('dragging'));
+}
+
+function zoneDragOver(e, zoneId) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  getZone(zoneId)?.classList.add('drag-over');
+}
+function zoneDragLeave(e, zoneId) {
+  getZone(zoneId)?.classList.remove('drag-over');
+}
+function zoneDrop(e, zoneId) {
+  e.preventDefault();
+  getZone(zoneId)?.classList.remove('drag-over');
+  if (!currentDrag || locked) return;
+
+  // If this zone already has a chip, send it back to pool
+  if (placed[zoneId]) {
+    const oldTerm = placed[zoneId];
+    getChip(oldTerm)?.classList.remove('placed');
+    delete placed[zoneId];
+    clearZoneDisplay(zoneId);
+  }
+
+  // If dragging from another zone, clear that zone
+  if (dragSource && dragSource !== 'pool') {
+    const srcZone = dragSource;
+    delete placed[srcZone];
+    clearZoneDisplay(srcZone);
+  }
+
+  // Place chip into this zone
+  placed[zoneId] = currentDrag;
+  getChip(currentDrag)?.classList.add('placed');
+  setZoneDisplay(zoneId, currentDrag);
+  currentDrag = null;
+  dragSource = null;
+  updateScore();
+}
+
+function poolDragOver(e) {
+  e.preventDefault();
+  document.getElementById('termsPool').classList.add('drag-over');
+}
+function poolDragLeave(e) {
+  document.getElementById('termsPool').classList.remove('drag-over');
+}
+function poolDrop(e) {
+  e.preventDefault();
+  document.getElementById('termsPool').classList.remove('drag-over');
+  if (!currentDrag || locked) return;
+  if (dragSource && dragSource !== 'pool') {
+    delete placed[dragSource];
+    clearZoneDisplay(dragSource);
+    getChip(currentDrag)?.classList.remove('placed');
+    currentDrag = null;
+    dragSource = null;
+    updateScore();
+  }
+}
+
+function setZoneDisplay(zoneId, term) {
+  const zone = getZone(zoneId);
+  if (!zone) return;
+  zone.classList.add('has-chip');
+  const span = zone.querySelector('.placed-chip');
+  if (span) span.textContent = term;
+}
+function clearZoneDisplay(zoneId) {
+  const zone = getZone(zoneId);
+  if (!zone) return;
+  zone.classList.remove('has-chip','correct-state','wrong-state');
+  const span = zone.querySelector('.placed-chip');
+  if (span) span.textContent = '';
+  const row = document.getElementById('row-' + zoneId);
+  if (row) row.classList.remove('correct','wrong');
+  const fb = document.getElementById('fb-' + zoneId);
+  if (fb) { fb.classList.remove('show','ok','no'); fb.textContent = ''; }
+}
+
+function checkAll() {
+  locked = true;
+  let correct = 0;
+  Object.keys(ANSWERS).forEach(zoneId => {
+    const placed_term = placed[zoneId];
+    const zone = getZone(zoneId);
+    const row = document.getElementById('row-' + zoneId);
+    const fb = document.getElementById('fb-' + zoneId);
+    if (!placed_term) return;
+    const isCorrect = placed_term === ANSWERS[zoneId];
+    if (isCorrect) {
+      correct++;
+      zone.classList.add('correct-state');
+      row.classList.add('correct');
+      fb.className = 'row-feedback show ok';
+      fb.innerHTML = '✓ <strong>' + placed_term + '</strong> — ' + FEEDBACK[zoneId].ok;
+    } else {
+      zone.classList.add('wrong-state');
+      row.classList.add('wrong');
+      fb.className = 'row-feedback show no';
+      fb.innerHTML = '✗ You placed <strong>' + placed_term + '</strong> here — ' + FEEDBACK[zoneId].no;
+    }
+  });
+  document.getElementById('finalScore').textContent = correct;
+  document.getElementById('summary').classList.add('show');
+  document.getElementById('summary').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetAll() {
+  locked = false;
+  placed = {};
+  document.querySelectorAll('.term-chip').forEach(c => c.classList.remove('placed','dragging'));
+  document.querySelectorAll('.drop-zone').forEach(z => {
+    z.classList.remove('has-chip','correct-state','wrong-state');
+    const span = z.querySelector('.placed-chip');
+    if (span) span.textContent = '';
+  });
+  document.querySelectorAll('.def-row').forEach(r => r.classList.remove('correct','wrong'));
+  document.querySelectorAll('.row-feedback').forEach(f => { f.classList.remove('show','ok','no'); f.textContent = ''; });
+  document.getElementById('summary').classList.remove('show');
+  updateScore();
+}
+
+// Touch support
+let touchDragEl = null;
+let touchClone = null;
+let touchZoneId = null;
+
+document.addEventListener('touchstart', e => {
+  const chip = e.target.closest('.term-chip:not(.placed), .placed-chip');
+  if (!chip || locked) return;
+  e.preventDefault();
+  if (chip.classList.contains('placed-chip')) {
+    const zone = chip.closest('.drop-zone');
+    touchDragEl = { type: 'placed', zoneId: zone.id.replace('zone-',''), term: placed[zone.id.replace('zone-','')] };
+  } else {
+    touchDragEl = { type: 'pool', term: chip.dataset.term };
+  }
+  touchClone = chip.cloneNode(true);
+  touchClone.style.cssText = 'position:fixed;pointer-events:none;opacity:.8;z-index:9999;font-size:14px;font-weight:600;background:#1A2B3C;color:#fff;padding:8px 16px;border-radius:6px;transition:none;';
+  document.body.appendChild(touchClone);
+}, { passive: false });
+
+document.addEventListener('touchmove', e => {
+  if (!touchDragEl) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  touchClone.style.left = (t.clientX - 60) + 'px';
+  touchClone.style.top = (t.clientY - 20) + 'px';
+  const el = document.elementFromPoint(t.clientX, t.clientY);
+  const zone = el?.closest('.drop-zone');
+  touchZoneId = zone ? zone.id.replace('zone-','') : null;
+}, { passive: false });
+
+document.addEventListener('touchend', e => {
+  if (!touchDragEl) return;
+  touchClone?.remove(); touchClone = null;
+  if (touchZoneId) {
+    currentDrag = touchDragEl.term;
+    dragSource = touchDragEl.type === 'placed' ? touchDragEl.zoneId : 'pool';
+    zoneDrop({ preventDefault: ()=>{} }, touchZoneId);
+  } else if (touchDragEl.type === 'placed') {
+    // Return to pool
+    delete placed[touchDragEl.zoneId];
+    clearZoneDisplay(touchDragEl.zoneId);
+    getChip(touchDragEl.term)?.classList.remove('placed');
+    updateScore();
+  }
+  touchDragEl = null; touchZoneId = null;
+});
+</script>
+</body>
+</html>
