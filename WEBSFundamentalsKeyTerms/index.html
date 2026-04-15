@@ -15,13 +15,53 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);min-height:100vh;}
 
+/* HEADER */
 .hdr{background:var(--navy);border-bottom:3px solid var(--bteal);position:sticky;top:0;z-index:100;}
 .hdr-inner{max-width:860px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
 .badge{background:var(--teal);color:#fff;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:3px;}
 .hdr-title{font-family:'DM Serif Display',serif;color:#fff;font-size:17px;}
-.score-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:13px;font-weight:600;padding:5px 14px;border-radius:20px;}
+.score-pill{color:rgba(255,255,255,.7);font-size:13px;font-weight:600;padding:5px 0;white-space:nowrap;}
 
 .main{max-width:860px;margin:0 auto;padding:40px 24px 80px;}
+
+/* ROUND TAB SWITCHER */
+.round-tabs{display:flex;gap:0;margin-bottom:32px;border:2px solid var(--border);border-radius:10px;overflow:hidden;}
+.round-tab{
+  flex:1;display:flex;align-items:center;gap:14px;
+  padding:18px 22px;border:none;background:#fff;
+  cursor:default;text-align:left;font-family:'DM Sans',sans-serif;
+  border-right:2px solid var(--border);transition:background .25s;
+  position:relative;
+}
+.round-tab:last-child{border-right:none;}
+.round-tab.rt-active{background:var(--navy);cursor:default;}
+.round-tab.rt-available{cursor:pointer;}
+.round-tab.rt-available:hover{background:#f0fbfc;}
+.round-tab.rt-locked{opacity:.42;cursor:not-allowed;}
+.rt-num{
+  width:38px;height:38px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;
+  background:var(--sand);color:var(--mid);transition:all .25s;
+}
+.round-tab.rt-active .rt-num{background:var(--teal);color:#fff;}
+.round-tab.rt-available:not(.rt-active) .rt-num{background:#e8f7f9;color:var(--teal);}
+.rt-body{flex:1;}
+.rt-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:3px;display:block;transition:color .25s;}
+.round-tab.rt-active .rt-label{color:var(--bteal);}
+.rt-name{font-size:14px;font-weight:600;color:var(--text);display:block;line-height:1.3;transition:color .25s;}
+.round-tab.rt-active .rt-name{color:#fff;}
+.rt-sub{font-size:12px;color:var(--mid);display:block;margin-top:2px;}
+.round-tab.rt-active .rt-sub{color:rgba(255,255,255,.5);}
+.rt-badge{
+  font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;
+  background:var(--bteal);color:var(--correct);white-space:nowrap;flex-shrink:0;
+  display:none;
+}
+.round-tab.rt-checked .rt-badge{display:block;}
+.rt-lock{font-size:16px;color:var(--border);flex-shrink:0;}
+.round-tab.rt-locked .rt-lock{display:block;}
+.round-tab:not(.rt-locked) .rt-lock{display:none;}
 
 /* INTRO */
 .intro{margin-bottom:40px;}
@@ -35,6 +75,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 .instructions{background:#fff;border:1px solid var(--border);border-left:4px solid var(--bteal);border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:36px;}
 .instructions p{font-size:14px;color:#3d4f62;line-height:1.65;}
 .instructions strong{color:var(--navy);}
+
+
+
+/* ROUND PANELS */
+.round-panel{display:none;}
+.round-panel.active{display:block;animation:fadeIn .35s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* BETWEEN ROUNDS */
+.round-complete{display:none;background:var(--correct);border-radius:12px;padding:32px 36px;margin-bottom:36px;animation:fadeIn .4s ease;}
+.round-complete.show{display:block;}
+.rc-eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--bteal);margin-bottom:8px;}
+.rc-h{font-family:'DM Serif Display',serif;font-size:24px;color:#fff;margin-bottom:10px;}
+.rc-p{font-size:15px;color:rgba(255,255,255,.8);line-height:1.65;margin-bottom:24px;max-width:480px;}
+.btn-next-round{display:inline-flex;align-items:center;gap:8px;background:var(--bteal);color:var(--correct);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;padding:13px 28px;border-radius:8px;border:none;cursor:pointer;transition:all .2s;}
+.btn-next-round:hover{background:#01a882;transform:translateY(-1px);}
+.rc-score{font-size:14px;color:rgba(255,255,255,.6);margin-top:16px;}
 
 /* DRAG AREA */
 .drag-section{margin-bottom:48px;}
@@ -76,9 +133,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 .drop-zone.drag-over{background:#e6fbf7;border-color:var(--bteal);}
 .drop-zone.has-chip{background:var(--navy);border-color:var(--navy);}
 .drop-zone.has-chip .drop-hint{display:none;}
-.drop-zone .placed-chip{
-  display:none;font-size:13px;font-weight:600;color:#fff;text-align:center;line-height:1.3;cursor:grab;
-}
+.drop-zone .placed-chip{display:none;font-size:13px;font-weight:600;color:#fff;text-align:center;line-height:1.3;cursor:grab;}
 .drop-zone.has-chip .placed-chip{display:block;}
 .drop-zone.correct-state{background:var(--correct);border-color:var(--correct);}
 .drop-zone.wrong-state{background:var(--wrong);border-color:var(--wrong);}
@@ -97,11 +152,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 .row-feedback strong{font-weight:700;}
 
 /* BUTTONS */
+.btn-row{display:flex;align-items:center;gap:12px;margin-top:28px;flex-wrap:wrap;}
 .btn-check{
   display:inline-flex;align-items:center;gap:8px;
   background:var(--teal);color:#fff;font-family:'DM Sans',sans-serif;
   font-size:15px;font-weight:600;padding:13px 28px;border-radius:8px;
-  border:none;cursor:pointer;transition:background .2s;margin-top:28px;
+  border:none;cursor:pointer;transition:background .2s;
 }
 .btn-check:hover{background:#026d7a;}
 .btn-check:disabled{background:var(--mid);cursor:not-allowed;}
@@ -109,26 +165,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
   display:inline-flex;align-items:center;gap:8px;
   background:transparent;color:var(--mid);font-family:'DM Sans',sans-serif;
   font-size:14px;font-weight:500;padding:13px 20px;border-radius:8px;
-  border:1px solid var(--border);cursor:pointer;transition:all .2s;margin-top:28px;margin-left:12px;
+  border:1px solid var(--border);cursor:pointer;transition:all .2s;
 }
 .btn-reset:hover{border-color:var(--teal);color:var(--teal);}
 
-/* SUMMARY */
-.summary{display:none;margin-top:40px;background:var(--navy);border-radius:12px;padding:36px;animation:fadeUp .4s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+
+/* FINAL SUMMARY */
+.summary{display:none;margin-top:40px;background:var(--navy);border-radius:12px;padding:36px;animation:fadeIn .4s ease;}
 .summary.show{display:block;}
 .sum-eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--bteal);margin-bottom:10px;}
 .sum-h{font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:14px;line-height:1.3;}
 .sum-p{font-size:15px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:24px;max-width:520px;}
+.score-bar{background:rgba(255,255,255,.1);border-radius:8px;padding:16px 20px;display:flex;align-items:center;gap:16px;margin-bottom:28px;}
+.score-num{font-family:'DM Serif Display',serif;font-size:40px;color:var(--bteal);line-height:1;}
+.score-label{font-size:14px;color:rgba(255,255,255,.7);line-height:1.5;}
 .glossary{display:flex;flex-direction:column;gap:8px;}
 .gl-row{display:flex;gap:14px;padding:12px 16px;background:rgba(255,255,255,.07);border-radius:6px;border-left:3px solid var(--bteal);}
 .gl-term{font-weight:600;font-size:14px;color:var(--bteal);min-width:160px;flex-shrink:0;}
 .gl-def{font-size:14px;color:rgba(255,255,255,.8);line-height:1.55;}
 .sum-close{margin-top:20px;font-size:13px;color:rgba(255,255,255,.4);font-style:italic;}
-
-.score-bar{background:rgba(255,255,255,.1);border-radius:8px;padding:16px 20px;display:flex;align-items:center;gap:16px;margin-bottom:28px;}
-.score-num{font-family:'DM Serif Display',serif;font-size:40px;color:var(--bteal);line-height:1;}
-.score-label{font-size:14px;color:rgba(255,255,255,.7);line-height:1.5;}
 
 @media(max-width:600px){
   .intro-h{font-size:26px;}
@@ -136,6 +192,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
   .drop-zone{width:100%;min-height:52px;border-right:none;border-bottom:1px solid var(--border);}
   .row-feedback{padding:10px 16px;}
   .gl-row{flex-direction:column;gap:4px;}
+  .round-tabs{flex-direction:column;}
+  .round-tab{border-right:none;border-bottom:2px solid var(--border);}
+  .round-tab:last-child{border-bottom:none;}
 }
 </style>
 </head>
@@ -143,212 +202,283 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 
 <header class="hdr">
   <div class="hdr-inner">
-    <div style="display:flex;align-items:center;gap:10px;">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <span class="badge">Oliver Product Fundamentals</span>
       <span class="hdr-title">Group Health / WEBS — Key Terms</span>
     </div>
-    <div class="score-pill" id="scorePill">0 / 10 matched</div>
+    <div class="score-pill" id="scorePill">Round 1 of 2</div>
   </div>
 </header>
 
 <div class="main">
+
+  <!-- INTRO -->
   <div class="intro">
     <div class="eyebrow">Key Terms Activity</div>
     <h1 class="intro-h">Match the term to the definition.</h1>
-    <p class="intro-body">These are the terms that unlock the rest of the WEBS lesson. Drag each term from the pool and drop it onto the matching definition. When you've placed them all, hit <strong>Check Answers</strong>.</p>
+    <p class="intro-body">These are the terms that unlock the rest of the WEBS lesson. Work through two rounds — five terms each. Drag each term from the pool and drop it onto the matching definition, then hit <strong>Check Answers</strong>.</p>
     <div class="meta">
       <span>⏱ About 5 minutes</span>
-      <span>🔟 10 terms</span>
+      <span>🔟 10 terms across 2 rounds</span>
       <span>🎯 Focus on understanding, not memorising</span>
     </div>
   </div>
 
   <div class="instructions">
-    <p><strong>How it works:</strong> Drag a term chip from the pool below and drop it onto the grey drop zone on the left of the definition it matches. Changed your mind? Drag it back to the pool or onto a different row. When all 10 are placed, click <strong>Check Answers</strong>.</p>
+    <p><strong>How it works:</strong> Drag a term chip from the pool and drop it onto the grey drop zone beside the matching definition. Changed your mind? Drag it back to the pool or swap it to a different row. When all terms in a round are placed, click <strong>Check Answers</strong>. <strong>Round 2 unlocks automatically once you've checked Round 1.</strong></p>
   </div>
 
-  <!-- TERMS POOL -->
-  <div class="drag-section">
-    <div class="drag-section-title">Terms — drag from here</div>
-    <div class="terms-pool" id="termsPool" 
-         ondragover="poolDragOver(event)" 
-         ondrop="poolDrop(event)"
-         ondragleave="poolDragLeave(event)">
-      <div class="term-chip" draggable="true" data-term="WEBS" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">WEBS</div>
-      <div class="term-chip" draggable="true" data-term="Plan Administrator" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Plan Administrator</div>
-      <div class="term-chip" draggable="true" data-term="Enrol-ME" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Enrol-ME</div>
-      <div class="term-chip" draggable="true" data-term="Pending / Locked" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Pending / Locked</div>
-      <div class="term-chip" draggable="true" data-term="Ledger" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Ledger</div>
-      <div class="term-chip" draggable="true" data-term="EE (Employee Profile)" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">EE (Employee Profile)</div>
-      <div class="term-chip" draggable="true" data-term="BP (Benefits Profile)" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">BP (Benefits Profile)</div>
-      <div class="term-chip" draggable="true" data-term="COB" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">COB</div>
-      <div class="term-chip" draggable="true" data-term="ERS" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">ERS</div>
-      <div class="term-chip" draggable="true" data-term="BSA" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">BSA</div>
+  <!-- ROUND TAB SWITCHER -->
+  <div class="round-tabs">
+    <!-- Tab 1 — active by default -->
+    <button class="round-tab rt-active" id="tab1" onclick="tabClick(1)">
+      <div class="rt-num">1</div>
+      <div class="rt-body">
+        <span class="rt-label">Round 1 of 2</span>
+        <span class="rt-name">The Platform &amp; The People</span>
+        <span class="rt-sub">WEBS · Plan Admin · Enrol-ME · Pending/Locked · Ledger</span>
+      </div>
+      <span class="rt-badge" id="tab1badge">✓ Done</span>
+    </button>
+    <!-- Tab 2 — locked until round 1 checked -->
+    <button class="round-tab rt-locked" id="tab2" onclick="tabClick(2)">
+      <div class="rt-num">2</div>
+      <div class="rt-body">
+        <span class="rt-label">Round 2 of 2</span>
+        <span class="rt-name">Inside the Records</span>
+        <span class="rt-sub">EE · BP · COB · ERS · BSA</span>
+      </div>
+      <span class="rt-badge" id="tab2badge">✓ Done</span>
+      <span class="rt-lock">🔒</span>
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       ROUND 1 — The Platform & The People
+  ═══════════════════════════════════════════════ -->
+  <div class="round-panel active" id="round1">
+
+    <!-- Pool -->
+    <div class="drag-section">
+      <div class="drag-section-title">Terms — drag from here</div>
+      <div class="terms-pool" id="pool1"
+           ondragover="poolDragOver(event,1)" ondrop="poolDrop(event,1)" ondragleave="poolDragLeave(event,1)">
+        <div class="term-chip" draggable="true" data-term="WEBS" data-round="1" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">WEBS</div>
+        <div class="term-chip" draggable="true" data-term="Plan Administrator" data-round="1" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Plan Administrator</div>
+        <div class="term-chip" draggable="true" data-term="Enrol-ME" data-round="1" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Enrol-ME</div>
+        <div class="term-chip" draggable="true" data-term="Pending / Locked" data-round="1" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Pending / Locked</div>
+        <div class="term-chip" draggable="true" data-term="Ledger" data-round="1" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">Ledger</div>
+      </div>
     </div>
-  </div>
 
-  <!-- DEFINITIONS -->
-  <div class="drag-section">
-    <div class="drag-section-title">Definitions — drop the matching term here</div>
-    <div class="def-list" id="defList">
+    <!-- Definitions -->
+    <div class="drag-section">
+      <div class="drag-section-title">Definitions — drop the matching term here</div>
+      <div class="def-list">
 
-      <div class="def-row" id="row-WEBS">
-        <div class="drop-zone" id="zone-WEBS"
-             ondragover="zoneDragOver(event,'WEBS')" ondrop="zoneDrop(event,'WEBS')" ondragleave="zoneDragLeave(event,'WEBS')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'WEBS')" ondragend="chipDragEnd(event)"></span>
+        <div class="def-row" id="row-WEBS">
+          <div class="drop-zone" id="zone-WEBS"
+               ondragover="zoneDragOver(event,'WEBS',1)" ondrop="zoneDrop(event,'WEBS',1)" ondragleave="zoneDragLeave(event,'WEBS')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'WEBS',1)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 1</div>
+            <div class="def-text">GroupHEALTH's self-service platform for accessing and managing group benefits. GroupHEALTH owns and uses it. Oliver supports, maintains, and evolves it.</div>
+            <div class="def-context">~80% of the GH pod's support work is related to this platform.</div>
+          </div>
         </div>
-        <div class="def-content">
-          <div class="def-num">Definition 1</div>
-          <div class="def-text">GroupHEALTH's self-service platform for accessing and managing group benefits. GroupHEALTH owns and uses it. Oliver supports, maintains, and evolves it.</div>
-          <div class="def-context">~80% of the GH pod's support work is related to this platform.</div>
+        <div class="row-feedback" id="fb-WEBS"></div>
+
+        <div class="def-row" id="row-Plan Administrator">
+          <div class="drop-zone" id="zone-Plan Administrator"
+               ondragover="zoneDragOver(event,'Plan Administrator',1)" ondrop="zoneDrop(event,'Plan Administrator',1)" ondragleave="zoneDragLeave(event,'Plan Administrator')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Plan Administrator',1)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 2</div>
+            <div class="def-text">The employer-side user responsible for managing employee benefits in WEBS — typically the HR lead or office manager. GroupHEALTH holds them responsible for keeping records current and on time.</div>
+            <div class="def-context">This is who used to call GroupHEALTH for every question. Now they go directly to WEBS.</div>
+          </div>
         </div>
+        <div class="row-feedback" id="fb-Plan Administrator"></div>
+
+        <div class="def-row" id="row-Enrol-ME">
+          <div class="drop-zone" id="zone-Enrol-ME"
+               ondragover="zoneDragOver(event,'Enrol-ME',1)" ondrop="zoneDrop(event,'Enrol-ME',1)" ondragleave="zoneDragLeave(event,'Enrol-ME')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Enrol-ME',1)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 3</div>
+            <div class="def-text">WEBS's digital onboarding tool. Sends new employees an email invitation to complete their own benefits application online — replacing paper enrolment cards. Also a selling platform for optional benefits such as Optional CI and Member Advantage.</div>
+            <div class="def-context">No paper form. No manual data entry by HR.</div>
+          </div>
+        </div>
+        <div class="row-feedback" id="fb-Enrol-ME"></div>
+
+        <div class="def-row" id="row-Pending / Locked">
+          <div class="drop-zone" id="zone-Pending / Locked"
+               ondragover="zoneDragOver(event,'Pending / Locked',1)" ondrop="zoneDrop(event,'Pending / Locked',1)" ondragleave="zoneDragLeave(event,'Pending / Locked')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Pending / Locked',1)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 4</div>
+            <div class="def-text">A record is locked while a submitted change awaits GroupHEALTH review. This is expected workflow — not an error. Changes are typically approved within 24 hours. The lock protects data integrity during review.</div>
+            <div class="def-context">The most common WEBS misconception: plan administrators often think something has gone wrong.</div>
+          </div>
+        </div>
+        <div class="row-feedback" id="fb-Pending / Locked"></div>
+
+        <div class="def-row" id="row-Ledger">
+          <div class="drop-zone" id="zone-Ledger"
+               ondragover="zoneDragOver(event,'Ledger',1)" ondrop="zoneDrop(event,'Ledger',1)" ondragleave="zoneDragLeave(event,'Ledger')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Ledger',1)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 5</div>
+            <div class="def-text">A client billing unit in WEBS. Plan administrators managing benefits for multiple groups switch between these to view, update and download statements for each group separately.</div>
+            <div class="def-context">One employer may have several of these — one per plan design or policy.</div>
+          </div>
+        </div>
+        <div class="row-feedback" id="fb-Ledger"></div>
+
       </div>
-      <div class="row-feedback" id="fb-WEBS"></div>
-
-      <div class="def-row" id="row-Plan Administrator">
-        <div class="drop-zone" id="zone-Plan Administrator"
-             ondragover="zoneDragOver(event,'Plan Administrator')" ondrop="zoneDrop(event,'Plan Administrator')" ondragleave="zoneDragLeave(event,'Plan Administrator')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Plan Administrator')" ondragend="chipDragEnd(event)"></span>
-        </div>
-        <div class="def-content">
-          <div class="def-num">Definition 2</div>
-          <div class="def-text">The employer-side user responsible for managing employee benefits in WEBS — typically the HR lead or office manager. GroupHEALTH holds them responsible for keeping records current and on time.</div>
-          <div class="def-context">This is who used to call GroupHEALTH for every question. Now they go directly to WEBS.</div>
-        </div>
-      </div>
-      <div class="row-feedback" id="fb-Plan Administrator"></div>
-
-      <div class="def-row" id="row-Enrol-ME">
-        <div class="drop-zone" id="zone-Enrol-ME"
-             ondragover="zoneDragOver(event,'Enrol-ME')" ondrop="zoneDrop(event,'Enrol-ME')" ondragleave="zoneDragLeave(event,'Enrol-ME')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Enrol-ME')" ondragend="chipDragEnd(event)"></span>
-        </div>
-        <div class="def-content">
-          <div class="def-num">Definition 3</div>
-          <div class="def-text">WEBS's digital onboarding tool. Sends new employees an email invitation to complete their own benefits application online — replacing paper enrolment cards. Also a selling platform for optional benefits such as Optional CI and Member Advantage.</div>
-          <div class="def-context">No paper form. No manual data entry by HR.</div>
-        </div>
-      </div>
-      <div class="row-feedback" id="fb-Enrol-ME"></div>
-
-      <div class="def-row" id="row-Pending / Locked">
-        <div class="drop-zone" id="zone-Pending / Locked"
-             ondragover="zoneDragOver(event,'Pending / Locked')" ondrop="zoneDrop(event,'Pending / Locked')" ondragleave="zoneDragLeave(event,'Pending / Locked')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Pending / Locked')" ondragend="chipDragEnd(event)"></span>
-        </div>
-        <div class="def-content">
-          <div class="def-num">Definition 4</div>
-          <div class="def-text">A record is locked while a submitted change awaits GroupHEALTH review. This is expected workflow — not an error. Changes are typically approved within 24 hours. The lock protects data integrity during review.</div>
-          <div class="def-context">The most common WEBS misconception: plan administrators often think something has gone wrong.</div>
-        </div>
-      </div>
-      <div class="row-feedback" id="fb-Pending / Locked"></div>
-
-      <div class="def-row" id="row-Ledger">
-        <div class="drop-zone" id="zone-Ledger"
-             ondragover="zoneDragOver(event,'Ledger')" ondrop="zoneDrop(event,'Ledger')" ondragleave="zoneDragLeave(event,'Ledger')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'Ledger')" ondragend="chipDragEnd(event)"></span>
-        </div>
-        <div class="def-content">
-          <div class="def-num">Definition 5</div>
-          <div class="def-text">A client billing unit in WEBS. Plan administrators managing benefits for multiple groups switch between these to view, update and download statements for each group separately.</div>
-          <div class="def-context">One employer may have several of these — one per plan design or policy.</div>
-        </div>
-      </div>
-      <div class="row-feedback" id="fb-Ledger"></div>
-
-      <div class="def-row" id="row-EE (Employee Profile)">
-        <div class="drop-zone" id="zone-EE (Employee Profile)"
-             ondragover="zoneDragOver(event,'EE (Employee Profile)')" ondrop="zoneDrop(event,'EE (Employee Profile)')" ondragleave="zoneDragLeave(event,'EE (Employee Profile)')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'EE (Employee Profile)')" ondragend="chipDragEnd(event)"></span>
-        </div>
-        <div class="def-content">
-          <div class="def-num">Definition 6</div>
-          <div class="def-text">The employer-side section of WEBS recording each employee's class, salary, occupation, and employment date. This is the administrative record of who the employee is and what their job details are.</div>
-          <div class="def-context">Distinct from their coverage details — that's a different record type.</div>
-        </div>
-      </div>
-      <div class="row-feedback" id="fb-EE (Employee Profile)"></div>
-
-      <div class="def-row" id="row-BP (Benefits Profile)">
-        <div class="drop-zone" id="zone-BP (Benefits Profile)"
-             ondragover="zoneDragOver(event,'BP (Benefits Profile)')" ondrop="zoneDrop(event,'BP (Benefits Profile)')" ondragleave="zoneDragLeave(event,'BP (Benefits Profile)')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'BP (Benefits Profile)')" ondragend="chipDragEnd(event)"></span>
-        </div>
-        <div class="def-content">
-          <div class="def-num">Definition 7</div>
-          <div class="def-text">The employee-side section of WEBS recording personal information, dependents, beneficiary designations, and coverage details. This is what the member sees as their own benefits record.</div>
-          <div class="def-context">Works alongside the EE Profile — together they form the full member picture in WEBS.</div>
-        </div>
-      </div>
-      <div class="row-feedback" id="fb-BP (Benefits Profile)"></div>
-
-      <div class="def-row" id="row-COB">
-        <div class="drop-zone" id="zone-COB"
-             ondragover="zoneDragOver(event,'COB')" ondrop="zoneDrop(event,'COB')" ondragleave="zoneDragLeave(event,'COB')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'COB')" ondragend="chipDragEnd(event)"></span>
-        </div>
-        <div class="def-content">
-          <div class="def-num">Definition 8</div>
-          <div class="def-text">Coordination of Benefits. The process of recording when a member is covered under more than one insurance plan, so claims are directed to the correct carrier first. Prevents double-payment and ensures correct sequencing.</div>
-          <div class="def-context">Often confused with CBO (Core Benefits Override) — they sound similar but are different processes.</div>
-        </div>
-      </div>
-      <div class="row-feedback" id="fb-COB"></div>
-
-      <div class="def-row" id="row-ERS">
-        <div class="drop-zone" id="zone-ERS"
-             ondragover="zoneDragOver(event,'ERS')" ondrop="zoneDrop(event,'ERS')" ondragleave="zoneDragLeave(event,'ERS')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'ERS')" ondragend="chipDragEnd(event)"></span>
-        </div>
-        <div class="def-content">
-          <div class="def-num">Definition 9</div>
-          <div class="def-text">Experience Reporting System. A reporting tool within WEBS that generates detailed claims and benefits experience reports per group and per ledger, on demand. Used heavily by GroupHEALTH client services teams.</div>
-          <div class="def-context">Generates reports like claims paid vs claims incurred — the data behind how a plan is performing.</div>
-        </div>
-      </div>
-      <div class="row-feedback" id="fb-ERS"></div>
-
-      <div class="def-row" id="row-BSA">
-        <div class="drop-zone" id="zone-BSA"
-             ondragover="zoneDragOver(event,'BSA')" ondrop="zoneDrop(event,'BSA')" ondragleave="zoneDragLeave(event,'BSA')">
-          <span class="drop-hint">Drop term here</span>
-          <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'BSA')" ondragend="chipDragEnd(event)"></span>
-        </div>
-        <div class="def-content">
-          <div class="def-num">Definition 10</div>
-          <div class="def-text">Billing System Administration. The section of WEBS showing an employee's coverage amounts for each eligible benefit. This is the financial layer — how much coverage a member has for each benefit type.</div>
-          <div class="def-context">Added to WEBS key terms based on SME review — important for billing accuracy checks.</div>
-        </div>
-      </div>
-      <div class="row-feedback" id="fb-BSA"></div>
-
-    </div><!-- /def-list -->
-
-    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:0;">
-      <button class="btn-check" id="btnCheck" onclick="checkAll()" disabled>Check Answers</button>
-      <button class="btn-reset" id="btnReset" onclick="resetAll()">↺ Start Over</button>
     </div>
-  </div>
 
-  <!-- SUMMARY -->
+    <div class="btn-row">
+      <button class="btn-check" id="btnCheck1" onclick="checkRound(1)" disabled>Check Answers</button>
+      <button class="btn-reset" onclick="resetRound(1)">↺ Reset Round 1</button>
+    </div>
+
+    <!-- Round 1 complete bridge -->
+    <div class="round-complete" id="r1complete">
+      <div class="rc-eye">Round 1 Complete</div>
+      <h2 class="rc-h">The platform and the people — done.</h2>
+      <p class="rc-p">Round 2 goes a layer deeper: the record types and reporting tools you'll encounter once you're working inside WEBS. Five more terms.</p>
+      <button class="btn-next-round" onclick="startRound2()">Start Round 2 →</button>
+      <div class="rc-score" id="r1scoreMsg"></div>
+    </div>
+
+  </div><!-- /round1 -->
+
+
+  <!-- ═══════════════════════════════════════════════
+       ROUND 2 — Inside the Records
+  ═══════════════════════════════════════════════ -->
+  <div class="round-panel" id="round2">
+
+    <!-- Pool -->
+    <div class="drag-section">
+      <div class="drag-section-title">Terms — drag from here</div>
+      <div class="terms-pool" id="pool2"
+           ondragover="poolDragOver(event,2)" ondrop="poolDrop(event,2)" ondragleave="poolDragLeave(event,2)">
+        <div class="term-chip" draggable="true" data-term="EE (Employee Profile)" data-round="2" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">EE (Employee Profile)</div>
+        <div class="term-chip" draggable="true" data-term="BP (Benefits Profile)" data-round="2" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">BP (Benefits Profile)</div>
+        <div class="term-chip" draggable="true" data-term="COB" data-round="2" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">COB</div>
+        <div class="term-chip" draggable="true" data-term="ERS" data-round="2" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">ERS</div>
+        <div class="term-chip" draggable="true" data-term="BSA" data-round="2" ondragstart="chipDragStart(event)" ondragend="chipDragEnd(event)">BSA</div>
+      </div>
+    </div>
+
+    <!-- Definitions -->
+    <div class="drag-section">
+      <div class="drag-section-title">Definitions — drop the matching term here</div>
+      <div class="def-list">
+
+        <div class="def-row" id="row-EE (Employee Profile)">
+          <div class="drop-zone" id="zone-EE (Employee Profile)"
+               ondragover="zoneDragOver(event,'EE (Employee Profile)',2)" ondrop="zoneDrop(event,'EE (Employee Profile)',2)" ondragleave="zoneDragLeave(event,'EE (Employee Profile)')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'EE (Employee Profile)',2)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 6</div>
+            <div class="def-text">The employer-side section of WEBS recording each employee's class, salary, occupation, and employment date. The administrative record of who the employee is and what their job details are.</div>
+            <div class="def-context">Distinct from their coverage details — that's a different record type.</div>
+          </div>
+        </div>
+        <div class="row-feedback" id="fb-EE (Employee Profile)"></div>
+
+        <div class="def-row" id="row-BP (Benefits Profile)">
+          <div class="drop-zone" id="zone-BP (Benefits Profile)"
+               ondragover="zoneDragOver(event,'BP (Benefits Profile)',2)" ondrop="zoneDrop(event,'BP (Benefits Profile)',2)" ondragleave="zoneDragLeave(event,'BP (Benefits Profile)')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'BP (Benefits Profile)',2)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 7</div>
+            <div class="def-text">The employee-side section of WEBS recording personal information, dependents, beneficiary designations, and coverage details. What the member sees as their own benefits record.</div>
+            <div class="def-context">Works alongside the EE Profile — together they form the full member picture in WEBS.</div>
+          </div>
+        </div>
+        <div class="row-feedback" id="fb-BP (Benefits Profile)"></div>
+
+        <div class="def-row" id="row-COB">
+          <div class="drop-zone" id="zone-COB"
+               ondragover="zoneDragOver(event,'COB',2)" ondrop="zoneDrop(event,'COB',2)" ondragleave="zoneDragLeave(event,'COB')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'COB',2)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 8</div>
+            <div class="def-text">Coordination of Benefits. The process of recording when a member is covered under more than one insurance plan, so claims are directed to the correct carrier first and double-payment is prevented.</div>
+            <div class="def-context">Don't confuse with CBO (Core Benefits Override) — similar acronym, different function entirely.</div>
+          </div>
+        </div>
+        <div class="row-feedback" id="fb-COB"></div>
+
+        <div class="def-row" id="row-ERS">
+          <div class="drop-zone" id="zone-ERS"
+               ondragover="zoneDragOver(event,'ERS',2)" ondrop="zoneDrop(event,'ERS',2)" ondragleave="zoneDragLeave(event,'ERS')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'ERS',2)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 9</div>
+            <div class="def-text">Experience Reporting System. A reporting tool within WEBS that generates detailed claims and benefits experience reports per group and per ledger, on demand. Used daily by GroupHEALTH client services teams.</div>
+            <div class="def-context">Generates the data that shows how well a plan is performing over time.</div>
+          </div>
+        </div>
+        <div class="row-feedback" id="fb-ERS"></div>
+
+        <div class="def-row" id="row-BSA">
+          <div class="drop-zone" id="zone-BSA"
+               ondragover="zoneDragOver(event,'BSA',2)" ondrop="zoneDrop(event,'BSA',2)" ondragleave="zoneDragLeave(event,'BSA')">
+            <span class="drop-hint">Drop term here</span>
+            <span class="placed-chip" draggable="true" ondragstart="placedDragStart(event,'BSA',2)" ondragend="chipDragEnd(event)"></span>
+          </div>
+          <div class="def-content">
+            <div class="def-num">Definition 10</div>
+            <div class="def-text">Billing System Administration. The section of WEBS that shows an employee's coverage amounts for each eligible benefit — the financial layer showing how much coverage a member actually has under each benefit type.</div>
+            <div class="def-context">The coverage amounts view — distinct from who the member is (EE) or what their plan includes (BP).</div>
+          </div>
+        </div>
+        <div class="row-feedback" id="fb-BSA"></div>
+
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-check" id="btnCheck2" onclick="checkRound(2)" disabled>Check Answers</button>
+      <button class="btn-reset" onclick="resetRound(2)">↺ Reset Round 2</button>
+    </div>
+
+  </div><!-- /round2 -->
+
+
+  <!-- FINAL SUMMARY -->
   <div class="summary" id="summary">
-    <div class="sum-eye">Activity Complete</div>
-    <h2 class="sum-h">You've matched all 10 WEBS key terms.</h2>
+    <div class="sum-eye">All Done</div>
+    <h2 class="sum-h">You've matched all 10 WEBS terms.</h2>
+    <p class="sum-p">These are the terms you'll encounter in real GH pod conversations. Go back and re-read any definitions you weren't sure about — then update your workbook.</p>
     <div class="score-bar">
       <div class="score-num" id="finalScore">10</div>
       <div class="score-label">out of 10 correct<br><span style="color:rgba(255,255,255,.5);font-size:12px;">Go back and fix any wrong ones — understanding matters more than the score.</span></div>
     </div>
-    <p class="sum-p">These are the terms you'll encounter in real GH pod conversations. Go back and re-read any definitions you weren't sure about — then update your workbook.</p>
     <div class="glossary">
       <div class="gl-row"><span class="gl-term">WEBS</span><span class="gl-def">GroupHEALTH's self-service platform for group benefits. Oliver supports, maintains, and evolves it.</span></div>
       <div class="gl-row"><span class="gl-term">Plan Administrator</span><span class="gl-def">Employer-side WEBS user — HR or office manager responsible for keeping benefit records current.</span></div>
@@ -367,6 +497,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);m
 </div><!-- /main -->
 
 <script>
+// ─── DATA ───────────────────────────────────────────────────────
 const ANSWERS = {
   'WEBS': 'WEBS',
   'Plan Administrator': 'Plan Administrator',
@@ -423,37 +554,49 @@ const FEEDBACK = {
   },
 };
 
-let currentDrag = null;
-let dragSource = null; // 'pool' or zone id
-let placed = {}; // zoneId -> termId
-let locked = false;
+const ROUND_TERMS = {
+  1: ['WEBS','Plan Administrator','Enrol-ME','Pending / Locked','Ledger'],
+  2: ['EE (Employee Profile)','BP (Benefits Profile)','COB','ERS','BSA']
+};
 
+// ─── STATE ──────────────────────────────────────────────────────
+let currentDrag = null;
+let dragSource = null;
+let placed = {};        // zoneId -> term
+let locked = { 1: false, 2: false };
+let r1correct = 0;
+let totalCorrect = 0;
+
+// ─── HELPERS ────────────────────────────────────────────────────
 function getChip(term) {
   return document.querySelector(`.term-chip[data-term="${CSS.escape(term)}"]`);
 }
 function getZone(id) {
   return document.getElementById('zone-' + id);
 }
-function getPlacedSpan(id) {
-  return getZone(id)?.querySelector('.placed-chip');
+
+function updateScore(round) {
+  const terms = ROUND_TERMS[round];
+  const placed_count = terms.filter(t => placed[t]).length;
+  const btn = document.getElementById('btnCheck' + round);
+  btn.disabled = (placed_count < terms.length);
+  document.getElementById('scorePill').textContent =
+    'Round ' + round + ' — ' + placed_count + ' / ' + terms.length + ' placed';
 }
 
-function updateScore() {
-  const count = Object.keys(placed).length;
-  document.getElementById('scorePill').textContent = count + ' / 10 matched';
-  document.getElementById('btnCheck').disabled = (count < 10);
-}
-
+// ─── DRAG EVENTS ────────────────────────────────────────────────
 function chipDragStart(e) {
-  if (locked) { e.preventDefault(); return; }
-  currentDrag = e.target.dataset.term || e.target.closest('[data-term]')?.dataset.term;
+  const chip = e.target.closest('[data-term]');
+  const round = parseInt(chip.dataset.round);
+  if (locked[round]) { e.preventDefault(); return; }
+  currentDrag = chip.dataset.term;
   dragSource = 'pool';
   e.dataTransfer.effectAllowed = 'move';
-  setTimeout(() => e.target.classList.add('dragging'), 0);
+  setTimeout(() => chip.classList.add('dragging'), 0);
 }
 
-function placedDragStart(e, zoneId) {
-  if (locked) { e.preventDefault(); return; }
+function placedDragStart(e, zoneId, round) {
+  if (locked[round]) { e.preventDefault(); return; }
   currentDrag = placed[zoneId];
   dragSource = zoneId;
   e.dataTransfer.effectAllowed = 'move';
@@ -464,7 +607,7 @@ function chipDragEnd(e) {
   document.querySelectorAll('.term-chip').forEach(c => c.classList.remove('dragging'));
 }
 
-function zoneDragOver(e, zoneId) {
+function zoneDragOver(e, zoneId, round) {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
   getZone(zoneId)?.classList.add('drag-over');
@@ -472,53 +615,48 @@ function zoneDragOver(e, zoneId) {
 function zoneDragLeave(e, zoneId) {
   getZone(zoneId)?.classList.remove('drag-over');
 }
-function zoneDrop(e, zoneId) {
+function zoneDrop(e, zoneId, round) {
   e.preventDefault();
   getZone(zoneId)?.classList.remove('drag-over');
-  if (!currentDrag || locked) return;
+  if (!currentDrag || locked[round]) return;
 
-  // If this zone already has a chip, send it back to pool
   if (placed[zoneId]) {
     const oldTerm = placed[zoneId];
     getChip(oldTerm)?.classList.remove('placed');
     delete placed[zoneId];
     clearZoneDisplay(zoneId);
   }
-
-  // If dragging from another zone, clear that zone
   if (dragSource && dragSource !== 'pool') {
-    const srcZone = dragSource;
-    delete placed[srcZone];
-    clearZoneDisplay(srcZone);
+    delete placed[dragSource];
+    clearZoneDisplay(dragSource);
   }
 
-  // Place chip into this zone
   placed[zoneId] = currentDrag;
   getChip(currentDrag)?.classList.add('placed');
   setZoneDisplay(zoneId, currentDrag);
   currentDrag = null;
   dragSource = null;
-  updateScore();
+  updateScore(round);
 }
 
-function poolDragOver(e) {
+function poolDragOver(e, round) {
   e.preventDefault();
-  document.getElementById('termsPool').classList.add('drag-over');
+  document.getElementById('pool' + round).classList.add('drag-over');
 }
-function poolDragLeave(e) {
-  document.getElementById('termsPool').classList.remove('drag-over');
+function poolDragLeave(e, round) {
+  document.getElementById('pool' + round).classList.remove('drag-over');
 }
-function poolDrop(e) {
+function poolDrop(e, round) {
   e.preventDefault();
-  document.getElementById('termsPool').classList.remove('drag-over');
-  if (!currentDrag || locked) return;
+  document.getElementById('pool' + round).classList.remove('drag-over');
+  if (!currentDrag || locked[round]) return;
   if (dragSource && dragSource !== 'pool') {
     delete placed[dragSource];
     clearZoneDisplay(dragSource);
     getChip(currentDrag)?.classList.remove('placed');
     currentDrag = null;
     dragSource = null;
-    updateScore();
+    updateScore(round);
   }
 }
 
@@ -541,10 +679,11 @@ function clearZoneDisplay(zoneId) {
   if (fb) { fb.classList.remove('show','ok','no'); fb.textContent = ''; }
 }
 
-function checkAll() {
-  locked = true;
+// ─── CHECK ──────────────────────────────────────────────────────
+function checkRound(round) {
+  locked[round] = true;
   let correct = 0;
-  Object.keys(ANSWERS).forEach(zoneId => {
+  ROUND_TERMS[round].forEach(zoneId => {
     const placed_term = placed[zoneId];
     const zone = getZone(zoneId);
     const row = document.getElementById('row-' + zoneId);
@@ -564,43 +703,105 @@ function checkAll() {
       fb.innerHTML = '✗ You placed <strong>' + placed_term + '</strong> here — ' + FEEDBACK[zoneId].no;
     }
   });
-  document.getElementById('finalScore').textContent = correct;
-  document.getElementById('summary').classList.add('show');
-  document.getElementById('summary').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  if (round === 1) {
+    r1correct = correct;
+    // Mark tab 1 as checked, unlock tab 2
+    document.getElementById('tab1').classList.add('rt-checked');
+    const tab2 = document.getElementById('tab2');
+    tab2.classList.remove('rt-locked');
+    tab2.classList.add('rt-available');
+    // Show bridge
+    const bridge = document.getElementById('r1complete');
+    bridge.classList.add('show');
+    document.getElementById('r1scoreMsg').textContent =
+      'You got ' + correct + ' out of 5 correct.';
+    bridge.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    totalCorrect = r1correct + correct;
+    document.getElementById('tab2').classList.add('rt-checked');
+    document.getElementById('tab2badge').textContent = '✓ Done';
+    document.getElementById('finalScore').textContent = totalCorrect;
+    const sum = document.getElementById('summary');
+    sum.classList.add('show');
+    sum.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
-function resetAll() {
-  locked = false;
-  placed = {};
-  document.querySelectorAll('.term-chip').forEach(c => c.classList.remove('placed','dragging'));
-  document.querySelectorAll('.drop-zone').forEach(z => {
-    z.classList.remove('has-chip','correct-state','wrong-state');
-    const span = z.querySelector('.placed-chip');
-    if (span) span.textContent = '';
+// ─── RESET ──────────────────────────────────────────────────────
+function resetRound(round) {
+  locked[round] = false;
+  ROUND_TERMS[round].forEach(zoneId => {
+    if (placed[zoneId]) {
+      getChip(placed[zoneId])?.classList.remove('placed','dragging');
+      delete placed[zoneId];
+    }
+    clearZoneDisplay(zoneId);
   });
-  document.querySelectorAll('.def-row').forEach(r => r.classList.remove('correct','wrong'));
-  document.querySelectorAll('.row-feedback').forEach(f => { f.classList.remove('show','ok','no'); f.textContent = ''; });
-  document.getElementById('summary').classList.remove('show');
-  updateScore();
+  if (round === 1) {
+    document.getElementById('r1complete').classList.remove('show');
+    document.getElementById('tab1').classList.remove('rt-checked');
+    // Re-lock tab 2 if round 2 not yet started
+    const tab2 = document.getElementById('tab2');
+    if (!locked[2]) {
+      tab2.classList.add('rt-locked');
+      tab2.classList.remove('rt-available','rt-active');
+    }
+  }
+  updateScore(round);
 }
 
-// Touch support
+// ─── TAB NAVIGATION ─────────────────────────────────────────────
+function tabClick(roundNum) {
+  const tab = document.getElementById('tab' + roundNum);
+  if (tab.classList.contains('rt-locked') || tab.classList.contains('rt-active')) return;
+  switchToRound(roundNum);
+}
+
+function startRound2() {
+  switchToRound(2);
+}
+
+function switchToRound(roundNum) {
+  const other = roundNum === 1 ? 2 : 1;
+  // Panels
+  document.getElementById('round' + other).classList.remove('active');
+  document.getElementById('round' + roundNum).classList.add('active');
+  // Tabs
+  document.getElementById('tab' + other).classList.remove('rt-active');
+  document.getElementById('tab' + roundNum).classList.add('rt-active');
+  // If switching to round 1 after unlocking round 2, keep round 2 available
+  if (roundNum === 1 && !document.getElementById('tab2').classList.contains('rt-locked')) {
+    document.getElementById('tab2').classList.add('rt-available');
+  }
+  // Update score pill
+  updateScore(roundNum);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── TOUCH SUPPORT ──────────────────────────────────────────────
 let touchDragEl = null;
 let touchClone = null;
 let touchZoneId = null;
+let touchRound = null;
 
 document.addEventListener('touchstart', e => {
   const chip = e.target.closest('.term-chip:not(.placed), .placed-chip');
-  if (!chip || locked) return;
+  if (!chip) return;
+  const roundEl = chip.closest('.round-panel');
+  const round = roundEl ? (roundEl.id === 'round1' ? 1 : 2) : null;
+  if (!round || locked[round]) return;
   e.preventDefault();
+  touchRound = round;
   if (chip.classList.contains('placed-chip')) {
     const zone = chip.closest('.drop-zone');
-    touchDragEl = { type: 'placed', zoneId: zone.id.replace('zone-',''), term: placed[zone.id.replace('zone-','')] };
+    const zId = zone.id.replace('zone-','');
+    touchDragEl = { type: 'placed', zoneId: zId, term: placed[zId] };
   } else {
     touchDragEl = { type: 'pool', term: chip.dataset.term };
   }
   touchClone = chip.cloneNode(true);
-  touchClone.style.cssText = 'position:fixed;pointer-events:none;opacity:.8;z-index:9999;font-size:14px;font-weight:600;background:#1A2B3C;color:#fff;padding:8px 16px;border-radius:6px;transition:none;';
+  touchClone.style.cssText = 'position:fixed;pointer-events:none;opacity:.85;z-index:9999;font-size:14px;font-weight:600;background:#1A2B3C;color:#fff;padding:8px 16px;border-radius:6px;transition:none;';
   document.body.appendChild(touchClone);
 }, { passive: false });
 
@@ -621,15 +822,14 @@ document.addEventListener('touchend', e => {
   if (touchZoneId) {
     currentDrag = touchDragEl.term;
     dragSource = touchDragEl.type === 'placed' ? touchDragEl.zoneId : 'pool';
-    zoneDrop({ preventDefault: ()=>{} }, touchZoneId);
+    zoneDrop({ preventDefault: ()=>{} }, touchZoneId, touchRound);
   } else if (touchDragEl.type === 'placed') {
-    // Return to pool
     delete placed[touchDragEl.zoneId];
     clearZoneDisplay(touchDragEl.zoneId);
     getChip(touchDragEl.term)?.classList.remove('placed');
-    updateScore();
+    updateScore(touchRound);
   }
-  touchDragEl = null; touchZoneId = null;
+  touchDragEl = null; touchZoneId = null; touchRound = null;
 });
 </script>
 </body>
