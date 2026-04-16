@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OLLIE — Key Terms</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1A2B3C; --teal:#028090; --bteal:#02C39A; --sand:#F5F0E8;
+  --white:#fff; --border:#D4DCE5; --mid:#8B9AAB; --text:#1A2B3C;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--sand);color:var(--text);min-height:100vh;}
+
+.hdr{background:var(--navy);border-bottom:3px solid var(--bteal);position:sticky;top:0;z-index:100;}
+.hdr-inner{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.badge{background:var(--teal);color:#fff;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:3px;}
+.hdr-title{font-family:'DM Serif Display',serif;color:#fff;font-size:16px;}
+.prog-wrap{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.prog-label{font-size:12px;color:rgba(255,255,255,.55);white-space:nowrap;}
+.prog-track{width:120px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--bteal);border-radius:2px;transition:width .4s ease;}
+
+.main{max-width:960px;margin:0 auto;padding:36px 24px 60px;}
+
+.intro{margin-bottom:24px;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.intro-h{font-family:'DM Serif Display',serif;font-size:32px;line-height:1.15;letter-spacing:-.02em;color:var(--navy);margin-bottom:10px;}
+.intro-body{font-size:15px;color:#3d4f62;line-height:1.65;max-width:580px;margin-bottom:14px;}
+.meta{display:flex;gap:20px;font-size:13px;color:var(--mid);flex-wrap:wrap;}
+.meta span{display:flex;align-items:center;gap:5px;}
+
+.instruction{background:#fff;border:1px solid var(--border);border-left:4px solid var(--bteal);border-radius:0 8px 8px 0;padding:12px 18px;margin-bottom:28px;font-size:14px;color:#3d4f62;line-height:1.6;}
+.instruction strong{color:var(--navy);}
+
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:40px;
+}
+
+/* The flip-card is a positioned container.
+   .card-sizer is an invisible copy of the front — it stays in flow
+   and gives the container its natural height.
+   .card-inner is absolute and stretches to match that height. */
+.flip-card{
+  position:relative;
+  perspective:1000px;
+  cursor:pointer;
+}
+.flip-card.revealed > .card-inner{
+  box-shadow:0 0 0 2px var(--bteal);
+}
+
+.card-sizer{
+  visibility:hidden;
+  display:flex;
+  flex-direction:column;
+  padding:20px;
+  border:1px solid transparent;
+  border-radius:10px;
+  pointer-events:none;
+  user-select:none;
+}
+.card-sizer .card-num{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;}
+.card-sizer .card-scenario{font-size:13px;line-height:1.65;flex:1;}
+.card-sizer .flip-hint{font-size:11px;font-weight:600;letter-spacing:.06em;padding-top:12px;border-top:1px solid var(--border);margin-top:12px;}
+
+.card-inner{
+  position:absolute;
+  inset:0;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+  transform-style:preserve-3d;
+  border-radius:10px;
+}
+.flip-card.flipped .card-inner{
+  transform:rotateY(180deg);
+}
+
+.card-face{
+  position:absolute;
+  inset:0;
+  border-radius:10px;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  display:flex;
+  flex-direction:column;
+  padding:20px;
+  border:1px solid var(--border);
+}
+.card-front{background:#fff;}
+.card-back{background:var(--navy);transform:rotateY(180deg);}
+
+.card-num{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:10px;flex-shrink:0;}
+.card-scenario{font-size:13px;color:#2d3e50;line-height:1.65;flex:1;}
+.flip-hint{font-size:11px;color:var(--teal);font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding-top:12px;border-top:1px solid var(--border);margin-top:12px;flex-shrink:0;}
+
+.card-term-reveal{font-family:'DM Serif Display',serif;font-size:19px;color:#fff;line-height:1.2;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.15);flex-shrink:0;}
+.card-def{font-size:12px;color:rgba(255,255,255,.85);line-height:1.6;flex:1;}
+.card-why{font-size:11px;color:var(--bteal);line-height:1.5;padding-top:8px;border-top:1px solid rgba(255,255,255,.12);margin-top:8px;flex-shrink:0;}
+
+.summary{display:none;background:var(--navy);border-radius:12px;padding:36px;animation:fadeUp .4s ease;}
+.summary.show{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.sum-eye{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--bteal);margin-bottom:10px;}
+.sum-h{font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:12px;line-height:1.3;}
+.sum-p{font-size:14px;color:rgba(255,255,255,.7);line-height:1.7;margin-bottom:24px;max-width:520px;}
+.glossary{display:flex;flex-direction:column;gap:8px;}
+.gl-row{display:flex;gap:14px;padding:12px 16px;background:rgba(255,255,255,.06);border-radius:6px;border-left:3px solid var(--bteal);}
+.gl-term{font-weight:600;font-size:13px;color:var(--bteal);min-width:140px;flex-shrink:0;}
+.gl-def{font-size:13px;color:rgba(255,255,255,.8);line-height:1.55;}
+.sum-close{margin-top:20px;font-size:13px;color:rgba(255,255,255,.4);font-style:italic;}
+
+@media(max-width:800px){.card-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.card-grid{grid-template-columns:1fr;}.intro-h{font-size:26px;}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <span class="badge">Oliver Product Fundamentals</span>
+      <span class="hdr-title">OLLIE — Key Terms</span>
+    </div>
+    <div class="prog-wrap">
+      <span class="prog-label" id="progLabel">0 of 8 revealed</span>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="intro">
+    <p class="eyebrow">Before the Lesson</p>
+    <h1 class="intro-h">Eight scenarios.<br>Which term fits?</h1>
+    <p class="intro-body">Each card describes a real OLLIE situation. Read it — then flip to find out which term it describes, what it means, and why it matters.</p>
+    <div class="meta">
+      <span>⏱ About 4 minutes</span>
+      <span>🃏 Read, think, then flip</span>
+      <span>↩ Flip back any time</span>
+    </div>
+  </div>
+
+  <div class="instruction">
+    <strong>How it works:</strong> Read the scenario on the front of each card. Think about which OLLIE term it describes — then flip to check. A teal border marks the cards you've revealed. A summary appears once you've worked through all eight.
+  </div>
+
+  <div class="card-grid" id="cardGrid">
+
+    <!-- CARD 1 -->
+    <div class="flip-card" id="fc1" onclick="flipCard(1)" role="button" aria-label="Scenario card 1" tabindex="0">
+      <div class="card-sizer">
+        <div class="card-num">Scenario 1 of 8</div>
+        <div class="card-scenario">A broker has 22 employer groups. They want to keep their client relationships — but remittances, billing, and carrier coordination are consuming their team. They don't want new software. They want someone to take the work away and run it for them.</div>
+        <div class="flip-hint">&#8635; which term is this?</div>
+      </div>
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-num">Scenario 1 of 8</div>
+          <div class="card-scenario">A broker has 22 employer groups. They want to keep their client relationships — but remittances, billing, and carrier coordination are consuming their team. They don't want new software. They want someone to take the work away and run it for them.</div>
+          <div class="flip-hint">&#8635; which term is this?</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-term-reveal">OLLIE</div>
+          <div class="card-def">Oliver's platform-powered administration (PPA) service — OLLIE Insurance Solutions. Delivers benefits, pension, billing and insurance administration as a managed service.</div>
+          <div class="card-why">OLLIE is the service, not the platform. Oliver built the engine — OLLIE runs it on behalf of clients.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="flip-card" id="fc2" onclick="flipCard(2)" role="button" aria-label="Scenario card 2" tabindex="0">
+      <div class="card-sizer">
+        <div class="card-num">Scenario 2 of 8</div>
+        <div class="card-scenario">A new colleague keeps using two names interchangeably. One refers to the technology and the company that built it. The other refers to the administration service that runs on top of it. They are not the same thing.</div>
+        <div class="flip-hint">&#8635; which term is this?</div>
+      </div>
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-num">Scenario 2 of 8</div>
+          <div class="card-scenario">A new colleague keeps using two names interchangeably. One refers to the technology and the company that built it. The other refers to the administration service that runs on top of it. They are not the same thing.</div>
+          <div class="flip-hint">&#8635; which term is this?</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-term-reveal">Oliver</div>
+          <div class="card-def">The platform and broader company. Not interchangeable with OLLIE.</div>
+          <div class="card-why">Oliver = the platform and company. OLLIE = the administration service that runs on it. Mixing these up causes real confusion in client conversations.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3 -->
+    <div class="flip-card" id="fc3" onclick="flipCard(3)" role="button" aria-label="Scenario card 3" tabindex="0">
+      <div class="card-sizer">
+        <div class="card-num">Scenario 3 of 8</div>
+        <div class="card-scenario">A prospect has had bad experiences with traditional administrators — manual processes, inflexible systems, slow turnaround. Oliver uses a different label to signal that OLLIE operates on modern technology, not legacy infrastructure.</div>
+        <div class="flip-hint">&#8635; which term is this?</div>
+      </div>
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-num">Scenario 3 of 8</div>
+          <div class="card-scenario">A prospect has had bad experiences with traditional administrators — manual processes, inflexible systems, slow turnaround. Oliver uses a different label to signal that OLLIE operates on modern technology, not legacy infrastructure.</div>
+          <div class="flip-hint">&#8635; which term is this?</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-term-reveal">PPA</div>
+          <div class="card-def">Platform-Powered Administration. Oliver's term for administration services delivered through modern technology. A deliberate reframe of the traditional TPA concept.</div>
+          <div class="card-why">PPA signals that OLLIE is not a legacy administrator. Same work — very different operating model behind it.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 4 -->
+    <div class="flip-card" id="fc4" onclick="flipCard(4)" role="button" aria-label="Scenario card 4" tabindex="0">
+      <div class="card-sizer">
+        <div class="card-num">Scenario 4 of 8</div>
+        <div class="card-scenario">A company hires an external organisation to handle enrolments, invoicing and carrier files on their behalf. That organisation is not the insurer and not the regulator — it sits between employer and carrier.</div>
+        <div class="flip-hint">&#8635; which term is this?</div>
+      </div>
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-num">Scenario 4 of 8</div>
+          <div class="card-scenario">A company hires an external organisation to handle enrolments, invoicing and carrier files on their behalf. That organisation is not the insurer and not the regulator — it sits between employer and carrier.</div>
+          <div class="flip-hint">&#8635; which term is this?</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-term-reveal">TPA</div>
+          <div class="card-def">Third-party administrator. Traditional industry term. OLLIE is positioned as a modern PPA alternative.</div>
+          <div class="card-why">TPAs manage the administrative layer between employers and carriers. OLLIE plays this role — but with modern technology replacing the manual model.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 5 -->
+    <div class="flip-card" id="fc5" onclick="flipCard(5)" role="button" aria-label="Scenario card 5" tabindex="0">
+      <div class="card-sizer">
+        <div class="card-num">Scenario 5 of 8</div>
+        <div class="card-scenario">An advisory firm wants OLLIE to handle remittances, billing, and carrier coordination — but they are keeping their employer relationships themselves. They stay visible to their clients. OLLIE runs everything behind the scenes.</div>
+        <div class="flip-hint">&#8635; which term is this?</div>
+      </div>
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-num">Scenario 5 of 8</div>
+          <div class="card-scenario">An advisory firm wants OLLIE to handle remittances, billing, and carrier coordination — but they are keeping their employer relationships themselves. They stay visible to their clients. OLLIE runs everything behind the scenes.</div>
+          <div class="flip-hint">&#8635; which term is this?</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-term-reveal">Back-office model</div>
+          <div class="card-def">OLLIE handles operational and financial work behind the scenes. The client retains the front-end relationship with members, employers, advisors or plan sponsors.</div>
+          <div class="card-why">The client is the face. OLLIE is the engine. Most brokers and advisors start here — they want the work gone, not the relationship.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 6 -->
+    <div class="flip-card" id="fc6" onclick="flipCard(6)" role="button" aria-label="Scenario card 6" tabindex="0">
+      <div class="card-sizer">
+        <div class="card-num">Scenario 6 of 8</div>
+        <div class="card-scenario">A union trust fund has no administration team and no desire to build one. They want a single partner to handle everything — member enrolments, remittances, carrier payments, call centre, reporting. All of it.</div>
+        <div class="flip-hint">&#8635; which term is this?</div>
+      </div>
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-num">Scenario 6 of 8</div>
+          <div class="card-scenario">A union trust fund has no administration team and no desire to build one. They want a single partner to handle everything — member enrolments, remittances, carrier payments, call centre, reporting. All of it.</div>
+          <div class="flip-hint">&#8635; which term is this?</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-term-reveal">Full-service model</div>
+          <div class="card-def">OLLIE manages administration end-to-end, including member and employer support, call centre functions, and complete operational ownership.</div>
+          <div class="card-why">Some clients want everything outsourced. Full-service means OLLIE is not just the engine — it's also the driver.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 7 -->
+    <div class="flip-card" id="fc7" onclick="flipCard(7)" role="button" aria-label="Scenario card 7" tabindex="0">
+      <div class="card-sizer">
+        <div class="card-num">Scenario 7 of 8</div>
+        <div class="card-scenario">A professional association wants OLLIE to manage their billing and carrier coordination — but wants to keep member inquiries and renewals with their own staff, and also wants OLLIE to train that team on an ongoing basis. This doesn't fit cleanly into either standard model.</div>
+        <div class="flip-hint">&#8635; which term is this?</div>
+      </div>
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-num">Scenario 7 of 8</div>
+          <div class="card-scenario">A professional association wants OLLIE to manage their billing and carrier coordination — but wants to keep member inquiries and renewals with their own staff, and also wants OLLIE to train that team on an ongoing basis. This doesn't fit cleanly into either standard model.</div>
+          <div class="flip-hint">&#8635; which term is this?</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-term-reveal">Hybrid model</div>
+          <div class="card-def">A tailored blend of back-office and full-service support — many clients fall between the two models.</div>
+          <div class="card-why">Flexibility is core to OLLIE's offer. The level of support is a conversation, not a fixed menu — and most real clients need something in between.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 8 -->
+    <div class="flip-card" id="fc8" onclick="flipCard(8)" role="button" aria-label="Scenario card 8" tabindex="0">
+      <div class="card-sizer">
+        <div class="card-num">Scenario 8 of 8</div>
+        <div class="card-scenario">An employer disputes a remittance from two months ago. OLLIE opens the platform and finds the exact date the change was made, who made it, and what the billing showed before and after. The auditor accepts this as documentation — no reconstruction needed.</div>
+        <div class="flip-hint">&#8635; which term is this?</div>
+      </div>
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div class="card-num">Scenario 8 of 8</div>
+          <div class="card-scenario">An employer disputes a remittance from two months ago. OLLIE opens the platform and finds the exact date the change was made, who made it, and what the billing showed before and after. The auditor accepts this as documentation — no reconstruction needed.</div>
+          <div class="flip-hint">&#8635; which term is this?</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-term-reveal">System of Record</div>
+          <div class="card-def">The authoritative source of truth — the single place where eligibility, billing and remittance data is official.</div>
+          <div class="card-why">When OLLIE records a change, that is the answer auditors accept. Already in the system, timestamped and traceable — not reconstructed from emails.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="summary" id="summary">
+    <p class="sum-eye">All eight revealed</p>
+    <h2 class="sum-h">Your OLLIE vocabulary — at a glance</h2>
+    <p class="sum-p">These terms connect directly to the content in the OLLIE lesson. Update your reference card, then return to the Sway lesson to continue.</p>
+    <div class="glossary">
+      <div class="gl-row"><span class="gl-term">OLLIE</span><span class="gl-def">Oliver's platform-powered administration (PPA) service — OLLIE Insurance Solutions. Delivers benefits, pension, billing and insurance administration as a managed service.</span></div>
+      <div class="gl-row"><span class="gl-term">Oliver</span><span class="gl-def">The platform and broader company. Not interchangeable with OLLIE.</span></div>
+      <div class="gl-row"><span class="gl-term">PPA</span><span class="gl-def">Platform-Powered Administration. Oliver's term for administration services delivered through modern technology. A deliberate reframe of the traditional TPA concept.</span></div>
+      <div class="gl-row"><span class="gl-term">TPA</span><span class="gl-def">Third-party administrator. Traditional industry term. OLLIE is positioned as a modern PPA alternative.</span></div>
+      <div class="gl-row"><span class="gl-term">Back-office model</span><span class="gl-def">OLLIE handles operational and financial work behind the scenes. The client retains the front-end relationship with members, employers, advisors or plan sponsors.</span></div>
+      <div class="gl-row"><span class="gl-term">Full-service model</span><span class="gl-def">OLLIE manages administration end-to-end, including member and employer support, call centre functions, and complete operational ownership.</span></div>
+      <div class="gl-row"><span class="gl-term">Hybrid model</span><span class="gl-def">A tailored blend of back-office and full-service support — many clients fall between the two models.</span></div>
+      <div class="gl-row"><span class="gl-term">System of Record</span><span class="gl-def">The authoritative source of truth — the single place where eligibility, billing and remittance data is official.</span></div>
+    </div>
+    <p class="sum-close">Close this tab and return to the Sway lesson to continue →</p>
+  </div>
+
+</div>
+
+<script>
+const TOTAL = 8;
+const revealed = new Set();
+
+function flipCard(n) {
+  const card = document.getElementById('fc' + n);
+  const isFlipped = card.classList.contains('flipped');
+  card.classList.toggle('flipped');
+  if (!isFlipped) {
+    revealed.add(n);
+    card.classList.add('revealed');
+    updateProgress();
+  }
+}
+
+function updateProgress() {
+  const count = revealed.size;
+  document.getElementById('progFill').style.width = (count / TOTAL * 100) + '%';
+  document.getElementById('progLabel').textContent = count + ' of ' + TOTAL + ' revealed';
+  if (count === TOTAL) {
+    setTimeout(() => {
+      const sum = document.getElementById('summary');
+      sum.classList.add('show');
+      sum.scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 600);
+  }
+}
+
+document.querySelectorAll('.flip-card').forEach(card => {
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
+  });
+});
+</script>
+</body>
+</html>
