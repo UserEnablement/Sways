@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OLLIE — Apply What You Know</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1A2B3C;
+    --teal: #028090;
+    --bright-teal: #02C39A;
+    --correct: #0A2E1E;
+    --correct-light: #e6f4ee;
+    --wrong: #2A1010;
+    --wrong-light: #fdf0ed;
+    --orange: #E85D2A;
+    --sand: #F5F0E8;
+    --mid: #8B9AAB;
+    --white: #FFFFFF;
+    --text: #1A2B3C;
+    --border: #D4DCE5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--bright-teal);
+  }
+  .header-inner {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .header-brand { display: flex; align-items: center; gap: 12px; }
+  .header-badge {
+    background: var(--teal);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+  .header-title {
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    white-space: nowrap;
+  }
+  .progress-track {
+    width: 120px;
+    height: 5px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--bright-teal);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* ── SCREENS ── */
+  .screens { position: relative; }
+
+  .screen {
+    display: none;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 40px 24px 100px;
+    animation: fadeSlide 0.35s ease;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── INTRO SCREEN ── */
+  .intro-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+  .intro-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.1;
+    color: var(--navy);
+    margin-bottom: 18px;
+    letter-spacing: -0.02em;
+  }
+  .intro-body {
+    font-size: 17px;
+    color: #3d4f62;
+    max-width: 580px;
+    line-height: 1.75;
+    margin-bottom: 28px;
+  }
+  .intro-meta {
+    display: flex;
+    gap: 28px;
+    font-size: 13px;
+    color: var(--mid);
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  .intro-meta span { display: flex; align-items: center; gap: 6px; }
+
+  .scenario-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 520px;
+    margin-bottom: 40px;
+  }
+  .preview-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .preview-num {
+    background: var(--teal);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .preview-label { font-weight: 600; font-size: 15px; color: var(--navy); }
+
+  .btn-start {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--teal);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 32px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-start:hover { background: #026d7a; transform: translateY(-1px); }
+
+  /* ── SCENARIO CARD ── */
+  .scenario-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 16px rgba(26,43,60,0.07);
+    margin-bottom: 24px;
+  }
+
+  .scenario-header {
+    background: var(--navy);
+    padding: 22px 28px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .scenario-num-badge {
+    background: var(--teal);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  .scenario-context-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--bright-teal);
+    margin-bottom: 9px;
+  }
+  .scenario-situation {
+    font-size: 16px;
+    color: rgba(255,255,255,0.92);
+    line-height: 1.7;
+    font-style: italic;
+  }
+  .scenario-situation strong {
+    color: white;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .scenario-body { padding: 28px; }
+
+  .scenario-question {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--navy);
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+
+  /* ── CHOICES ── */
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+
+  .choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 2px solid var(--border);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.12s;
+    background: white;
+    text-align: left;
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .choice:hover:not(:disabled) {
+    border-color: var(--teal);
+    background: #f0fbfc;
+    transform: translateX(2px);
+  }
+  .choice:focus { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .choice:disabled { cursor: default; }
+
+  .choice-marker {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--mid);
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .choice:hover:not(:disabled) .choice-marker { border-color: var(--teal); color: var(--teal); }
+
+  .choice-text { font-size: 15px; color: var(--text); line-height: 1.55; padding-top: 3px; }
+  .choice-label { font-weight: 600; display: block; margin-bottom: 3px; }
+  .choice-sub { font-size: 13px; color: var(--mid); }
+
+  .choice.is-correct { border-color: var(--bright-teal); background: var(--correct-light); }
+  .choice.is-correct .choice-marker { background: var(--bright-teal); border-color: var(--bright-teal); color: white; }
+  .choice.is-wrong-sel { border-color: var(--orange); background: var(--wrong-light); }
+  .choice.is-wrong-sel .choice-marker { background: var(--orange); border-color: var(--orange); color: white; }
+  .choice.is-dim { opacity: 0.38; }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    display: none;
+    margin-top: 20px;
+    border-radius: 9px;
+    overflow: hidden;
+    animation: feedIn 0.3s ease;
+  }
+  @keyframes feedIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .feedback.show { display: block; }
+
+  .feedback-banner {
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .feedback.ok .feedback-banner { background: var(--correct); color: var(--bright-teal); }
+  .feedback.no .feedback-banner { background: var(--wrong);   color: var(--orange); }
+  .feedback-icon { font-size: 17px; line-height: 1; }
+
+  .feedback-body {
+    padding: 20px 20px 22px;
+    background: #f7f9fb;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 9px 9px;
+  }
+  .feedback-body p { font-size: 15px; line-height: 1.72; color: #2d3e50; margin-bottom: 12px; }
+  .feedback-body p:last-child { margin-bottom: 0; }
+  .feedback-body strong { color: var(--navy); }
+
+  .wim {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: white;
+    border-left: 4px solid var(--teal);
+    border-radius: 0 6px 6px 0;
+  }
+  .wim-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 6px;
+  }
+  .wim p { font-size: 14px; color: #3d4f62; margin: 0 !important; }
+
+  /* ── NEXT BAR ── */
+  .next-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(245,240,232,0.96);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border);
+    padding: 14px 24px;
+    display: none;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    z-index: 50;
+  }
+  .next-bar.show { display: flex; animation: barUp 0.25s ease; }
+  @keyframes barUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .next-hint { font-size: 13px; color: var(--mid); }
+
+  .btn-next {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--teal);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-next:hover { background: #026d7a; transform: translateY(-1px); }
+  .btn-next.final { background: var(--correct); }
+  .btn-next.final:hover { background: #082418; }
+
+  /* ── SUMMARY SCREEN ── */
+  .summary-inner {
+    background: var(--navy);
+    border-radius: 14px;
+    padding: 44px;
+    color: white;
+  }
+  .summary-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--bright-teal);
+    margin-bottom: 12px;
+  }
+  .summary-heading {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    line-height: 1.25;
+    margin-bottom: 18px;
+    letter-spacing: -0.01em;
+  }
+  .summary-body {
+    font-size: 16px;
+    color: rgba(255,255,255,0.78);
+    line-height: 1.75;
+    margin-bottom: 14px;
+    max-width: 580px;
+  }
+  .summary-rule {
+    margin-top: 28px;
+    padding: 20px 22px;
+    background: rgba(2,195,154,0.12);
+    border: 1px solid rgba(2,195,154,0.28);
+    border-radius: 9px;
+    font-size: 15px;
+    color: rgba(255,255,255,0.88);
+    line-height: 1.7;
+  }
+  .summary-rule strong { color: var(--bright-teal); }
+  .summary-close {
+    margin-top: 24px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.42);
+    font-style: italic;
+  }
+
+  @media (max-width: 580px) {
+    .intro-heading { font-size: 30px; }
+    .summary-heading { font-size: 24px; }
+    .screen { padding: 28px 16px 100px; }
+    .scenario-body { padding: 20px 18px; }
+    .scenario-header { padding: 18px 18px; }
+    .summary-inner { padding: 28px 20px; }
+    .header-inner { padding: 14px 16px; }
+    .progress-track { width: 80px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <span class="header-badge">Oliver Product Fundamentals</span>
+      <span class="header-title">OLLIE — Apply What You Know</span>
+    </div>
+    <div class="progress-wrap">
+      <span class="progress-label" id="progLabel">Intro</span>
+      <div class="progress-track">
+        <div class="progress-fill" id="progFill"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="screens">
+
+  <!-- ══════════════════ SCREEN 0 — INTRO ══════════════════ -->
+  <div class="screen active" id="screen-0">
+    <p class="intro-eyebrow">Apply What You Know</p>
+    <h1 class="intro-heading">Three situations.<br>You decide.</h1>
+    <p class="intro-body">These aren't recognition questions — there's no feature list to match against. Each scenario asks you to reason through a real situation and make a call. Read carefully. The nuance is intentional.</p>
+    <div class="intro-meta">
+      <span>&#9203; About 5 minutes</span>
+      <span>&#128172; Explanation after each answer</span>
+      <span>&#8594; One scenario at a time</span>
+    </div>
+    <div class="scenario-preview">
+      <div class="preview-row"><span class="preview-num">1</span><span class="preview-label">New client conversation</span></div>
+      <div class="preview-row"><span class="preview-num">2</span><span class="preview-label">Internal scoping meeting</span></div>
+      <div class="preview-row"><span class="preview-num">3</span><span class="preview-label">New joiner terminology question</span></div>
+    </div>
+    <button class="btn-start" onclick="goTo(1)">Start &#8594;</button>
+  </div>
+
+
+  <!-- ══════════════════ SCREEN 1 ══════════════════ -->
+  <div class="screen" id="screen-1">
+    <div class="scenario-card">
+      <div class="scenario-header">
+        <div class="scenario-num-badge">Scenario 1 of 3</div>
+        <div>
+          <div class="scenario-context-label">New client conversation</div>
+          <p class="scenario-situation">A broker contacts you. They manage group benefits for <strong>18 employer groups</strong>. They're spending most of their team's time on remittances, billing, carrier coordination, and month-end reporting — all manual, all painful. They want to keep talking to their employer clients directly. <strong>But they've been clear: they don't want a new software system to manage. They want someone to take the work away and run it for them.</strong></p>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <p class="scenario-question">What do you recommend — and what's the reasoning?</p>
+        <div class="choices" id="choices-1" role="group" aria-label="Scenario 1 choices">
+
+          <button class="choice" onclick="answer(1,this,false,'fb-1-a')">
+            <div class="choice-marker">A</div>
+            <div class="choice-text">
+              <span class="choice-label">Oliver platform</span>
+              <span class="choice-sub">They need better tools to manage their administration more efficiently</span>
+            </div>
+          </button>
+
+          <button class="choice" onclick="answer(1,this,true,'fb-1-b')">
+            <div class="choice-marker">B</div>
+            <div class="choice-text">
+              <span class="choice-label">OLLIE — back-office model</span>
+              <span class="choice-sub">OLLIE handles operations behind the scenes; the broker keeps the client relationship</span>
+            </div>
+          </button>
+
+          <button class="choice" onclick="answer(1,this,false,'fb-1-c')">
+            <div class="choice-marker">C</div>
+            <div class="choice-text">
+              <span class="choice-label">OLLIE — full-service model</span>
+              <span class="choice-sub">OLLIE takes over everything, including client-facing contact</span>
+            </div>
+          </button>
+
+        </div>
+
+        <div class="feedback ok" id="fb-1-b">
+          <div class="feedback-banner"><span class="feedback-icon">&#10003;</span> Correct — and the reasoning matters as much as the answer</div>
+          <div class="feedback-body">
+            <p><strong>OLLIE back-office model is right.</strong> The broker has given you two clear signals. First: they don't want to manage a system — that rules out the Oliver platform, which requires the client to run their own administration. Second: they want to keep talking to their employer clients directly — that rules out full-service, which hands over the front end too.</p>
+            <p>Back-office is built for exactly this: OLLIE takes the operational complexity — remittances, billing, carrier coordination, reporting — while the broker stays the face to their clients. The client is the face. OLLIE is the engine.</p>
+            <div class="wim">
+              <div class="wim-label">The distinction to hold onto</div>
+              <p>The question is never just "do they want Oliver?" It's always "what do they want Oliver to do for them?" When the answer is "do the work" — that's OLLIE. When the answer is "give us better tools" — that's the Oliver platform.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback no" id="fb-1-a">
+          <div class="feedback-banner"><span class="feedback-icon">&#10007;</span> Not quite — the broker was explicit about what they don't want</div>
+          <div class="feedback-body">
+            <p><strong>The correct answer is OLLIE back-office model.</strong> The Oliver platform gives organizations better technology — but the team still has to use it to run administration themselves. This broker said clearly: they don't want a new system to manage. They want the work taken away.</p>
+            <p>That's the fundamental distinction. Platform = technology to run yourself. OLLIE = administration run for you.</p>
+            <div class="wim">
+              <div class="wim-label">The rule to remember</div>
+              <p>If they want tools — Oliver platform. If they want the work done — OLLIE. The broker's exact words are the clearest possible signal of which conversation this is.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback no" id="fb-1-c">
+          <div class="feedback-banner"><span class="feedback-icon">&#10007;</span> Not quite — the broker wants to keep the client relationship</div>
+          <div class="feedback-body">
+            <p><strong>The correct answer is OLLIE back-office model.</strong> Full-service hands over everything — including member and employer contact. But this broker was clear: they want to keep talking to their employer clients directly. That front-end relationship is the one thing they're not willing to outsource.</p>
+            <p>Back-office is designed for exactly this: OLLIE runs the engine, the broker keeps the relationship.</p>
+            <div class="wim">
+              <div class="wim-label">The signal to watch for</div>
+              <p>"We want to keep talking to our clients" = back-office. "We want everything handled" = full-service. The presence or absence of that sentence decides the model in almost every OLLIE scoping conversation.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════ SCREEN 2 ══════════════════ -->
+  <div class="screen" id="screen-2">
+    <div class="scenario-card">
+      <div class="scenario-header">
+        <div class="scenario-num-badge">Scenario 2 of 3</div>
+        <div>
+          <div class="scenario-context-label">Internal scoping meeting</div>
+          <p class="scenario-situation">You're in a scoping meeting. A new client has just signed on to OLLIE. Your colleague says: <em>"I've gone ahead and booked the same onboarding flow we use for all our Oliver Admin clients — same steps, same timeline, same technical setup. <strong>OLLIE runs on the Oliver platform anyway, so the process should be identical.</strong>"</em></p>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <p class="scenario-question">Is your colleague right — and how would you respond?</p>
+        <div class="choices" id="choices-2" role="group" aria-label="Scenario 2 choices">
+
+          <button class="choice" onclick="answer(2,this,false,'fb-2-a')">
+            <div class="choice-marker">A</div>
+            <div class="choice-text">
+              <span class="choice-label">Yes — OLLIE runs on Oliver Admin, so the onboarding process is the same</span>
+              <span class="choice-sub">The platform is the same, so the setup steps are identical</span>
+            </div>
+          </button>
+
+          <button class="choice" onclick="answer(2,this,true,'fb-2-b')">
+            <div class="choice-marker">B</div>
+            <div class="choice-text">
+              <span class="choice-label">No — OLLIE is a managed service engagement, not just a platform onboarding</span>
+              <span class="choice-sub">Setting up OLLIE means configuring an operating model, not just technology</span>
+            </div>
+          </button>
+
+          <button class="choice" onclick="answer(2,this,false,'fb-2-c')">
+            <div class="choice-marker">C</div>
+            <div class="choice-text">
+              <span class="choice-label">Partly — the technical setup is the same, but the timeline will be longer</span>
+              <span class="choice-sub">It's the same process, just with more complexity</span>
+            </div>
+          </button>
+
+        </div>
+
+        <div class="feedback ok" id="fb-2-b">
+          <div class="feedback-banner"><span class="feedback-icon">&#10003;</span> Correct — this distinction matters from day one of the engagement</div>
+          <div class="feedback-body">
+            <p><strong>OLLIE is a managed service engagement — not a platform onboarding.</strong> Yes, OLLIE runs on the Oliver platform. But what's being configured isn't just technology — it's an operating model. That means eligibility workflows, remittance processing rules, billing configurations, carrier coordination, reporting, and resourcing. The client isn't learning to use a system — they're handing over their operations.</p>
+            <p>Using an Oliver Admin onboarding flow misses all of that. It treats the client like they're self-administering, when they've specifically chosen not to.</p>
+            <div class="wim">
+              <div class="wim-label">Why this matters in your work</div>
+              <p>Getting the onboarding model wrong at the start creates rework, resourcing confusion, and a client relationship that starts on the wrong foot. OLLIE clients expect OLLIE to own the outcome — that has to be scoped and set up correctly from day one.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback no" id="fb-2-a">
+          <div class="feedback-banner"><span class="feedback-icon">&#10007;</span> The shared platform doesn't mean a shared process</div>
+          <div class="feedback-body">
+            <p><strong>The correct answer is B.</strong> It's true that OLLIE runs on the Oliver platform — but what's being onboarded is fundamentally different. An Oliver Admin onboarding sets up a client who will run their own administration. An OLLIE onboarding sets up a managed service: eligibility workflows, remittance processing, billing rules, carrier coordination, and operational resourcing — all configured for a client handing their operations over to OLLIE.</p>
+            <p>Same technology. Completely different setup.</p>
+            <div class="wim">
+              <div class="wim-label">The distinction to hold onto</div>
+              <p>OLLIE is a service. Oliver Admin is a product. They share a platform — but onboarding a service means configuring operations, not just technology. That difference shows up immediately in scoping, resourcing, and timeline.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback no" id="fb-2-c">
+          <div class="feedback-banner"><span class="feedback-icon">&#10007;</span> It's not the same process — it's a different type of engagement entirely</div>
+          <div class="feedback-body">
+            <p><strong>The correct answer is B.</strong> The difference isn't just timeline length — it's what's being set up. An Oliver Admin onboarding configures technology for a client who will self-administer. An OLLIE onboarding configures an operating model: eligibility workflows, billing rules, carrier coordination, processing logic, and the people and responsibilities behind it.</p>
+            <p>Adding more time to the same process doesn't fix the problem. You need a different process designed for a managed service engagement.</p>
+            <div class="wim">
+              <div class="wim-label">Why this matters in your work</div>
+              <p>If you're in Implementation &amp; Delivery or Support &amp; Client Success, this is one of the most important things to get right early. Scoping the wrong engagement type means the client doesn't receive what they signed up for.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════ SCREEN 3 ══════════════════ -->
+  <div class="screen" id="screen-3">
+    <div class="scenario-card">
+      <div class="scenario-header">
+        <div class="scenario-num-badge">Scenario 3 of 3</div>
+        <div>
+          <div class="scenario-context-label">New joiner terminology question</div>
+          <p class="scenario-situation">A new colleague pulls you aside after a team meeting. <em>"I keep hearing 'OLLIE' and 'Oliver' in the same conversations — sometimes by the same person in the same sentence. <strong>Are they just different names for the same thing? And what's PPA? Someone mentioned it and nobody explained it.</strong>"</em></p>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <p class="scenario-question">What's the most accurate way to explain all three?</p>
+        <div class="choices" id="choices-3" role="group" aria-label="Scenario 3 choices">
+
+          <button class="choice" onclick="answer(3,this,false,'fb-3-a')">
+            <div class="choice-marker">A</div>
+            <div class="choice-text">
+              <span class="choice-label">OLLIE is just Oliver's informal nickname — they refer to the same thing</span>
+              <span class="choice-sub">PPA is a technical term for the platform's architecture</span>
+            </div>
+          </button>
+
+          <button class="choice" onclick="answer(3,this,false,'fb-3-b')">
+            <div class="choice-marker">B</div>
+            <div class="choice-text">
+              <span class="choice-label">OLLIE is the older product name being phased out — Oliver is the new brand</span>
+              <span class="choice-sub">PPA describes the pricing model</span>
+            </div>
+          </button>
+
+          <button class="choice" onclick="answer(3,this,true,'fb-3-c')">
+            <div class="choice-marker">C</div>
+            <div class="choice-text">
+              <span class="choice-label">Oliver is the platform and company. OLLIE is the administration service that runs on it. PPA — Platform-Powered Administration — is what Oliver calls that combination.</span>
+              <span class="choice-sub">Related, but not interchangeable — each term means something specific</span>
+            </div>
+          </button>
+
+        </div>
+
+        <div class="feedback ok" id="fb-3-c">
+          <div class="feedback-banner"><span class="feedback-icon">&#10003;</span> Correct — and this is the most common confusion in OLLIE conversations</div>
+          <div class="feedback-body">
+            <p><strong>Three distinct things, used precisely.</strong> Oliver is the platform and the broader company — in the benefits and pension administration space for more than 40 years. OLLIE is OLLIE Insurance Solutions, the administration service that uses the Oliver platform to manage benefits, pension, billing, and insurance programs for clients who want the work run for them.</p>
+            <p>PPA — Platform-Powered Administration — is Oliver's deliberate positioning term. It signals that OLLIE isn't a traditional manual TPA: it's administration delivered through modern technology, at scale, with better outcomes. When someone in the industry hears "TPA," they often think inflexible and legacy. PPA is the reframe.</p>
+            <div class="wim">
+              <div class="wim-label">The rule that makes it stick</div>
+              <p>Oliver = platform and company. OLLIE = the administration service. PPA = what OLLIE delivers. They are related — but not interchangeable. Using them precisely is the difference between a conversation that lands and one that creates confusion.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback no" id="fb-3-a">
+          <div class="feedback-banner"><span class="feedback-icon">&#10007;</span> OLLIE is not a nickname — it's a distinct service with its own identity</div>
+          <div class="feedback-body">
+            <p><strong>The correct answer is C.</strong> OLLIE isn't informal or interchangeable with Oliver. OLLIE Insurance Solutions is a distinct service offering — the administration business that Oliver operates for clients who want their back-office work managed for them. Oliver is the platform and company. OLLIE is what runs on it, as a service.</p>
+            <p>And PPA isn't a technical architecture term. It's Oliver's deliberate positioning language: a signal to the market that this is modern, technology-enabled administration — not legacy TPA work.</p>
+            <div class="wim">
+              <div class="wim-label">Why precision matters</div>
+              <p>When Oliver and OLLIE get used interchangeably, clients and colleagues lose track of what's being offered. A client asking about "Oliver" may mean the platform. One asking about "OLLIE" means the service. The distinction changes the entire conversation.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback no" id="fb-3-b">
+          <div class="feedback-banner"><span class="feedback-icon">&#10007;</span> OLLIE is newer than Oliver — not the other way around</div>
+          <div class="feedback-body">
+            <p><strong>The correct answer is C.</strong> Oliver is the original — the platform and company in the benefits and pension space for more than 40 years. OLLIE is the newer offering: the administration service built on the Oliver platform. Neither is being phased out — they serve different purposes in the same ecosystem.</p>
+            <p>And PPA — Platform-Powered Administration — isn't a pricing term. It's Oliver's name for what OLLIE delivers: the combination of modern platform technology and expert administration service.</p>
+            <div class="wim">
+              <div class="wim-label">The order to remember</div>
+              <p>Oliver came first — the platform. OLLIE came next — the service. PPA is the positioning term that describes what happens when you combine them. Three things, each with a specific meaning.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════ SCREEN 4 — SUMMARY ══════════════════ -->
+  <div class="screen" id="screen-4">
+    <div class="summary-inner">
+      <p class="summary-eyebrow">All three done</p>
+      <h2 class="summary-heading">You've reasoned through it —<br>not just recognised it.</h2>
+      <p class="summary-body">The three situations covered the decisions that come up most in real OLLIE conversations: identifying which model fits a client, understanding what an OLLIE engagement actually involves internally, and explaining the terminology precisely to someone new.</p>
+      <p class="summary-body">The knowledge check tests recall. This was about application — and that's the harder, more useful kind.</p>
+      <div class="summary-rule">
+        <strong>The rule that ties all three together:</strong> The question is never just "do they want Oliver?" It's always <strong>"what do they want Oliver to do for them?"</strong> — and knowing whether the answer is platform, back-office, or full-service is what makes every OLLIE conversation land.
+      </div>
+      <p class="summary-close">Close this tab and return to the Sway lesson for the knowledge check &#8594;</p>
+    </div>
+  </div>
+
+</div><!-- /screens -->
+
+
+<!-- FIXED NEXT BAR -->
+<div class="next-bar" id="nextBar">
+  <span class="next-hint" id="nextHint"></span>
+  <button class="btn-next" id="nextBtn" onclick="advance()">Next scenario &#8594;</button>
+</div>
+
+<script>
+  const TOTAL = 3;
+  let current = 0;
+  const answered = {};
+
+  // ── Navigation ────────────────────────────────────────────────
+  function goTo(n) {
+    document.getElementById('screen-' + current).classList.remove('active');
+    current = n;
+    const next = document.getElementById('screen-' + current);
+    next.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateHeader();
+    updateNextBar();
+  }
+
+  function advance() {
+    goTo(current + 1);
+  }
+
+  // ── Answer handler ────────────────────────────────────────────
+  function answer(scenarioNum, btn, isCorrect, feedbackId) {
+    if (answered[scenarioNum]) return;
+    answered[scenarioNum] = isCorrect;
+
+    // Style choices
+    const group = document.getElementById('choices-' + scenarioNum);
+    group.querySelectorAll('.choice').forEach(c => {
+      if (c === btn) {
+        c.classList.add(isCorrect ? 'is-correct' : 'is-wrong-sel');
+        c.querySelector('.choice-marker').textContent = isCorrect ? '✓' : '✗';
+      } else {
+        c.classList.add('is-dim');
+      }
+      c.disabled = true;
+    });
+
+    // Show feedback
+    const fb = document.getElementById(feedbackId);
+    fb.classList.add('show');
+    setTimeout(() => fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+
+    updateHeader();
+    updateNextBar();
+  }
+
+  // ── Header progress ───────────────────────────────────────────
+  function updateHeader() {
+    const fill = document.getElementById('progFill');
+    const label = document.getElementById('progLabel');
+
+    if (current === 0) {
+      fill.style.width = '0%';
+      label.textContent = 'Intro';
+    } else if (current <= TOTAL) {
+      const pct = ((current - 1) / TOTAL) * 100;
+      fill.style.width = pct + '%';
+      label.textContent = current + ' of ' + TOTAL;
+    } else {
+      fill.style.width = '100%';
+      label.textContent = 'Complete';
+    }
+  }
+
+  // ── Next bar ──────────────────────────────────────────────────
+  function updateNextBar() {
+    const bar  = document.getElementById('nextBar');
+    const btn  = document.getElementById('nextBtn');
+    const hint = document.getElementById('nextHint');
+
+    // Only show after an answer has been given on the current scenario screen
+    if (current === 0 || current > TOTAL) {
+      bar.classList.remove('show');
+      return;
+    }
+
+    if (!answered.hasOwnProperty(current)) {
+      bar.classList.remove('show');
+      return;
+    }
+
+    bar.classList.add('show');
+
+    if (current < TOTAL) {
+      hint.textContent = 'Scenario ' + current + ' done';
+      btn.textContent  = 'Next scenario \u2192';
+      btn.className    = 'btn-next';
+    } else {
+      hint.textContent = 'All three done';
+      btn.textContent  = 'See summary \u2192';
+      btn.className    = 'btn-next final';
+    }
+  }
+</script>
+</body>
+</html>
