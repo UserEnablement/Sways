@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADKAR Hotspot Quiz — Lesson 1</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a3a5c;
+    --teal: #2a7a6f;
+    --teal-light: #e8f5f3;
+    --amber: #c8793a;
+    --amber-light: #fdf3eb;
+    --slate: #4a5568;
+    --light: #f7f9fc;
+    --white: #ffffff;
+    --border: #e2e8f0;
+    --correct: #2a7a6f;
+    --correct-light: #e8f5f3;
+    --incorrect: #c0392b;
+    --incorrect-light: #fdf0ef;
+    --shadow: 0 4px 24px rgba(26,58,92,0.10);
+    --radius: 12px;
+
+    /* ADKAR element colours */
+    --a1: #7c5cbf; --a1-light: #f0ecfa;
+    --d:  #2a7a6f; --d-light:  #e8f5f3;
+    --k:  #2a6a9a; --k-light:  #e8f2fa;
+    --a2: #c8793a; --a2-light: #fdf3eb;
+    --r:  #c0392b; --r-light:  #fdf0ef;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--light);
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  .header {
+    background: var(--navy);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-brand { font-family: 'DM Serif Display', serif; color: white; font-size: 17px; }
+  .header-label { font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+
+  .container { max-width: 780px; margin: 0 auto; padding: 36px 20px 60px; }
+
+  .intro-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--teal); background: var(--teal-light);
+    border-radius: 20px; padding: 4px 12px; margin-bottom: 14px;
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px; color: var(--navy); line-height: 1.25; margin-bottom: 8px;
+  }
+  .intro-text { font-size: 14px; color: var(--slate); line-height: 1.65; margin-bottom: 28px; }
+
+  /* ── DIAGRAM ── */
+  .diagram-wrap {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 28px 20px 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+  }
+
+  .adkar-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-width: 560px;
+    position: relative;
+  }
+
+  .adkar-node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.18s ease;
+  }
+  .adkar-node:hover { transform: translateY(-3px); }
+
+  .node-box {
+    width: 100px;
+    border-radius: 10px;
+    padding: 14px 10px 12px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .node-box.completed { opacity: 0.75; }
+  .node-box.active { transform: scale(1.04); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+
+  .node-number {
+    position: absolute;
+    top: -12px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    font-size: 12px; font-weight: 700; color: white;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid white;
+  }
+  .node-check {
+    position: absolute;
+    top: -12px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #2a7a6f;
+    font-size: 13px; color: white;
+    display: none; align-items: center; justify-content: center;
+    border: 2px solid white;
+  }
+  .node-box.completed .node-number { display: none; }
+  .node-box.completed .node-check { display: flex; }
+
+  .node-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .node-sub { font-size: 11px; font-style: italic; opacity: 0.85; line-height: 1.3; }
+
+  /* colours per element */
+  .node-a1 .node-box { background: var(--a1-light); border-color: var(--a1); }
+  .node-a1 .node-number { background: var(--a1); }
+  .node-a1 .node-title { color: var(--a1); }
+  .node-a1 .node-sub { color: var(--a1); }
+
+  .node-d .node-box { background: var(--d-light); border-color: var(--d); }
+  .node-d .node-number { background: var(--d); }
+  .node-d .node-title { color: var(--d); }
+  .node-d .node-sub { color: var(--d); }
+
+  .node-k .node-box { background: var(--k-light); border-color: var(--k); }
+  .node-k .node-number { background: var(--k); }
+  .node-k .node-title { color: var(--k); }
+  .node-k .node-sub { color: var(--k); }
+
+  .node-a2 .node-box { background: var(--a2-light); border-color: var(--a2); }
+  .node-a2 .node-number { background: var(--a2); }
+  .node-a2 .node-title { color: var(--a2); }
+  .node-a2 .node-sub { color: var(--a2); }
+
+  .node-r .node-box { background: var(--r-light); border-color: var(--r); }
+  .node-r .node-number { background: var(--r); }
+  .node-r .node-title { color: var(--r); }
+  .node-r .node-sub { color: var(--r); }
+
+  /* arrows */
+  .arrow {
+    width: 32px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #cbd5e0; font-size: 20px; font-weight: 300;
+    margin-bottom: 4px;
+  }
+
+  .diagram-note {
+    text-align: center;
+    font-size: 11px; color: #999; font-style: italic;
+    margin-top: 14px;
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 10px;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .progress-dots { display: flex; gap: 8px; }
+  .dot {
+    width: 28px; height: 8px; border-radius: 4px;
+    background: var(--border); transition: background 0.3s ease;
+  }
+  .dot.done { background: var(--teal); }
+  .dot.active { background: var(--navy); }
+  .progress-label { font-size: 13px; color: var(--slate); }
+  .reset-btn {
+    font-size: 12px; color: var(--slate);
+    background: white; border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .reset-btn:hover { border-color: var(--navy); color: var(--navy); }
+
+  /* ── QUESTION PANEL ── */
+  .question-panel {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: fadeUp 0.3s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .panel-badge {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  }
+  .panel-title { font-size: 14px; font-weight: 600; color: var(--navy); }
+
+  .panel-body { padding: 20px 22px; }
+
+  .question-text {
+    font-size: 14px; line-height: 1.7; color: var(--navy);
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    background: var(--light);
+    border-radius: 8px;
+    border-left: 3px solid var(--navy);
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .option-btn {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; line-height: 1.5; color: var(--navy);
+    cursor: pointer; text-align: left;
+    transition: all 0.18s ease;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--teal); background: var(--teal-light);
+  }
+  .option-btn:disabled { cursor: default; }
+  .option-btn.correct { border-color: var(--correct); background: var(--correct-light); }
+  .option-btn.incorrect { border-color: var(--incorrect); background: var(--incorrect-light); }
+  .option-btn.reveal { border-color: var(--correct); background: var(--correct-light); opacity: 0.7; }
+
+  .option-letter {
+    min-width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--border); color: var(--slate);
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+    transition: all 0.18s;
+  }
+  .option-btn.correct .option-letter { background: var(--correct); color: white; }
+  .option-btn.incorrect .option-letter { background: var(--incorrect); color: white; }
+  .option-btn.reveal .option-letter { background: var(--correct); color: white; }
+
+  /* feedback */
+  .feedback {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-size: 13px; line-height: 1.65;
+    display: none;
+    animation: fadeUp 0.25s ease;
+  }
+  .feedback.correct { background: var(--correct-light); border-left: 3px solid var(--correct); color: #1a4a40; display: block; }
+  .feedback.incorrect { background: var(--incorrect-light); border-left: 3px solid var(--incorrect); color: #6b1a14; display: block; }
+  .feedback-label { font-weight: 700; margin-bottom: 4px; font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .next-btn {
+    margin-top: 16px;
+    display: none;
+    background: var(--navy); color: white;
+    border: none; border-radius: 8px;
+    padding: 11px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .next-btn:hover { background: #0f2540; transform: translateY(-1px); }
+  .next-btn.visible { display: inline-block; }
+
+  /* placeholder */
+  .placeholder {
+    padding: 24px 22px;
+    text-align: center;
+    color: var(--slate);
+    font-size: 14px; font-style: italic;
+  }
+
+  /* ── COMPLETION ── */
+  .completion {
+    display: none;
+    background: var(--navy);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    text-align: center;
+    animation: fadeUp 0.4s ease;
+  }
+  .completion.visible { display: block; }
+  .completion h2 {
+    font-family: 'DM Serif Display', serif;
+    color: white; font-size: 22px; margin-bottom: 10px;
+  }
+  .completion p { color: rgba(255,255,255,0.8); font-size: 14px; line-height: 1.65; margin-bottom: 20px; }
+  .completion-score {
+    display: inline-block;
+    background: var(--teal); color: white;
+    font-size: 28px; font-weight: 700;
+    padding: 12px 28px; border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  .restart-btn {
+    background: white; color: var(--navy);
+    border: none; border-radius: 8px;
+    padding: 10px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .restart-btn:hover { background: var(--teal-light); }
+
+  @media (max-width: 600px) {
+    .container { padding: 24px 14px 48px; }
+    h1 { font-size: 21px; }
+    .node-box { width: 86px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">Oliver</div>
+  <div class="header-label">ADKAR · Lesson 1 · Knowledge Check</div>
+</div>
+
+<div class="container">
+
+  <div class="intro-tag">Consolidation Activity</div>
+  <h1>Check Your Understanding — The ADKAR Model</h1>
+  <p class="intro-text">Click each numbered element on the ADKAR model below. Answer the question to confirm your understanding before moving on.</p>
+
+  <!-- DIAGRAM -->
+  <div class="diagram-wrap">
+    <div class="adkar-flow">
+
+      <div class="adkar-node node-a1" onclick="openQuestion(0)" id="node-0">
+        <div class="node-box" id="box-0">
+          <div class="node-number">1</div>
+          <div class="node-check">✓</div>
+          <div class="node-title">Awareness</div>
+          <div class="node-sub">"I understand why"</div>
+        </div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div class="adkar-node node-d" onclick="openQuestion(1)" id="node-1">
+        <div class="node-box" id="box-1">
+          <div class="node-number">2</div>
+          <div class="node-check">✓</div>
+          <div class="node-title">Desire</div>
+          <div class="node-sub">"I choose to support"</div>
+        </div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div class="adkar-node node-k" onclick="openQuestion(2)" id="node-2">
+        <div class="node-box" id="box-2">
+          <div class="node-number">3</div>
+          <div class="node-check">✓</div>
+          <div class="node-title">Knowledge</div>
+          <div class="node-sub">"I know how"</div>
+        </div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div class="adkar-node node-a2" onclick="openQuestion(3)" id="node-3">
+        <div class="node-box" id="box-3">
+          <div class="node-number">4</div>
+          <div class="node-check">✓</div>
+          <div class="node-title">Ability</div>
+          <div class="node-sub">"I can do it"</div>
+        </div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div class="adkar-node node-r" onclick="openQuestion(4)" id="node-4">
+        <div class="node-box" id="box-4">
+          <div class="node-number">5</div>
+          <div class="node-check">✓</div>
+          <div class="node-title">Reinforcement</div>
+          <div class="node-sub">"I keep doing it"</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="diagram-note">ADKAR is sequential — earlier gaps block later success</div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-row">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="progress-dots">
+        <div class="dot" id="dot-0"></div>
+        <div class="dot" id="dot-1"></div>
+        <div class="dot" id="dot-2"></div>
+        <div class="dot" id="dot-3"></div>
+        <div class="dot" id="dot-4"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">0 / 5 answered</div>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">Reset</button>
+  </div>
+
+  <!-- QUESTION PANEL -->
+  <div id="questionPanel" class="question-panel">
+    <div class="placeholder">Click any numbered element on the diagram above to begin.</div>
+  </div>
+
+  <!-- COMPLETION -->
+  <div class="completion" id="completion">
+    <h2>All five elements reviewed.</h2>
+    <div class="completion-score" id="scoreDisplay"></div>
+    <p id="completionMsg"></p>
+    <button class="restart-btn" onclick="resetAll()">↺ Try again</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    element: "Awareness",
+    color: "#7c5cbf",
+    colorLight: "#f0ecfa",
+    quote: "\"I understand why\"",
+    question: "You've just announced a major process change to your team. A week later, you hear people saying \"no one told us about this.\" As a leader, what does this signal?",
+    options: [
+      "The team needs training on the new process.",
+      "Your communication of the why hasn't landed yet.",
+      "The team is resistant and needs stronger direction.",
+      "You should move straight to implementation."
+    ],
+    correct: 1,
+    feedbackCorrect: "Exactly. Awareness is about understanding why the change is happening — not how. If people feel uninformed, the first step is clearer, more credible communication of the reason and urgency. Training comes later.",
+    feedbackIncorrect: "Not quite. The team isn't saying they don't know how — they're saying they weren't told. That's an Awareness gap. Before anything else, people need to understand why the change is happening and why it matters."
+  },
+  {
+    element: "Desire",
+    color: "#2a7a6f",
+    colorLight: "#e8f5f3",
+    quote: "\"I choose to support\"",
+    question: "A team member fully understands the reason for the change and can explain it clearly. But when you ask if they're on board, they say: \"I get it — I just don't see why I have to be the one to change.\" What's your next move?",
+    options: [
+      "Send them back to the communication materials.",
+      "Remind them it's a company requirement.",
+      "Listen to their concerns and explore what feels personally at stake.",
+      "Move them straight to training."
+    ],
+    correct: 2,
+    feedbackCorrect: "Right. Desire is a personal choice — and it can't be pushed or mandated. Awareness is already there. What's missing is a reason to personally commit. Listening, acknowledging concerns, and addressing WIIFM is the right move here.",
+    feedbackIncorrect: "They already understand — so more communication won't help. Desire is the personal decision to support the change, and it requires a different approach: listening, not telling."
+  },
+  {
+    element: "Knowledge",
+    color: "#2a6a9a",
+    colorLight: "#e8f2fa",
+    quote: "\"I know how\"",
+    question: "Your team wants to support the change and understands why it's happening. But in practice, they keep asking: \"What exactly am I supposed to do differently?\" What does this tell you?",
+    options: [
+      "They need clear role-specific guidance, training, and job aids.",
+      "They need more time to build confidence through practice.",
+      "They're not motivated enough to engage.",
+      "The reinforcement systems aren't working yet."
+    ],
+    correct: 0,
+    feedbackCorrect: "Correct. This is a Knowledge gap — they have Awareness and Desire, but don't yet know how to change. Role-specific training, clear expectations, and practical job aids are the right response. Timing matters too: training too early or too late misses the moment.",
+    feedbackIncorrect: "Look at where they are: they want to change and understand why. What's missing is knowing how. That's a Knowledge gap — and the fix is targeted guidance, not more motivation or practice time."
+  },
+  {
+    element: "Ability",
+    color: "#c8793a",
+    colorLight: "#fdf3eb",
+    quote: "\"I can do it\"",
+    question: "A team member completed training and can explain the new process step by step. But in real situations, they slow down, make errors, and occasionally revert to the old way. What do they need most right now?",
+    options: [
+      "A refresher on why the change is important.",
+      "Another round of training.",
+      "Stronger accountability and more frequent check-ins.",
+      "Coaching, safe practice time, and support in real working conditions."
+    ],
+    correct: 3,
+    feedbackCorrect: "Exactly. There's an important distinction between knowing what to do and being able to do it consistently under pressure. This is an Ability gap. Coaching, hands-on practice, and removing barriers will build the capability that training alone can't.",
+    feedbackIncorrect: "They already know the process — more training won't help. The gap is between knowledge and consistent performance. That's Ability, and it needs coaching and practice in real conditions, not more instruction."
+  },
+  {
+    element: "Reinforcement",
+    color: "#c0392b",
+    colorLight: "#fdf0ef",
+    quote: "\"I keep doing it\"",
+    question: "Six weeks after a successful launch, you notice team members gradually slipping back into old habits. No one has raised it as an issue. What does this tell you about your role as a leader?",
+    options: [
+      "The change wasn't communicated clearly enough at the start.",
+      "The team never truly had Desire to support the change.",
+      "More training is needed to correct the regression.",
+      "Reinforcement has faded — recognition, accountability, and follow-through need to be re-established."
+    ],
+    correct: 3,
+    feedbackCorrect: "Spot on. Without active reinforcement, change erodes — not because people are resistant, but because old habits are easier and no one is holding the line. Recognition, consistent accountability, and removing the option to revert are all part of a leader's Reinforcement role.",
+    feedbackIncorrect: "The launch worked — so Awareness, Desire, Knowledge, and Ability were all there. What's fading is the follow-through. Reinforcement is what makes change stick beyond go-live."
+  }
+];
+
+let answered = new Array(5).fill(false);
+let correct  = new Array(5).fill(false);
+let current  = -1;
+
+function openQuestion(i) {
+  current = i;
+  const q = questions[i];
+  const letters = ['A','B','C','D'];
+
+  const opts = q.options.map((opt, idx) => {
+    const done = answered[i];
+    let cls = '';
+    if (done) {
+      if (idx === q.correct) cls = 'reveal';
+      if (idx === q.correct && correct[i]) cls = 'correct';
+      if (answered[i] && !correct[i] && idx !== q.correct) cls = '';
+    }
+    return `
+      <button class="option-btn ${cls}" ${done ? 'disabled' : ''} onclick="selectAnswer(${i},${idx})">
+        <span class="option-letter">${letters[idx]}</span>
+        ${opt}
+      </button>`;
+  }).join('');
+
+  const feedbackHTML = answered[i] ? `
+    <div class="feedback ${correct[i] ? 'correct' : 'incorrect'}">
+      <div class="feedback-label">${correct[i] ? '✓ Correct' : '✗ Not quite'}</div>
+      ${correct[i] ? q.feedbackCorrect : q.feedbackIncorrect}
+    </div>` : '';
+
+  const nextHTML = answered[i] ? `<button class="next-btn visible" onclick="closePanel()">
+    ${answered.filter(Boolean).length < 5 ? 'Click another element to continue' : 'See your results →'}
+  </button>` : '';
+
+  document.getElementById('questionPanel').innerHTML = `
+    <div class="panel-header">
+      <span class="panel-badge" style="background:${q.colorLight};color:${q.color}">${q.element}</span>
+      <span class="panel-title" style="color:${q.color}">${q.quote}</span>
+    </div>
+    <div class="panel-body">
+      <div class="question-text">${q.question}</div>
+      <div class="options">${opts}</div>
+      ${feedbackHTML}
+      ${nextHTML}
+    </div>`;
+
+  // mark active
+  document.querySelectorAll('.node-box').forEach((b,idx) => b.classList.toggle('active', idx === i));
+}
+
+function selectAnswer(qi, selected) {
+  if (answered[qi]) return;
+  answered[qi] = true;
+  correct[qi]  = selected === questions[qi].correct;
+
+  // update box
+  const box = document.getElementById('box-' + qi);
+  box.classList.add('completed');
+
+  // update dots
+  updateProgress();
+
+  // re-render panel with feedback
+  openQuestion(qi);
+
+  // check if all done
+  if (answered.every(Boolean)) {
+    setTimeout(showCompletion, 800);
+  }
+}
+
+function updateProgress() {
+  const count = answered.filter(Boolean).length;
+  document.getElementById('progressLabel').textContent = count + ' / 5 answered';
+  for (let i = 0; i < 5; i++) {
+    const dot = document.getElementById('dot-' + i);
+    dot.className = 'dot' + (answered[i] ? ' done' : (i === current ? ' active' : ''));
+  }
+}
+
+function closePanel() {
+  if (answered.every(Boolean)) {
+    showCompletion();
+  } else {
+    document.getElementById('questionPanel').innerHTML =
+      '<div class="placeholder">Click the next element on the diagram to continue.</div>';
+    document.querySelectorAll('.node-box').forEach(b => b.classList.remove('active'));
+  }
+}
+
+function showCompletion() {
+  const score = correct.filter(Boolean).length;
+  document.getElementById('questionPanel').style.display = 'none';
+  const comp = document.getElementById('completion');
+  comp.classList.add('visible');
+  document.getElementById('scoreDisplay').textContent = score + ' / 5 correct';
+
+  let msg = '';
+  if (score === 5) msg = "You've reviewed all five ADKAR elements with confidence. Each one builds on the last — and each one requires a different response from you as a leader. You're ready to move on.";
+  else if (score >= 3) msg = "Good work. You've reviewed all five elements — revisit the ones that tripped you up before moving on. Each element requires a distinct leadership response.";
+  else msg = "Keep going. Return to the ADKAR element cards above and revisit the ones that felt unclear, then try again. The model only works when all five are understood in sequence.";
+  document.getElementById('completionMsg').textContent = msg;
+}
+
+function resetAll() {
+  answered = new Array(5).fill(false);
+  correct  = new Array(5).fill(false);
+  current  = -1;
+  for (let i = 0; i < 5; i++) {
+    document.getElementById('box-' + i).classList.remove('completed','active');
+    document.getElementById('dot-' + i).className = 'dot';
+  }
+  document.getElementById('progressLabel').textContent = '0 / 5 answered';
+  document.getElementById('questionPanel').style.display = '';
+  document.getElementById('questionPanel').innerHTML =
+    '<div class="placeholder">Click any numbered element on the diagram above to begin.</div>';
+  document.getElementById('completion').classList.remove('visible');
+}
+</script>
+</body>
+</html>
