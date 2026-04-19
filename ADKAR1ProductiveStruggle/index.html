@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reflection 2 – Productive Struggle</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #1A2B4A;
+    --teal:    #1B7A8A;
+    --teal-lt: #E8F4F6;
+    --amber:   #D4871A;
+    --amber-lt:#FDF3E3;
+    --green:   #1E6B45;
+    --green-lt:#E6F4ED;
+    --slate:   #4A5568;
+    --fog:     #F7F9FB;
+    --white:   #FFFFFF;
+    --radius:  12px;
+    --shadow:  0 4px 24px rgba(26,43,74,0.10);
+  }
+
+  html, body {
+    min-height: 100%;
+    background: var(--fog);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--navy);
+  }
+
+  body {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px 60px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    max-width: 680px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  .card-header {
+    background: var(--navy);
+    padding: 28px 36px 24px;
+    position: relative;
+  }
+  .lesson-tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 10px;
+  }
+  .card-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--white);
+    line-height: 1.25;
+    font-weight: 400;
+  }
+  .card-header h1 span {
+    color: #7EC8D4;
+  }
+
+  /* ── Body ── */
+  .card-body {
+    padding: 32px 36px 36px;
+  }
+
+  .intro-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--slate);
+    margin-bottom: 24px;
+  }
+
+  /* ── Quote block ── */
+  .quote-block {
+    background: var(--amber-lt);
+    border-left: 4px solid var(--amber);
+    border-radius: 0 8px 8px 0;
+    padding: 18px 22px;
+    margin-bottom: 28px;
+  }
+  .quote-block p {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--navy);
+    font-style: italic;
+  }
+  .quote-attr {
+    font-size: 12px;
+    color: var(--amber);
+    font-weight: 600;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── Prompt ── */
+  .prompt-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 16px;
+  }
+
+  /* ── Options ── */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 2px solid #DDE3EC;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s, transform 0.12s;
+    background: var(--white);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .option:hover {
+    border-color: var(--teal);
+    background: var(--teal-lt);
+    transform: translateX(3px);
+  }
+  .option.selected {
+    border-color: var(--navy);
+    background: #EEF2F8;
+  }
+  .option.disabled {
+    cursor: default;
+    transform: none;
+  }
+  .option.disabled:hover {
+    border-color: #DDE3EC;
+    background: var(--white);
+  }
+  .option.selected.disabled {
+    border-color: var(--navy);
+    background: #EEF2F8;
+  }
+
+  .option-marker {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #BBC5D4;
+    margin-top: 1px;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .option.selected .option-marker {
+    border-color: var(--navy);
+    background: var(--navy);
+  }
+  .option.selected .option-marker::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--white);
+  }
+
+  .option-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--navy);
+    padding-top: 1px;
+  }
+
+  /* ── Submit ── */
+  .submit-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.12s;
+    letter-spacing: 0.02em;
+  }
+  .submit-btn:hover:not(:disabled) {
+    background: var(--teal);
+    transform: translateY(-1px);
+  }
+  .submit-btn:disabled {
+    opacity: 0.38;
+    cursor: default;
+    transform: none;
+  }
+
+  /* ── Feedback panel ── */
+  .feedback {
+    display: none;
+    margin-top: 28px;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: slideIn 0.35s ease;
+  }
+  .feedback.visible { display: block; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback-header {
+    padding: 16px 22px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .feedback-header.correct { background: var(--green); }
+  .feedback-header.near    { background: var(--teal); }
+  .feedback-header.reflect { background: var(--navy); }
+
+  .feedback-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .feedback-header h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--white);
+    font-weight: 400;
+  }
+
+  .feedback-body {
+    padding: 20px 22px 22px;
+    background: var(--white);
+    border: 2px solid #DDE3EC;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+  }
+  .feedback-body p {
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--slate);
+    margin-bottom: 10px;
+  }
+  .feedback-body p:last-child { margin-bottom: 0; }
+  .feedback-body strong { color: var(--navy); }
+
+  .adkar-tag {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  /* ── Workbook cue ── */
+  .workbook-cue {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--teal-lt);
+    border: 1.5px solid var(--teal);
+    border-radius: 8px;
+    padding: 14px 18px;
+  }
+  .workbook-cue .cue-icon { font-size: 20px; flex-shrink: 0; }
+  .workbook-cue p {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--navy);
+    font-weight: 500;
+  }
+
+  /* ── Reset ── */
+  .reset-btn {
+    display: none;
+    margin-top: 18px;
+    background: none;
+    border: 1.5px solid #BBC5D4;
+    color: var(--slate);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .reset-btn:hover { border-color: var(--navy); color: var(--navy); }
+  .reset-btn.visible { display: inline-block; }
+
+  @media (max-width: 500px) {
+    .card-header { padding: 22px 22px 20px; }
+    .card-body   { padding: 24px 22px 28px; }
+    .card-header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-header">
+    <div class="lesson-tag">Lesson 1 · Reflection 2</div>
+    <h1>Productive <span>Struggle</span></h1>
+  </div>
+
+  <div class="card-body">
+    <p class="intro-text">A team member comes to you after a meeting. They say:</p>
+
+    <div class="quote-block">
+      <p>"I understand why we're doing this. I just don't see why it has to be <em>me</em> who changes."</p>
+      <p class="quote-attr">Team member · post-meeting</p>
+    </div>
+
+    <p class="prompt-label">What would you do first?</p>
+
+    <div class="options" id="options">
+      <div class="option" data-value="A" onclick="selectOption(this)">
+        <div class="option-marker"></div>
+        <span class="option-text">Schedule them for additional training</span>
+      </div>
+      <div class="option" data-value="B" onclick="selectOption(this)">
+        <div class="option-marker"></div>
+        <span class="option-text">Remind them it's a company requirement</span>
+      </div>
+      <div class="option" data-value="C" onclick="selectOption(this)">
+        <div class="option-marker"></div>
+        <span class="option-text">Ask what specifically feels difficult or unfair for them</span>
+      </div>
+      <div class="option" data-value="D" onclick="selectOption(this)">
+        <div class="option-marker"></div>
+        <span class="option-text">Share a success story from another team</span>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitAnswer()" disabled>
+      See the answer
+    </button>
+
+    <div class="feedback" id="feedback"></div>
+    <button class="reset-btn" id="resetBtn" onclick="resetActivity()">↩ Try again</button>
+  </div>
+</div>
+
+<script>
+  const feedback = {
+    A: {
+      type: 'reflect',
+      icon: '🤔',
+      heading: 'That\'s the most common instinct — and it misses the point',
+      adkar: 'DESIRE gap',
+      body: [
+        'They already told you they <strong>understand</strong> why the change is happening. Sending them to training addresses Knowledge — but Knowledge isn\'t missing here.',
+        'This is a <strong>Desire gap</strong>. They\'re not confused about the change; they\'re not personally on board with it. More information won\'t close that gap.',
+        'The right move is to slow down and <strong>listen</strong> — find out what\'s personally at stake for them before deciding what to do next.'
+      ]
+    },
+    B: {
+      type: 'reflect',
+      icon: '🤔',
+      heading: 'Compliance ≠ commitment — and it rarely closes a Desire gap',
+      adkar: 'DESIRE gap',
+      body: [
+        'Reminding someone it\'s a requirement tells them <em>what</em> will happen if they don\'t comply. It doesn\'t address <em>why they don\'t want to</em>.',
+        'This is a <strong>Desire gap</strong>. The person understands the change — they\'re questioning their personal stake in it. Pressure tends to deepen resistance, not dissolve it.',
+        'A better first move: ask an open question. Find out what feels unfair or threatening before you respond.'
+      ]
+    },
+    C: {
+      type: 'correct',
+      icon: '✓',
+      heading: 'Yes — this is the right move',
+      adkar: 'DESIRE gap',
+      body: [
+        'They said they understand — so this isn\'t an Awareness or Knowledge problem. It\'s a <strong>Desire gap</strong>: they\'re not personally on board.',
+        'The single most effective thing a leader can do at this stage is <strong>listen before acting</strong>. Ask an open question, find out what\'s personally at stake, and resist the urge to immediately counter or reassure.',
+        'What you learn in that conversation shapes everything that comes next.'
+      ]
+    },
+    D: {
+      type: 'near',
+      icon: '→',
+      heading: 'Closer — but social proof isn\'t always enough',
+      adkar: 'DESIRE gap',
+      body: [
+        'Sharing a success story can help, especially if the person trusts the example and can see themselves in it. But it\'s still a form of <em>telling</em> — and Desire gaps usually need <em>listening</em> first.',
+        'This is a <strong>Desire gap</strong>. Before you try to persuade, it\'s worth finding out what specifically feels difficult or unfair. Their resistance may be about something a success story won\'t address.',
+        'Use stories as a tool — but only once you understand what they actually need to hear.'
+      ]
+    }
+  };
+
+  let selected = null;
+
+  function selectOption(el) {
+    if (el.classList.contains('disabled')) return;
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selected = el.dataset.value;
+    document.getElementById('submitBtn').disabled = false;
+  }
+
+  function submitAnswer() {
+    if (!selected) return;
+    const f = feedback[selected];
+
+    // Disable all options
+    document.querySelectorAll('.option').forEach(o => {
+      o.classList.add('disabled');
+      o.onclick = null;
+    });
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').style.display = 'none';
+
+    // Build feedback
+    const fb = document.getElementById('feedback');
+    fb.innerHTML = `
+      <div class="feedback-header ${f.type}">
+        <span class="feedback-icon">${f.icon}</span>
+        <h3>${f.heading}</h3>
+      </div>
+      <div class="feedback-body">
+        <span class="adkar-tag">${f.adkar}</span>
+        ${f.body.map(b => `<p>${b}</p>`).join('')}
+      </div>
+    `;
+    fb.classList.add('visible');
+
+    // Show workbook cue
+    const cue = document.createElement('div');
+    cue.className = 'workbook-cue';
+    cue.innerHTML = `
+      <span class="cue-icon">📓</span>
+      <p>Open your ADKAR Workbook → Reflection 2 and record which option you chose, why, and what is one thing you will do differently next time.</p>
+    `;
+    fb.after(cue);
+
+    document.getElementById('resetBtn').classList.add('visible');
+    fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function resetActivity() {
+    selected = null;
+    document.querySelectorAll('.option').forEach(o => {
+      o.classList.remove('selected', 'disabled');
+      o.onclick = function() { selectOption(this); };
+    });
+    const fb = document.getElementById('feedback');
+    fb.className = 'feedback';
+    fb.innerHTML = '';
+    const cue = document.querySelector('.workbook-cue');
+    if (cue) cue.remove();
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').style.display = 'block';
+    document.getElementById('resetBtn').classList.remove('visible');
+  }
+</script>
+</body>
+</html>
