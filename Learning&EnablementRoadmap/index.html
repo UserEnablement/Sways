@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L&E Roadmap 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  /* Workstream colours */
+  --c-onboarding : #4A90D9;   /* blue   */
+  --c-product    : #E8C030;   /* yellow */
+  --c-leadership : #6BBF6B;   /* green  */
+  --c-infra      : #E05C5C;   /* red    */
+  --c-client     : #9B6FD4;   /* purple */
+
+
+  /* Status */
+  --done   : #6BBF6B;
+  --inprog : #F5923A;
+  --planned: #C5CDD8;
+
+  /* UI */
+  --bg      : #EDF1F7;
+  --surface : #FFFFFF;
+  --border  : #D5DDE8;
+  --hdr-bg  : #EAEFF5;
+  --ink     : #1A2535;
+  --mid     : #1E3148;
+  --muted   : #4A6280;
+  --radius  : 14px;
+  --shadow  : 0 6px 28px rgba(0,0,0,.10);
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html { font-size:16px }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; padding:20px 14px 48px }
+
+/* ── Page header ─────────────────────────────── */
+.page-hd { max-width:1500px; margin:0 auto 14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px }
+.page-hd h1 { font-family:'DM Serif Display',serif; font-size:1.75rem; line-height:1.2 }
+.page-hd h1 span { color:var(--ink) }
+.page-hd p { font-size:.78rem; color:var(--muted); margin-top:2px }
+
+/* ── Quarter nav ─────────────────────────────── */
+.q-nav { max-width:1500px; margin:0 auto 14px; display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+.q-nav-lbl { font-size:.7rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-right:2px }
+.q-btn { padding:7px 18px; border-radius:30px; border:2px solid var(--border); background:var(--surface); color:var(--mid); font-family:'DM Sans',sans-serif; font-size:.78rem; font-weight:700; cursor:pointer; transition:all .16s; letter-spacing:.04em; position:relative }
+.q-btn:hover { border-color:var(--c-onboarding); color:var(--c-onboarding) }
+.q-btn.is-done    { border-color:var(--done);   color:var(--done) }
+.q-btn.is-current { border-color:var(--inprog); color:var(--inprog) }
+.q-btn.is-active  { background:var(--ink)!important; border-color:var(--ink)!important; color:#fff!important; box-shadow:0 4px 12px rgba(0,0,0,.2) }
+.q-pip { position:absolute; top:-4px; right:-4px; width:9px; height:9px; border-radius:50%; border:2px solid var(--bg) }
+.is-done    .q-pip { background:var(--done) }
+.is-current .q-pip { background:var(--inprog) }
+.is-planned .q-pip { background:var(--planned) }
+
+/* ── Layout ──────────────────────────────────── */
+.layout { max-width:1500px; margin:0 auto; display:flex; gap:14px; align-items:flex-start }
+.tables-col { flex:1; display:flex; flex-direction:column; gap:0; min-width:0; overflow-x:auto }
+.table-wrap { background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden }
+.table-wrap + .table-wrap { margin-top:12px }
+
+/* ═══════════════════════════════════════════════
+   SWIMLANE TABLE (shared styles for both tables)
+═══════════════════════════════════════════════ */
+.sl { width:100%; border-collapse:separate; border-spacing:0; min-width:820px }
+
+/* Column headers */
+.sl thead th {
+  padding:12px 8px 10px; text-align:center;
+  background:var(--hdr-bg); border-bottom:2px solid var(--border);
+  position:sticky; top:0; z-index:10; vertical-align:bottom;
+}
+.sl thead th.th-ws { text-align:left; width:190px; padding-left:14px; border-right:2px solid var(--border) }
+.th-icon { font-size:1.35rem; display:block; margin-bottom:4px }
+.th-lbl  { font-size:.67rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink); display:block }
+.th-sub  { font-size:.62rem; color:var(--muted); display:block; margin-top:1px }
+
+/* Workstream label cell */
+.td-ws {
+  padding:0; border-right:2px solid var(--border);
+  vertical-align:top; width:190px;
+  position:sticky; left:0; background:var(--surface); z-index:5;
+  cursor:pointer; transition:background .15s;
+}
+.td-ws:hover { background:#F4F7FB }
+.td-ws.row-hi { background:#EEF2F8 }
+.ws-inner { display:flex; align-items:flex-start; gap:8px; padding:12px 10px 12px 14px }
+.ws-swatch { width:9px; min-width:9px; border-radius:3px; align-self:stretch }
+.ws-name { font-size:.72rem; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:.02em; line-height:1.3 }
+.ws-tag  { font-size:.62rem; color:var(--muted); font-style:italic; margin-top:2px }
+
+/* Data cells — very subtle tint by default, NO highlight tint applied automatically */
+.td-data {
+  padding:10px 9px; vertical-align:top;
+  border-bottom:1px solid var(--border); border-right:1px solid var(--border);
+  cursor:pointer; position:relative;
+}
+.td-data:last-child { border-right:none }
+
+/* Very subtle default row tints */
+.r-onboarding .td-data { background:#F7FAFE }
+.r-product    .td-data { background:#FDFCF2 }
+.r-leadership .td-data { background:#F7FCF7 }
+.r-infra      .td-data { background:#FEF5F5 }
+.r-client     .td-data { background:#FAF7FE }
+
+/* Row highlight ONLY — triggered by clicking the workstream label */
+.td-data.row-hi { filter:brightness(.87) saturate(1.4); box-shadow:inset 0 0 0 2px rgba(74,144,217,.38) }
+.td-ws.row-hi { background:#EEF2F8 }
+
+/* Merged cell subtle indicator */
+.td-data.merged {
+  background-image: repeating-linear-gradient(
+    90deg, transparent, transparent 10px,
+    rgba(255,255,255,.6) 10px, rgba(255,255,255,.6) 11px
+  );
+}
+
+/* Bullet items */
+.items { list-style:none }
+.items li { font-size:.7rem; color:var(--mid); line-height:1.4; margin-bottom:4px; padding-left:2px }
+.items li:last-child { margin-bottom:0 }
+
+/* Bold items when quarter active — only text weight changes, no cell background */
+.items li.q-bold .txt { font-weight:700; color:var(--ink) }
+.items li.q-bold .txt.italic { font-weight:700; font-style:italic }
+
+/* Merged span label */
+.span-label { font-size:.59rem; color:var(--muted); font-style:italic; display:block; margin-top:4px }
+
+/* Progress row — one full-width bar per workstream */
+.progress-tr td { padding:2px 9px 8px; border-bottom:2px solid var(--border); background:inherit }
+.progress-tr .td-ws-prog {
+  padding:2px 10px 8px 14px; border-right:2px solid var(--border);
+  position:sticky; left:0; background:var(--surface); z-index:5;
+  font-size:.6rem; font-weight:700; color:var(--muted); text-align:right;
+}
+.progress-tr .td-bar-full { padding:4px 9px 8px; border-bottom:2px solid var(--border) }
+.pbar-outer { height:5px; background:#E5EAF0; border-radius:10px; overflow:hidden }
+.pbar-fill  { height:100%; border-radius:10px; width:0%; transition:width .7s cubic-bezier(.4,0,.2,1) }
+.pbar-pct   { font-size:.6rem; font-weight:700; color:var(--muted); margin-top:3px; display:flex; justify-content:flex-end; opacity:0; transition:opacity .2s }
+.progress-active .pbar-pct { opacity:1 }
+
+/* Employee experience bar */
+.exp-row td { padding:10px 5px; background:var(--ink); text-align:center; vertical-align:middle }
+.exp-row td.exp-lbl { text-align:left; padding-left:14px; font-size:.64rem; font-weight:700; color:#fff; letter-spacing:.07em; text-transform:uppercase; border-right:2px solid rgba(255,255,255,.14); white-space:nowrap; vertical-align:middle }
+.exp-pill { display:inline-block; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:20px; padding:4px 10px; font-size:.64rem; font-weight:700; color:rgba(255,255,255,.9); white-space:nowrap; line-height:1.3 }
+.exp-arr  { display:inline-block; font-size:.8rem; color:rgba(255,255,255,.35); margin:0 2px; vertical-align:middle }
+
+/* Client section header */
+.client-hd {
+  max-width:1500px; margin:16px auto 8px;
+  display:flex; align-items:center; gap:10px;
+}
+.client-hd-bar { height:3px; flex:1; background:var(--c-client); border-radius:2px; opacity:.4 }
+.client-hd-lbl { font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--c-client); white-space:nowrap }
+
+/* Client table header tint */
+.sl.client-table thead th { background:#F8F5FD }
+
+/* Detail panel */
+.panel { width:290px; min-width:265px; background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow); display:none; flex-direction:column; position:sticky; top:20px; max-height:calc(100vh - 40px); overflow:hidden }
+.panel.open { display:flex }
+.panel-hd { padding:14px 16px 11px; border-bottom:2px solid var(--border); position:relative }
+.panel-hd h3 { font-family:'DM Serif Display',serif; font-size:1.05rem; color:var(--ink); padding-right:20px }
+.panel-hd p  { font-size:.7rem; color:var(--muted); margin-top:2px }
+.close-btn { position:absolute; top:12px; right:12px; background:none; border:none; font-size:.95rem; cursor:pointer; color:var(--muted); line-height:1 }
+.close-btn:hover { color:var(--ink) }
+.panel-body { padding:12px 16px; overflow-y:auto; flex:1 }
+.pws { margin-bottom:14px }
+.pws:last-child { margin-bottom:0 }
+.pws-hd  { display:flex; align-items:center; gap:6px; margin-bottom:5px }
+.pws-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0 }
+.pws-name { font-size:.7rem; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:.05em }
+.pws-bar  { height:6px; background:#E5EAF0; border-radius:10px; overflow:hidden; margin-bottom:2px }
+.pws-fill { height:100%; border-radius:10px; transition:width .65s ease }
+.pws-pct  { font-size:.63rem; font-weight:700; color:var(--muted); margin-bottom:5px }
+.pws-acts { list-style:none }
+.pws-acts li { display:flex; align-items:flex-start; gap:7px; font-size:.69rem; color:var(--mid); margin-bottom:4px; line-height:1.4 }
+.tick-dot { width:8px; min-width:8px; height:8px; border-radius:50%; margin-top:3px; flex-shrink:0 }
+.dvd { height:1px; background:var(--border); margin:8px 0 }
+
+/* Legend */
+.legend { max-width:1500px; margin:11px auto 0; display:flex; gap:16px; flex-wrap:wrap; align-items:center; font-size:.69rem; color:var(--muted) }
+.li { display:flex; align-items:center; gap:5px }
+.li-dot { width:8px; height:8px; border-radius:50% }
+.li-bar { width:18px; height:4px; border-radius:3px }
+.legend-hint { margin-left:auto; font-size:.68rem }
+
+@media(max-width:960px) { .layout { flex-direction:column } .panel { width:100%; min-width:unset; position:static; max-height:none } }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+  ✏️  DATA — edit everything here
+════════════════════════════════════════════════════════ -->
+<script>
+// ── QUARTERS ─────────────────────────────────────────────
+const QUARTERS = [
+  { id:"q1", label:"Q1", sub:"Jan–Mar 2026", status:"done"    },
+  { id:"q2", label:"Q2", sub:"Apr–Jun 2026", status:"current" },
+  { id:"q3", label:"Q3", sub:"Jul–Sep 2026", status:"planned" },
+  { id:"q4", label:"Q4", sub:"Oct–Dec 2026", status:"planned" },
+  { id:"27", label:"'27", sub:"2027+",        status:"planned" },
+];
+
+// ── JOURNEY MILESTONES (internal workstreams table) ───────
+const MILESTONES = [
+  { id:"preboard",    label:"Pre-Boarding",    sub:"Before Day 1", icon:"📋" },
+  { id:"entry",       label:"Entry & Context", sub:"Day 1–Week 2", icon:"🎬" },
+  { id:"foundations", label:"Foundations",     sub:"Weeks 2–6",    icon:"🏗️"  },
+  { id:"activation",  label:"Role Activation", sub:"Month 2–3",    icon:"⚙️"  },
+  { id:"performance", label:"Performance",     sub:"Month 3–6",    icon:"💰"  },
+  { id:"advanced",    label:"Advanced",        sub:"6–12 Months",  icon:"📈"  },
+  { id:"growth",      label:"Growth",          sub:"Ongoing",      icon:"🚀"  },
+];
+
+// ── CLIENT MILESTONES (separate table — quarter-based) ────
+const CLIENT_MILESTONES = [
+  { id:"cq1", label:"Q1",  sub:"Jan–Mar 2026", icon:"📋" },
+  { id:"cq2", label:"Q2",  sub:"Apr–Jun 2026", icon:"🎬" },
+  { id:"cq3", label:"Q3",  sub:"Jul–Sep 2026", icon:"🏗️"  },
+  { id:"cq4", label:"Q4",  sub:"Oct–Dec 2026", icon:"⚙️"  },
+  { id:"c27", label:"'27", sub:"2027+",         icon:"🚀"  },
+];
+
+// ── INTERNAL WORKSTREAMS ──────────────────────────────────
+const WS = [
+  { id:"onboarding", label:"Company Culture",                    tag:"Core Engine",        color:"#4A90D9" },
+  { id:"product",    label:"Product Enablement",                     tag:"Priority",          color:"#E8C030" },
+  { id:"leadership", label:"Leadership & Career Development",    tag:"Development",        color:"#6BBF6B" },
+  { id:"infra",      label:"Learning Infrastructure",            tag:"Enabler",            color:"#E05C5C" },
+];
+
+// ── CLIENT WORKSTREAM ─────────────────────────────────────
+const WS_CLIENT = { id:"client", label:"Client Enablement", tag:"External", color:"#9B6FD4" };
+const ALL_WS = [...WS, WS_CLIENT];
+
+// ── EMPLOYEE EXPERIENCE ───────────────────────────────────
+const EXP = [
+  '"I\'m ready"','"I understand"','"I know the products"',
+  '"I can do my job"','"I contribute"','"I think strategically"','"I grow"',
+];
+
+// ═══════════════════════════════════════════════════════════
+// INTERNAL WORKSTREAM ROWS
+// Each row = array of cell defs in MILESTONE order.
+// { mid, items[], span?, mergedLabel?, skip? }
+// skip:true = no <td> rendered (covered by a preceding span)
+// items: { text, q (quarter id or array), italic? }
+// ═══════════════════════════════════════════════════════════
+const ROWS = {
+
+  // ── COMPANY CULTURE (ONBOARDING) ───────────────────────
+  onboarding: [
+    { mid:"preboard",
+      items:[
+        { text:"Welcome Communication", q:"q1" },
+        { text:"System Access",         q:"q1" },
+      ]
+    },
+    { mid:"entry",
+      items:[
+        { text:"Meetings: Manager, Buddy, Guide, Team Members", q:"q1" },
+      ]
+    },
+    { mid:"foundations",
+      items:[
+        { text:"Roundtables with Managers & Leadership Team", q:"q1" },
+      ]
+    },
+    { mid:"activation",
+      items:[
+        { text:"30/60/90 Plans",    q:["q2","q3"] },
+        { text:"Role Expectations", q:["q2","q3"] },
+        { text:"30 Days Survey",    q:"q1" },
+      ]
+    },
+    { mid:"performance",
+      items:[
+        { text:"Manager Coaching",             q:"q4" },
+        { text:"Feedback Loops",               q:"q4" },
+        { text:"Performance Management – KPI", q:"q4" },
+        { text:"6 Months Survey",              q:"q1" },
+      ]
+    },
+    { mid:"advanced",
+      items:[
+        { text:"Performance Tracking", q:"27" },
+      ]
+    },
+    { mid:"growth",
+      items:[
+        { text:"Continuous Support",           q:"27" },
+        { text:"Dashboard Insights",           q:"27" },
+        { text:"Ongoing Career Conversations", q:"27" },
+      ]
+    },
+  ],
+
+  // ── PRODUCT ENABLEMENT ──────────────────────────────────
+  product: [
+    { mid:"preboard", items:[] },
+    { mid:"entry",
+      items:[
+        { text:"Oliver Foundations", q:"q2" },
+        { text:"Glossary",           q:"q2" },
+      ]
+    },
+    { mid:"foundations",
+      items:[
+        { text:"Knowledge Checks",    q:"q2" },
+        { text:"Product Fundamentals",q:"q2" },
+        { text:"Industry Knowledge",  q:"q2" },
+      ]
+    },
+    { mid:"activation",
+      items:[
+        { text:"Guides & Videos",     q:"q3" },
+        { text:"Role-Based Pathways", q:"q4" },
+        { text:"Workflow Training",   q:"27" },
+        { text:"Tools & Systems",     q:"27" },
+      ]
+    },
+    { mid:"performance",
+      items:[
+        { text:"Advanced Practitioners", q:"q4" },
+        { text:"Applied Product Usage",  q:"q4" },
+        { text:"Real Client Scenarios",  q:"q4" },
+      ]
+    },
+    { mid:"advanced",
+      items:[
+        { text:"SME",               q:"27" },
+        { text:"Cross-POD Training", q:"27" },
+      ]
+    },
+    { mid:"growth",
+      items:[
+        { text:"Continuous Learning",    q:"27" },
+        { text:"Reduced SME Dependency", q:"27" },
+        { text:"PODs Specialisation",    q:"27" },
+      ]
+    },
+  ],
+
+  // ── LEADERSHIP & CAREER DEVELOPMENT ────────────────────
+  // Soft-Skill Training spans foundations → advanced (4 cols)
+  leadership: [
+    { mid:"preboard", items:[] },
+    { mid:"entry",
+      items:[
+        { text:"DISC Assessment", q:"q2" },
+      ]
+    },
+    { mid:"foundations",
+      span:4,
+      mergedLabel:"Foundations → Advanced (ongoing across stages)",
+      items:[
+        { text:"Soft-Skill Training = Self-Enrolment",      q:"q3" },
+        { text:"Soft-Skill Training = Assigned by Managers", q:"q3" },
+        { text:"Mentorship + Q&A",                           q:"q4" },
+        { text:"Coaching",                                   q:"q2" },
+        { text:"POD Roles & Career Pathways",                q:"27" },
+      ]
+    },
+    { mid:"activation",  skip:true },
+    { mid:"performance", skip:true },
+    { mid:"advanced",    skip:true },
+    { mid:"growth",
+      items:[
+        { text:"Leadership Academy",            q:"27", italic:true },
+        { text:"EQ Assessments",                q:"27" },
+        { text:"Ad-Hoc Team Training Requests", q:"27" },
+      ]
+    },
+  ],
+
+  // ── LEARNING INFRASTRUCTURE ─────────────────────────────
+  // L&E Hub + Power BI spans preboard → performance (5 cols)
+  infra: [
+    { mid:"preboard",
+      span:5,
+      mergedLabel:"Pre-Boarding → Performance (ongoing)",
+      items:[
+        { text:"Learning & Enablement Hub + Newsletter",   q:["q1","q2","q3"] },
+        { text:"Power BI Dashboards (Leaders & Managers)", q:["q1","q2","q3"] },
+      ]
+    },
+    { mid:"entry",       skip:true },
+    { mid:"foundations", skip:true },
+    { mid:"activation",  skip:true },
+    { mid:"performance", skip:true },
+    { mid:"advanced",    items:[] },
+    { mid:"growth",
+      items:[
+        { text:"Single Source of Truth",     q:"27" },
+        { text:"Learning Management System", q:"27", italic:true },
+      ]
+    },
+  ],
+};
+
+// ═══════════════════════════════════════════════════════════
+// CLIENT ROW — uses CLIENT_MILESTONES (cq1…c27)
+// span here refers to client milestone columns
+// ═══════════════════════════════════════════════════════════
+const CLIENT_ROW = [
+  // Ad hoc requests spans cq1 + cq2 (2 columns)
+  { mid:"cq1",
+    span:2,
+    mergedLabel:"Q1 & Q2 (ongoing)",
+    items:[
+      { text:"Ad hoc requests – Client-facing materials (videos, guides)", q:["q1","q2"] },
+    ]
+  },
+  { mid:"cq2", skip:true },
+  { mid:"cq3",
+    items:[
+      { text:"Client Facing user guides",  q:"q3" },
+      { text:"Leverage demos, recordings", q:"q3" },
+    ]
+  },
+  { mid:"cq4",
+    items:[
+      { text:"Define approach",              q:"q4" },
+      { text:"Identify client journeys",     q:"q4" },
+      { text:"Standardized demos",           q:"q4" },
+      { text:"Advanced enablement:",         q:"q4" },
+      { text:"  – Use-case content",         q:"q4" },
+      { text:"  – Scenario learning",        q:"q4" },
+      { text:"  – Client success materials", q:"q4" },
+    ]
+  },
+  { mid:"c27",
+    items:[
+      { text:"Self-serve learning",            q:"27" },
+      { text:"Scalable onboarding",            q:"27" },
+      { text:"Reduced support dependency",     q:"27" },
+      { text:"Additional Feature for Clients", q:"27" },
+      { text:"Client onboarding materials",    q:"27" },
+    ]
+  },
+];
+
+// ── PANEL DATA ────────────────────────────────────────────
+const PANEL = {
+  q1:{
+    onboarding:{ acts:[
+      { text:"Welcome Communication & System Access",            s:"done" },
+      { text:"Meetings: Manager, Buddy, Guide, Team Members",   s:"done" },
+      { text:"Roundtables with Managers & Leadership Team",     s:"done" },
+      { text:"30 Days Survey",                                  s:"done" },
+      { text:"6 Months Survey",                                 s:"done" },
+    ]},
+    product:{ acts:[] },
+    leadership:{ acts:[] },
+    infra:{ acts:[
+      { text:"L&E Hub + Newsletter Launched",                   s:"done" },
+      { text:"Power BI Dashboards (Leaders & Managers)",        s:"done" },
+    ]},
+    client:{ acts:[
+      { text:"Ad Hoc Client-Facing Materials (Videos, Guides)", s:"done" },
+    ]},
+  },
+  q2:{
+    onboarding:{ acts:[
+      { text:"30/60/90 Plans",                                  s:"prog" },
+      { text:"Role Expectations Defined",                       s:"prog" },
+    ]},
+    product:{ acts:[
+      { text:"Oliver Foundations Launch",                       s:"prog" },
+      { text:"Glossary Published",                              s:"prog" },
+      { text:"Knowledge Checks Live",                           s:"todo" },
+      { text:"Product Fundamentals Module",                     s:"todo" },
+      { text:"Industry Knowledge",                              s:"todo" },
+    ]},
+    leadership:{ acts:[
+      { text:"DISC Assessment",                                 s:"prog" },
+      { text:"Coaching Sessions",                               s:"prog" },
+    ]},
+    infra:{ acts:[
+      { text:"L&E Hub + Newsletter – Ongoing",                  s:"done" },
+      { text:"Power BI Dashboards (Leaders & Managers)",        s:"prog" },
+    ]},
+    client:{ acts:[
+      { text:"Ad Hoc Client-Facing Materials (Videos, Guides)", s:"prog" },
+    ]},
+  },
+  q3:{
+    onboarding:{ acts:[
+      { text:"30/60/90 Plans – Review Cycle",                   s:"todo" },
+      { text:"Role Expectations – Review",                      s:"todo" },
+    ]},
+    product:{ acts:[
+      { text:"Guides & Videos",                                 s:"todo" },
+    ]},
+    leadership:{ acts:[
+      { text:"Soft-Skill Training = Self-Enrolment",            s:"todo" },
+      { text:"Soft-Skill Training = Assigned by Managers",      s:"todo" },
+    ]},
+    infra:{ acts:[
+      { text:"L&E Hub + Newsletter – Ongoing",                  s:"todo" },
+      { text:"Power BI Dashboards – Expanded",                  s:"todo" },
+    ]},
+    client:{ acts:[
+      { text:"Client Facing User Guides",                       s:"todo" },
+      { text:"Leverage Demos, Recordings",                      s:"todo" },
+    ]},
+  },
+  q4:{
+    onboarding:{ acts:[
+      { text:"Manager Coaching",                                s:"todo" },
+      { text:"Feedback Loops",                                  s:"todo" },
+      { text:"Performance Management – KPI",                    s:"todo" },
+    ]},
+    product:{ acts:[
+      { text:"Role-Based Pathways",                             s:"todo" },
+      { text:"Workflow Training + Tools & Systems",             s:"todo" },
+      { text:"Advanced Practitioners",                          s:"todo" },
+      { text:"Applied Product Usage",                           s:"todo" },
+      { text:"Real Client Scenarios",                           s:"todo" },
+    ]},
+    leadership:{ acts:[
+      { text:"Mentorship + Q&A",                                s:"todo" },
+    ]},
+    infra:{ acts:[] },
+    client:{ acts:[
+      { text:"Define Approach + Identify Client Journeys",      s:"todo" },
+      { text:"Standardized Demos",                              s:"todo" },
+      { text:"Advanced Enablement (Use-Case, Scenario, Success)",s:"todo" },
+    ]},
+  },
+  "27":{
+    onboarding:{ acts:[
+      { text:"Continuous Support",                              s:"todo" },
+      { text:"Dashboard Insights",                              s:"todo" },
+      { text:"Ongoing Career Conversations",                    s:"todo" },
+    ]},
+    product:{ acts:[
+      { text:"SME + Cross-POD Training",                        s:"todo" },
+      { text:"Continuous Learning",                             s:"todo" },
+      { text:"Reduced SME Dependency",                          s:"todo" },
+      { text:"PODs Specialisation",                             s:"todo" },
+    ]},
+    leadership:{ acts:[
+      { text:"Leadership Academy",                              s:"todo", italic:true },
+      { text:"EQ Assessments",                                  s:"todo" },
+      { text:"Ad-Hoc Team Training Requests",                   s:"todo" },
+      { text:"POD Roles & Career Pathways",                     s:"todo" },
+    ]},
+    infra:{ acts:[
+      { text:"Single Source of Truth",                          s:"todo" },
+      { text:"Learning Management System",                      s:"todo", italic:true },
+    ]},
+    client:{ acts:[
+      { text:"Self-Serve Learning",                             s:"todo" },
+      { text:"Scalable Onboarding",                             s:"todo" },
+      { text:"Reduced Support Dependency",                      s:"todo" },
+      { text:"Additional Feature for Clients",                  s:"todo" },
+      { text:"Client Onboarding Materials",                     s:"todo" },
+    ]},
+  },
+};
+
+// ── AUTO-CALCULATE PROGRESS ───────────────────────────────
+const Q_ORDER = ["q1","q2","q3","q4","27"];
+function calcProgress(){
+  const result = {};
+  ALL_WS.forEach(ws => {
+    const rowDefs = ws.id === "client"
+      ? CLIENT_ROW
+      : (ROWS[ws.id] || []);
+    const allItems = rowDefs.flatMap(rd => rd.items || []);
+    const perQ = {};
+    Q_ORDER.forEach(q => perQ[q] = 0);
+    allItems.forEach(item => {
+      const qs = Array.isArray(item.q) ? item.q : (item.q ? [item.q] : []);
+      // only count once per quarter per item (de-dupe)
+      [...new Set(qs)].forEach(q => { if(q && perQ[q] !== undefined) perQ[q]++; });
+    });
+    const total = Q_ORDER.reduce((s,q) => s + perQ[q], 0) || 1;
+    let cum = 0; const pct = {};
+    Q_ORDER.forEach(q => { cum += perQ[q]; pct[q] = Math.round(cum/total*100); });
+    pct["27"] = 100;
+    result[ws.id] = pct;
+  });
+  return result;
+}
+const PROGRESS = calcProgress();
+</script>
+
+<!-- ════════════════════════════════════════════════════════
+   HTML SHELL
+════════════════════════════════════════════════════════ -->
+<div class="page-hd">
+  <div>
+    <h1>Learning &amp; <span>Enablement</span> Roadmap 2026</h1>
+  </div>
+</div>
+
+<div class="q-nav" id="qNav"><span class="q-nav-lbl">Quarter:</span></div>
+
+<div class="layout">
+  <div class="tables-col">
+
+    <!-- ── INTERNAL WORKSTREAMS TABLE ── -->
+    <div class="table-wrap">
+      <table class="sl" id="sl-internal"></table>
+    </div>
+
+    <!-- ── EMPLOYEE EXPERIENCE ── -->
+    <!-- rendered inside internal table, below the workstreams -->
+
+    <!-- ── CLIENT ENABLEMENT SECTION ── -->
+    <div class="client-hd">
+      <div class="client-hd-bar"></div>
+      <div class="client-hd-lbl">🌐 External · Client Enablement</div>
+      <div class="client-hd-bar"></div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="sl client-table" id="sl-client"></table>
+    </div>
+
+  </div>
+
+  <!-- ── DETAIL PANEL ── -->
+  <div class="panel" id="panel">
+    <button class="close-btn" id="closeBtn">✕</button>
+    <div class="panel-hd">
+      <h3 id="pTitle"></h3>
+      <p  id="pSub"></p>
+    </div>
+    <div class="panel-body" id="pBody"></div>
+  </div>
+</div>
+
+
+
+<!-- ════════════════════════════════════════════════════════
+   RENDER + INTERACTION
+════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  let activeQ  = null;
+  let activeWS = null;
+
+  // ── Quarter nav ──────────────────────────────────────────
+  const nav = document.getElementById("qNav");
+  QUARTERS.forEach(q => {
+    const btn = document.createElement("button");
+    btn.className = `q-btn is-${q.status}`;
+    btn.dataset.qid = q.id;
+    btn.innerHTML = `${q.label}<span class="q-pip"></span>`;
+    btn.title = q.sub;
+    btn.addEventListener("click", () => onQClick(q.id));
+    nav.appendChild(btn);
+  });
+
+  // ── BUILD INTERNAL TABLE ──────────────────────────────────
+  const intTable = document.getElementById("sl-internal");
+
+  // thead
+  (() => {
+    const thead = intTable.createTHead();
+    const tr = thead.insertRow();
+    const th0 = document.createElement("th");
+    th0.className = "th-ws";
+    th0.innerHTML = `<span class="th-lbl">Workstream</span>`;
+    tr.appendChild(th0);
+    MILESTONES.forEach(m => {
+      const th = document.createElement("th");
+      th.innerHTML = `<span class="th-icon">${m.icon}</span><span class="th-lbl">${m.label}</span><span class="th-sub">${m.sub}</span>`;
+      tr.appendChild(th);
+    });
+  })();
+
+  const intBody = intTable.createTBody();
+
+  // Internal workstream rows
+  WS.forEach(ws => buildWsBlock(intBody, ws, MILESTONES, ROWS[ws.id] || []));
+
+  // Employee experience row (inside internal table)
+  (() => {
+    const expTr = intBody.insertRow();
+    expTr.className = "exp-row";
+
+    // Label cell
+    const lbl = expTr.insertCell();
+    lbl.className = "exp-lbl";
+    lbl.innerHTML = "🎯 Employee Experience";
+
+    // Single spanning cell — CSS grid splits evenly across milestone columns
+    const pillTd = expTr.insertCell();
+    pillTd.colSpan = MILESTONES.length;
+    pillTd.style.cssText = "padding:0; vertical-align:middle;";
+    pillTd.innerHTML = `<div style="display:grid;grid-template-columns:repeat(${MILESTONES.length},1fr);height:100%;">
+      ${EXP.map((stage, i) =>
+        `<div style="display:flex;align-items:center;justify-content:center;gap:4px;padding:8px 2px;">
+          <span class="exp-pill">${stage}</span>
+          ${i < EXP.length - 1 ? `<span class="exp-arr">→</span>` : ""}
+        </div>`
+      ).join("")}
+    </div>`;
+  })();
+
+  // ── BUILD CLIENT TABLE ────────────────────────────────────
+  const cliTable = document.getElementById("sl-client");
+
+  (() => {
+    const thead = cliTable.createTHead();
+    const tr = thead.insertRow();
+    const th0 = document.createElement("th");
+    th0.className = "th-ws";
+    th0.innerHTML = `<span class="th-lbl">Workstream</span>`;
+    tr.appendChild(th0);
+    CLIENT_MILESTONES.forEach(m => {
+      const th = document.createElement("th");
+      th.innerHTML = `<span class="th-lbl">${m.label}</span><span class="th-sub">${m.sub}</span>`;
+      tr.appendChild(th);
+    });
+  })();
+
+  const cliBody = cliTable.createTBody();
+  buildWsBlock(cliBody, WS_CLIENT, CLIENT_MILESTONES, CLIENT_ROW);
+
+  // ── BUILD WORKSTREAM BLOCK ────────────────────────────────
+  function buildWsBlock(tbody, ws, milestones, rowDefs) {
+    // DATA ROW
+    const tr = tbody.insertRow();
+    tr.className = "r-" + ws.id;
+    tr.dataset.wsid = ws.id;
+
+    // label cell
+    const lbl = tr.insertCell();
+    lbl.className = "td-ws";
+    lbl.dataset.wsid = ws.id;
+    lbl.innerHTML = `<div class="ws-inner">
+      <div class="ws-swatch" style="background:${ws.color}"></div>
+      <div>
+        <div class="ws-name">${ws.label}</div>
+        ${ws.tag ? `<div class="ws-tag">${ws.tag}</div>` : ""}
+      </div>
+    </div>`;
+    lbl.addEventListener("click", () => onWSClick(ws.id));
+
+    // data cells
+    rowDefs.forEach(rd => {
+      if (rd.skip) return;
+      const td = tr.insertCell();
+      td.className = "td-data" + (rd.span > 1 ? " merged" : "");
+      td.dataset.wsid = ws.id;
+      td.dataset.mid  = rd.mid;
+      if (rd.span > 1) td.colSpan = rd.span;
+
+      const itemsHtml = (rd.items || []).map(item => {
+        const qs    = Array.isArray(item.q) ? item.q : (item.q ? [item.q] : []);
+        const cls   = item.italic ? "italic" : "";
+        const txt   = item.text.replace(/^  – /, "\u00a0\u00a0");   // convert leading " – " to indent
+        return `<li data-qs="${qs.join(",")}"><span class="txt ${cls}">${txt}</span></li>`;
+      }).join("");
+
+      td.innerHTML = `<ul class="items">${itemsHtml}</ul>
+        ${rd.mergedLabel ? `<span class="span-label">↔ ${rd.mergedLabel}</span>` : ""}`;
+
+      td.addEventListener("click", () => onCellClick(ws.id, rd.items || []));
+    });
+
+    // PROGRESS ROW
+    const ptr = tbody.insertRow();
+    ptr.className = "progress-tr";
+    ptr.dataset.wsid = ws.id;
+
+    const ptdLbl = ptr.insertCell();
+    ptdLbl.className = "td-ws-prog";
+    ptdLbl.textContent = "Progress";
+
+    const ptdBar = ptr.insertCell();
+    ptdBar.className = "td-bar-full";
+    ptdBar.colSpan = milestones.length;
+    ptdBar.innerHTML = `
+      <div class="pbar-outer">
+        <div class="pbar-fill" style="background:${ws.color}" id="pbar-${ws.id}"></div>
+      </div>
+      <div class="pbar-pct" id="ppct-${ws.id}"></div>`;
+  }
+
+  // ── INTERACTION ───────────────────────────────────────────
+
+  function onQClick(qid) {
+    if (activeQ === qid && !activeWS) { reset(); return; }
+    activeQ = qid; activeWS = null;
+    applyAll();
+    openPanel(qid, null);
+  }
+
+  function onWSClick(wsid) {
+    if (activeWS === wsid && !activeQ) { reset(); return; }
+    activeWS = wsid;
+    if (!activeQ) {
+      activeQ = (QUARTERS.find(q => q.status === "current") || QUARTERS[0]).id;
+    }
+    applyAll();
+    openPanel(activeQ, wsid);
+  }
+
+  function onCellClick(wsid, items) {
+    activeWS = wsid;
+    if (!activeQ) {
+      // pick quarter from items if possible
+      const qSet = new Set();
+      items.forEach(item => {
+        const qs = Array.isArray(item.q) ? item.q : (item.q ? [item.q] : []);
+        qs.forEach(q => qSet.add(q));
+      });
+      activeQ = [...qSet][0] || (QUARTERS.find(q => q.status === "current") || QUARTERS[0]).id;
+    }
+    applyAll();
+    openPanel(activeQ, wsid);
+  }
+
+  // ── APPLY ─────────────────────────────────────────────────
+
+  function applyAll() {
+    clearVisuals();
+
+    // Quarter button active
+    document.querySelectorAll(".q-btn").forEach(btn =>
+      btn.classList.toggle("is-active", activeQ && btn.dataset.qid === activeQ)
+    );
+
+    // Bold items — NO cell background change, only text weight
+    if (activeQ) {
+      document.querySelectorAll(".items li[data-qs]").forEach(li => {
+        const qs = li.dataset.qs.split(",").filter(Boolean);
+        li.classList.toggle("q-bold", qs.includes(activeQ));
+      });
+    }
+
+    // Progress bars
+    if (activeQ) {
+      ALL_WS.forEach(ws => {
+        const pct  = PROGRESS[ws.id]?.[activeQ] ?? 0;
+        const fill = document.getElementById("pbar-" + ws.id);
+        const lbl  = document.getElementById("ppct-" + ws.id);
+        if (fill) fill.style.width = pct + "%";
+        if (lbl)  lbl.textContent  = pct + "% complete";
+      });
+      document.querySelectorAll(".progress-tr").forEach(r => r.classList.add("progress-active"));
+    }
+
+    // Row highlight — ONLY when a workstream label is clicked
+    if (activeWS) {
+      document.querySelectorAll(`[data-wsid="${activeWS}"].td-data`).forEach(td => td.classList.add("row-hi"));
+      document.querySelectorAll(`[data-wsid="${activeWS}"].td-ws`).forEach(td  => td.classList.add("row-hi"));
+    }
+  }
+
+  function clearVisuals() {
+    document.querySelectorAll(".td-data").forEach(td => td.classList.remove("row-hi"));
+    document.querySelectorAll(".td-ws").forEach(td   => td.classList.remove("row-hi"));
+    document.querySelectorAll(".items li").forEach(li => li.classList.remove("q-bold"));
+    document.querySelectorAll(".q-btn").forEach(btn  => btn.classList.remove("is-active"));
+    document.querySelectorAll(".pbar-fill").forEach(f => f.style.width = "0%");
+    document.querySelectorAll(".pbar-pct").forEach(l  => l.textContent = "");
+    document.querySelectorAll(".progress-tr").forEach(r => r.classList.remove("progress-active"));
+  }
+
+  // ── DETAIL PANEL ──────────────────────────────────────────
+  function openPanel(qid, focusWS) {
+    const qObj = QUARTERS.find(q => q.id === qid);
+    const statusLabel = { done:"Complete", current:"In Progress", planned:"Planned" };
+    document.getElementById("pTitle").textContent = `${qObj?.label} — ${statusLabel[qObj?.status] || ""}`;
+    document.getElementById("pSub").textContent   = qObj?.sub || "";
+
+    const body = document.getElementById("pBody");
+    body.innerHTML = "";
+
+    ALL_WS.forEach((ws, i) => {
+      const wd  = PANEL[qid]?.[ws.id] || { acts:[] };
+      const pct = PROGRESS[ws.id]?.[qid] ?? 0;
+      const div = document.createElement("div");
+      div.className = "pws";
+      if (focusWS === ws.id) div.style.cssText = "background:#F2F5FA;border-radius:8px;padding:8px;margin:0 -8px";
+
+      // All dots = workstream colour. Opacity signals status: done=full, prog=0.7, todo=0.3
+      const opacity = { done:"1", prog:"0.65", todo:"0.25" };
+      const actsHtml = wd.acts.map(a =>
+        `<li>
+          <span class="tick-dot" style="background:${ws.color};opacity:${opacity[a.s]}" title="${a.s}"></span>
+          <span style="${a.italic ? "font-style:italic;font-weight:700" : ""};opacity:${a.s==="todo"?"0.55":"1"}">${a.text}</span>
+         </li>`
+      ).join("");
+
+      div.innerHTML = `
+        <div class="pws-hd">
+          <div class="pws-dot" style="background:${ws.color}"></div>
+          <div class="pws-name">${ws.label}</div>
+        </div>
+        <div class="pws-bar"><div class="pws-fill" style="background:${ws.color};width:${pct}%"></div></div>
+        <div class="pws-pct">${pct}% complete</div>
+        <ul class="pws-acts">${actsHtml}</ul>`;
+      if (i < ALL_WS.length-1) { const d=document.createElement("div"); d.className="dvd"; div.appendChild(d); }
+      body.appendChild(div);
+    });
+    document.getElementById("panel").classList.add("open");
+  }
+
+  // ── RESET ─────────────────────────────────────────────────
+  function reset() {
+    activeQ = null; activeWS = null;
+    clearVisuals();
+    document.getElementById("panel").classList.remove("open");
+  }
+  document.getElementById("closeBtn").addEventListener("click", reset);
+
+  // Auto-open current quarter on load
+  const cur = QUARTERS.find(q => q.status === "current");
+  if (cur) setTimeout(() => onQClick(cur.id), 300);
+
+})();
+</script>
+</body>
+</html>
