@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jordan — ADKAR Branching Scenario</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a3a5c;
+    --teal: #2a7a6f;
+    --teal-light: #e8f5f3;
+    --amber: #c8793a;
+    --amber-light: #fdf3eb;
+    --slate: #4a5568;
+    --light: #f7f9fc;
+    --white: #ffffff;
+    --border: #e2e8f0;
+    --wrong: #c0392b;
+    --wrong-light: #fdf0ef;
+    --correct: #2a7a6f;
+    --correct-light: #e8f5f3;
+    --redirect: #6b4c9a;
+    --redirect-light: #f3eefb;
+    --shadow: 0 4px 24px rgba(26,58,92,0.10);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--light);
+    color: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+
+  /* HEADER */
+  .header {
+    width: 100%;
+    background: var(--navy);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-brand {
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: 18px;
+    letter-spacing: 0.3px;
+  }
+  .header-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+  }
+  .progress-fill {
+    height: 4px;
+    background: var(--teal);
+    transition: width 0.5s ease;
+  }
+
+  /* MAIN CONTAINER */
+  .container {
+    width: 100%;
+    max-width: 720px;
+    padding: 40px 24px 60px;
+  }
+
+  /* SCREEN */
+  .screen { display: none; animation: fadeIn 0.4s ease; }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* STAGE TAG */
+  .stage-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: var(--teal-light);
+    border-radius: 20px;
+    padding: 4px 12px;
+    margin-bottom: 16px;
+  }
+
+  /* TITLE */
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--navy);
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+
+  /* BODY TEXT */
+  .body-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--slate);
+    margin-bottom: 20px;
+  }
+  .body-text strong { color: var(--navy); }
+
+  /* JORDAN CARD */
+  .jordan-card {
+    background: white;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--navy);
+    padding: 20px 24px;
+    margin: 24px 0;
+    box-shadow: var(--shadow);
+  }
+  .jordan-card .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 8px;
+  }
+  .jordan-card p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--navy);
+  }
+
+  /* SIGNAL PILLS */
+  .signals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0 24px;
+  }
+  .signal {
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .signal-on { background: #e8f5e9; color: #2e7d32; }
+  .signal-off { background: #fdecea; color: #c62828; }
+  .signal-mixed { background: #fff8e1; color: #f57f17; }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* QUESTION BOX */
+  .question-box {
+    background: var(--navy);
+    color: white;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .question-box .q-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 8px;
+  }
+  .question-box p {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  /* CHOICE BUTTONS */
+  .choices { display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
+
+  .choice-btn {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--navy);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .choice-btn:hover {
+    border-color: var(--teal);
+    background: var(--teal-light);
+    transform: translateX(4px);
+  }
+  .choice-btn::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    margin-right: 12px;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+
+  /* CONSEQUENCE PANELS */
+  .consequence {
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .consequence-wrong {
+    background: var(--wrong-light);
+    border-left: 4px solid var(--wrong);
+  }
+  .consequence-correct {
+    background: var(--correct-light);
+    border-left: 4px solid var(--correct);
+  }
+  .consequence .c-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .consequence-wrong .c-label { color: var(--wrong); }
+  .consequence-correct .c-label { color: var(--correct); }
+  .consequence p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--navy);
+  }
+
+  /* REDIRECT BOX */
+  .redirect-box {
+    background: var(--redirect-light);
+    border: 1.5px solid var(--redirect);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .redirect-box .r-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--redirect);
+    margin-bottom: 8px;
+  }
+  .redirect-box p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #3d2b5e;
+  }
+
+  /* INSIGHT BOX */
+  .insight-box {
+    background: var(--amber-light);
+    border-left: 4px solid var(--amber);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .insight-box .i-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+  .insight-box p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #5a3a1a;
+  }
+
+  /* ADKAR BADGE */
+  .adkar-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--navy);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  /* REFLECTION */
+  .reflection-box {
+    background: white;
+    border: 2px solid var(--teal);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .reflection-box .rf-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 12px;
+  }
+  .reflection-box p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--navy);
+    resize: vertical;
+    outline: none;
+    transition: border 0.2s;
+    margin-top: 4px;
+  }
+  textarea:focus { border-color: var(--teal); }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  .btn-primary {
+    background: var(--teal);
+    color: white;
+  }
+  .btn-primary:hover { background: #1f5c54; transform: translateY(-1px); }
+  .btn-secondary {
+    background: white;
+    color: var(--navy);
+    border: 2px solid var(--border);
+    margin-left: 10px;
+  }
+  .btn-secondary:hover { border-color: var(--navy); }
+  .btn-navy {
+    background: var(--navy);
+    color: white;
+  }
+  .btn-navy:hover { background: #0f2540; transform: translateY(-1px); }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+
+  /* FINAL SUMMARY */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .summary-item {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    border: 1px solid var(--border);
+  }
+  .summary-item .s-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 6px;
+  }
+  .summary-item p { font-size: 13px; line-height: 1.5; color: var(--slate); }
+
+  /* ADKAR ROW */
+  .adkar-row {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+  .adkar-pill {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    padding: 10px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 2px solid transparent;
+  }
+  .adkar-pill.inactive { background: var(--border); color: var(--slate); }
+  .adkar-pill.barrier { background: var(--wrong-light); border-color: var(--wrong); color: var(--wrong); }
+  .adkar-pill.ok { background: var(--correct-light); border-color: var(--correct); color: var(--correct); }
+
+  @media (max-width: 600px) {
+    .container { padding: 24px 16px 48px; }
+    h1 { font-size: 22px; }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">Oliver</div>
+  <div class="header-label">ADKAR · Branching Scenario</div>
+</div>
+<div class="progress-bar">
+  <div class="progress-fill" id="progressFill" style="width:0%"></div>
+</div>
+
+<div class="container">
+
+  <!-- ==================== SCREEN 0: INTRO ==================== -->
+  <div class="screen active" id="screen-0">
+    <div class="stage-tag">Meet Jordan</div>
+    <h1>Same employee.<br>Different signals.</h1>
+    <p class="body-text">Jordan has always been a strong performer. Reliable. Experienced. Trusted by clients.</p>
+    <p class="body-text">Since the new process launched, things feel… uneven.</p>
+
+    <div class="jordan-card">
+      <div class="label">What you're observing</div>
+      <div class="signals">
+        <span class="signal signal-on">✅ Some days: on board</span>
+        <span class="signal signal-off">❌ Other days: frustrated</span>
+        <span class="signal signal-mixed">⚠️ Sometimes: disengaged</span>
+        <span class="signal signal-on">✅ Still completing tasks</span>
+        <span class="signal signal-off">❌ Missing deadlines</span>
+        <span class="signal signal-mixed">⚠️ Taking longer than before</span>
+      </div>
+    </div>
+
+    <p class="body-text">As a leader, what do you do next? Do you push harder? Send Jordan back to training? Assume it's resistance?</p>
+    <p class="body-text"><strong>Or do you pause long enough to figure out what's really missing?</strong></p>
+    <p class="body-text">This scenario will help you practice diagnosing before acting. At each step, you'll choose how to respond — and see what happens next.</p>
+
+    <div class="insight-box">
+      <div class="i-label">💡 Your objective</div>
+      <p>Your goal is not to fix Jordan quickly. Your goal is to <strong>diagnose accurately</strong> — then act with intent.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-navy" onclick="goTo('screen-1')">Begin the scenario →</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 1: DECISION POINT 1 ==================== -->
+  <div class="screen" id="screen-1">
+    <div class="stage-tag">Decision Point 1 of 2</div>
+    <h2>Jordan misses another deadline.</h2>
+
+    <div class="jordan-card">
+      <div class="label">The situation</div>
+      <p>It's the third week since the new process launched. Jordan has submitted two reports with errors and missed a client deadline. In your check-in, Jordan is quiet — gives short answers, avoids eye contact. When you ask how it's going, Jordan says: <strong>"Fine. I'm just figuring it out."</strong></p>
+    </div>
+
+    <p class="body-text">You've seen Jordan perform at a high level for years. Something is off — but you're not sure what.</p>
+
+    <div class="question-box">
+      <div class="q-label">Your decision</div>
+      <p>What do you do first?</p>
+    </div>
+
+    <div class="choices">
+      <button class="choice-btn" onclick="goTo('screen-2a')">Have a direct conversation. Remind Jordan of expectations and the importance of the new process.</button>
+      <button class="choice-btn" onclick="goTo('screen-2b')">Ask open questions about what specifically feels difficult about the new process.</button>
+      <button class="choice-btn" onclick="goTo('screen-2c')">Arrange for Jordan to repeat the training — clearly something didn't land the first time.</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 2A: WRONG PATH — DESIRE ==================== -->
+  <div class="screen" id="screen-2a">
+    <div class="stage-tag">What happened next</div>
+    <h2>You had the conversation.</h2>
+
+    <div class="consequence consequence-wrong">
+      <div class="c-label">⚠️ Two weeks later</div>
+      <p>Jordan listened, nodded, and thanked you for the clarity. Performance improved briefly — then slipped back. The errors are still there. The deadlines are still being missed. Jordan seems more anxious now, not less.</p>
+    </div>
+
+    <p class="body-text">The conversation felt productive. But nothing changed.</p>
+
+    <div class="redirect-box">
+      <div class="r-label">🔍 What this tells us</div>
+      <p>You treated this as a <strong>Desire gap</strong> — assuming Jordan didn't want to comply. But Jordan was already trying. Reminding someone of expectations doesn't help when the real barrier is somewhere else.</p>
+      <br>
+      <p>Before acting, the question is always: <em>what is actually missing?</em> Awareness? Desire? Knowledge? Ability? Reinforcement?</p>
+    </div>
+
+    <div class="insight-box">
+      <div class="i-label">💡 ADKAR insight</div>
+      <p>Motivation-based interventions only work when Desire is genuinely the gap. Applied to the wrong barrier, they can increase anxiety and erode trust.</p>
+    </div>
+
+    <p class="body-text">Let's go back and try a different approach.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo('screen-1')">← Try again</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 2B: CORRECT PATH — CONTINUES ==================== -->
+  <div class="screen" id="screen-2b">
+    <div class="stage-tag">What happened next</div>
+    <h2>You asked. Jordan opened up — slightly.</h2>
+
+    <div class="consequence consequence-correct">
+      <div class="c-label">✅ The conversation</div>
+      <p>Jordan paused, then said: <strong>"I know what we're supposed to do. I just… it takes me so much longer than before. And I don't want to look like I can't handle it."</strong></p>
+    </div>
+
+    <p class="body-text">This is new information. Jordan understands the change. Jordan wants to succeed. But something is still getting in the way.</p>
+
+    <div class="insight-box">
+      <div class="i-label">💡 What you're hearing</div>
+      <p>Jordan said <em>"I know what we're supposed to do."</em> That rules out an Awareness or Knowledge gap. Jordan also clearly cares about performing well — that rules out a Desire gap. So what's missing?</p>
+    </div>
+
+    <div class="question-box">
+      <div class="q-label">Decision Point 2 — Your response</div>
+      <p>Jordan knows what to do but is struggling to execute consistently. What do you do next?</p>
+    </div>
+
+    <div class="choices">
+      <button class="choice-btn" onclick="goTo('screen-3a')">Temporarily adjust Jordan's targets to reduce the pressure while they catch up.</button>
+      <button class="choice-btn" onclick="goTo('screen-3b')">Name what you're observing: this looks like an Ability gap. Offer structured coaching and protected practice time.</button>
+      <button class="choice-btn" onclick="goTo('screen-3c')">Increase your check-ins to twice a week so you can monitor progress more closely.</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 2C: WRONG PATH — KNOWLEDGE ==================== -->
+  <div class="screen" id="screen-2c">
+    <div class="stage-tag">What happened next</div>
+    <h2>Jordan repeated the training.</h2>
+
+    <div class="consequence consequence-wrong">
+      <div class="c-label">⚠️ One week later</div>
+      <p>Jordan completed the training module and scored 88% on the knowledge check. But in the next client report, the same errors appeared. Jordan told a colleague: <em>"I don't understand what they want from me. I passed the test."</em></p>
+    </div>
+
+    <p class="body-text">The training worked. The performance didn't improve. These are two different things.</p>
+
+    <div class="redirect-box">
+      <div class="r-label">🔍 What this tells us</div>
+      <p>You treated this as a <strong>Knowledge gap</strong> — assuming Jordan didn't know what to do. But Jordan passed the training the first time too. Knowing what to do and being able to do it consistently under real conditions are not the same thing.</p>
+      <br>
+      <p>In ADKAR, <strong>Knowledge</strong> is understanding how to change. <strong>Ability</strong> is performing it in real working conditions. They look similar from the outside — but they require very different responses.</p>
+    </div>
+
+    <div class="insight-box">
+      <div class="i-label">💡 ADKAR insight</div>
+      <p>Training only addresses Knowledge. If the gap is Ability, more training won't close it — coaching, practice time, and psychological safety will.</p>
+    </div>
+
+    <p class="body-text">Let's go back and look more carefully at what Jordan is actually experiencing.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo('screen-1')">← Try again</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 3A: WRONG PATH — ACCOMMODATION ==================== -->
+  <div class="screen" id="screen-3a">
+    <div class="stage-tag">What happened next</div>
+    <h2>You adjusted Jordan's targets.</h2>
+
+    <div class="consequence consequence-wrong">
+      <div class="c-label">⚠️ Three weeks later</div>
+      <p>Jordan felt relieved — and grateful. But the reduced targets became the new normal. Other team members noticed. Two of them asked why Jordan's workload was lighter. The underlying gap — the actual reason for Jordan's struggles — was never addressed.</p>
+    </div>
+
+    <p class="body-text">You removed the pressure. But you didn't remove the barrier.</p>
+
+    <div class="redirect-box">
+      <div class="r-label">🔍 What this tells us</div>
+      <p>Accommodation can be a compassionate short-term move — but when it replaces diagnosis, it becomes avoidance. Jordan needed support to <em>build capability</em>, not a reduced expectation to perform around the gap.</p>
+      <br>
+      <p>The ADKAR barrier was still there. The consequences were just deferred.</p>
+    </div>
+
+    <div class="insight-box">
+      <div class="i-label">💡 ADKAR insight</div>
+      <p>An Ability gap requires coaching, practice, and time — not reduced standards. Lowering the bar doesn't build capability; it hides the gap until it becomes a bigger problem.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo('screen-2b')">← Go back and choose differently</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 3B: CORRECT PATH — ABILITY ==================== -->
+  <div class="screen" id="screen-3b">
+    <div class="stage-tag">What happened next</div>
+    <h2>You named it — and acted on it.</h2>
+
+    <div class="consequence consequence-correct">
+      <div class="c-label">✅ What you said</div>
+      <p><em>"Jordan, what I'm hearing is that you understand the process and you want to get this right — you're just not there yet in terms of speed and consistency under pressure. That's an Ability gap, and it's normal at this stage. Let's work on it together."</em></p>
+    </div>
+
+    <p class="body-text">You blocked 30 minutes twice a week for Jordan to practice the new process with you available for questions. You also removed one lower-priority task temporarily to create space.</p>
+
+    <div class="consequence consequence-correct">
+      <div class="c-label">✅ Three weeks later</div>
+      <p>Jordan's confidence visibly improved. Errors dropped by more than half. Jordan told you: <em>"I think I've finally got it. I just needed time to actually do it, not just learn it."</em></p>
+    </div>
+
+    <div class="adkar-badge">💪 Ability gap — correctly diagnosed and addressed</div>
+
+    <div class="insight-box">
+      <div class="i-label">💡 Why this worked</div>
+      <p>You listened before acting. You named the gap specifically — not "resistance," not "a training issue," but an Ability gap. Then you gave Jordan what an Ability gap actually needs: coaching, practice time, and psychological safety to struggle without consequence.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-navy" onclick="goTo('screen-debrief')">Continue to debrief →</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN 3C: WRONG PATH — OVERSIGHT ==================== -->
+  <div class="screen" id="screen-3c">
+    <div class="stage-tag">What happened next</div>
+    <h2>You increased your check-ins.</h2>
+
+    <div class="consequence consequence-wrong">
+      <div class="c-label">⚠️ Two weeks later</div>
+      <p>Jordan started preparing extensively before every check-in — spending time managing your perception rather than developing the skill. Performance under observation improved slightly. Performance when you weren't watching stayed inconsistent. Jordan seemed more stressed than before.</p>
+    </div>
+
+    <p class="body-text">More oversight created more anxiety — not more capability.</p>
+
+    <div class="redirect-box">
+      <div class="r-label">🔍 What this tells us</div>
+      <p>Oversight is a <strong>Reinforcement</strong> tool — it's useful when people have the ability but need accountability to sustain new behaviors. Applied to an <strong>Ability gap</strong>, it creates pressure without support. Jordan needed coaching, not monitoring.</p>
+      <br>
+      <p>In ADKAR, using the right tool for the wrong gap doesn't just fail — it can actively make things worse.</p>
+    </div>
+
+    <div class="insight-box">
+      <div class="i-label">💡 ADKAR insight</div>
+      <p>Accountability without capability is just pressure. Coaching is different from monitoring — one builds the person, the other measures them.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo('screen-2b')">← Go back and choose differently</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN: DEBRIEF ==================== -->
+  <div class="screen" id="screen-debrief">
+    <div class="stage-tag">Debrief</div>
+    <h1>What Jordan's story reveals.</h1>
+
+    <p class="body-text">Jordan wasn't resistant. Jordan wasn't undertrained. Jordan had an <strong>Ability gap</strong> — the gap between knowing what to do and being able to do it consistently under real conditions.</p>
+
+    <p class="body-text">The signals were mixed because Ability gaps often look like Desire gaps from the outside. Frustration, avoidance, and inconsistency can mean many things. That's why diagnosis comes before action.</p>
+
+    <div class="adkar-row">
+      <div class="adkar-pill ok">✅ Awareness</div>
+      <div class="adkar-pill ok">✅ Desire</div>
+      <div class="adkar-pill ok">✅ Knowledge</div>
+      <div class="adkar-pill barrier">⚠️ Ability</div>
+      <div class="adkar-pill inactive">— Reinforcement</div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="s-label">Wrong move A</div>
+        <p>Motivational conversation → treated as Desire gap → nothing changed because Desire wasn't missing</p>
+      </div>
+      <div class="summary-item">
+        <div class="s-label">Wrong move B</div>
+        <p>More training → treated as Knowledge gap → Jordan already knew; couldn't yet perform</p>
+      </div>
+      <div class="summary-item">
+        <div class="s-label">Wrong move C</div>
+        <p>Adjusted targets → removed pressure without removing the barrier → gap deferred, not closed</p>
+      </div>
+      <div class="summary-item">
+        <div class="s-label">Wrong move D</div>
+        <p>Increased oversight → added accountability without capability → anxiety increased, performance didn't</p>
+      </div>
+    </div>
+
+    <div class="insight-box">
+      <div class="i-label">💡 The key principle</div>
+      <p><strong>Every ADKAR element requires a different response.</strong> Training fixes Knowledge. Conversations fix Desire. Coaching fixes Ability. Accountability fixes Reinforcement. Applying the wrong fix — even a good one — to the wrong gap is where change efforts break down.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-navy" onclick="goTo('screen-end')">Complete the scenario →</button>
+    </div>
+  </div>
+
+  <!-- ==================== SCREEN: END ==================== -->
+  <div class="screen" id="screen-end">
+    <div class="stage-tag">Complete</div>
+    <h1>One employee.<br>One gap.<br>One intentional action.</h1>
+
+    <p class="body-text">Effective change leadership doesn't start with action — it starts with diagnosis. Jordan's story is a reminder that the most common mistake isn't bad intent. It's reacting before understanding.</p>
+
+    <div class="jordan-card">
+      <div class="label">What you practiced today</div>
+      <p>Diagnosing a barrier point before acting · Recognizing that the same signals can point to different gaps · Choosing an intervention matched to the specific missing ADKAR element</p>
+    </div>
+
+    <div class="insight-box">
+      <div class="i-label">💡 Take this forward</div>
+      <p>Go back now to your <strong>ADKAR Employee Quick Scan</strong>. Use it to formalize your diagnosis for a real employee. One focused action, matched to the right gap, will do more than a dozen well-intentioned but misdirected efforts.</p>
+    </div>
+
+    <hr class="divider">
+
+    <p class="body-text" style="font-size:13px;color:#888;">Want to explore how this plays out across every ADKAR stage? A second scenario — walking through all five elements — is coming soon.</p>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="restart()">↺ Restart scenario</button>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  const progressMap = {
+    'screen-0': 0,
+    'screen-1': 15,
+    'screen-2a': 35,
+    'screen-2b': 45,
+    'screen-2c': 35,
+    'screen-3a': 65,
+    'screen-3b': 80,
+    'screen-3c': 65,
+    'screen-debrief': 88,
+    'screen-end': 100
+  };
+
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById(id);
+    if (target) {
+      target.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const pct = progressMap[id] || 0;
+      document.getElementById('progressFill').style.width = pct + '%';
+    }
+  }
+
+  function restart() {
+    goTo('screen-0');
+  }
+</script>
+</body>
+</html>
