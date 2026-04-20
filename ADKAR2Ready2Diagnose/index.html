@@ -3,27 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>What Would You Do? – ADKAR Diagnostic</title>
+<title>Ready to Diagnose – Quick Scan Transition</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --navy:     #1A2B4A;
-    --teal:     #1B7A8A;
-    --teal-lt:  #E8F4F6;
-    --teal-mid: #D0EBF0;
-    --amber:    #D4871A;
-    --amber-lt: #FDF3E3;
-    --green:    #1E6B45;
-    --green-lt: #E6F4ED;
-    --rose:     #B03A2E;
-    --rose-lt:  #FDECEA;
-    --slate:    #4A5568;
-    --fog:      #F0F4F8;
-    --white:    #FFFFFF;
-    --radius:   12px;
-    --shadow:   0 4px 28px rgba(26,43,74,0.11);
+    --navy:    #1A2B4A;
+    --teal:    #1B7A8A;
+    --teal-lt: #E8F4F6;
+    --amber:   #D4871A;
+    --amber-lt:#FDF3E3;
+    --green:   #1E6B45;
+    --green-lt:#E6F4ED;
+    --slate:   #4A5568;
+    --mid:     #6B7A90;
+    --fog:     #F0F4F8;
+    --rule:    #DDE3EC;
+    --white:   #FFFFFF;
+    --radius:  12px;
+    --shadow:  0 4px 24px rgba(26,43,74,0.10);
   }
 
   html, body {
@@ -32,7 +31,6 @@
     font-family: 'DM Sans', sans-serif;
     color: var(--navy);
   }
-
   body {
     display: flex;
     align-items: flex-start;
@@ -40,19 +38,19 @@
     padding: 40px 20px 60px;
   }
 
-  /* ── Wrapper ── */
-  .wrapper {
-    max-width: 700px;
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    max-width: 660px;
     width: 100%;
+    overflow: hidden;
   }
 
-  /* ── Intro card ── */
-  .intro-card {
+  /* ── Header ── */
+  .card-header {
     background: var(--navy);
-    border-radius: var(--radius);
-    padding: 28px 36px 26px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow);
+    padding: 28px 36px 24px;
   }
   .lesson-tag {
     font-size: 11px;
@@ -62,742 +60,398 @@
     color: rgba(255,255,255,0.5);
     margin-bottom: 10px;
   }
-  .intro-card h1 {
+  .card-header h1 {
     font-family: 'DM Serif Display', serif;
-    font-size: 26px;
+    font-size: 24px;
     color: var(--white);
     font-weight: 400;
     line-height: 1.3;
-    margin-bottom: 14px;
   }
-  .intro-card h1 em { color: #7EC8D4; font-style: normal; }
-  .intro-card p {
-    font-size: 14.5px;
-    line-height: 1.7;
-    color: rgba(255,255,255,0.75);
-  }
-
-  /* ── Progress ── */
-  .progress-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 22px;
-  }
-  .progress-bar-wrap {
-    flex: 1;
-    height: 5px;
-    background: #DDE3EC;
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  .progress-bar-fill {
-    height: 100%;
-    background: var(--teal);
-    border-radius: 3px;
-    transition: width 0.4s ease;
-    width: 0%;
-  }
-  .progress-label {
-    font-size: 12px;
-    color: var(--slate);
-    font-weight: 500;
-    white-space: nowrap;
-  }
-
-  /* ── Scenario card ── */
-  .scenario-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-
-  .scenario-header {
-    padding: 20px 28px 18px;
-    border-bottom: 1px solid #EDF1F7;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-  }
-  .scenario-num {
-    flex-shrink: 0;
-    width: 34px;
-    height: 34px;
-    background: var(--navy);
-    color: var(--white);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .card-header h1 em { color: #7EC8D4; font-style: normal; }
+  .card-header p {
     font-size: 14px;
-    font-weight: 600;
-    margin-top: 1px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 10px;
+    line-height: 1.65;
   }
-  .scenario-role {
-    font-size: 11px;
+
+  /* ── Body ── */
+  .card-body { padding: 30px 36px 36px; }
+
+  /* ── Checklist ── */
+  .checklist-label {
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--teal);
-    margin-bottom: 6px;
-  }
-  .scenario-quote {
-    font-family: 'DM Serif Display', serif;
-    font-size: 17px;
-    line-height: 1.55;
-    color: var(--navy);
-    font-style: italic;
+    margin-bottom: 16px;
   }
 
-  .scenario-body {
-    padding: 22px 28px 26px;
-  }
-
-  .prompt-label {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--teal);
-    margin-bottom: 14px;
-  }
-
-  /* ── Options ── */
-  .options {
+  .checklist {
     display: flex;
     flex-direction: column;
-    gap: 9px;
-    margin-bottom: 20px;
+    gap: 10px;
+    margin-bottom: 28px;
   }
 
-  .option {
+  .check-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 12px 16px;
-    border: 2px solid #DDE3EC;
-    border-radius: 9px;
+    gap: 14px;
+    padding: 14px 18px;
+    border: 2px solid var(--rule);
+    border-radius: 10px;
     cursor: pointer;
-    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    transition: border-color 0.15s, background 0.15s;
     background: var(--white);
     user-select: none;
     -webkit-user-select: none;
   }
-  .option:hover:not(.disabled) {
-    border-color: var(--teal);
-    background: var(--teal-lt);
-    transform: translateX(3px);
-  }
-  .option.selected {
-    border-color: var(--navy);
-    background: #EEF2F8;
-  }
-  .option.disabled { cursor: default; }
-  .option.disabled:hover { transform: none; border-color: #DDE3EC; background: var(--white); }
-  .option.selected.disabled { border-color: var(--navy); background: #EEF2F8; }
+  .check-item:hover { border-color: var(--teal); background: var(--teal-lt); }
+  .check-item.checked { border-color: var(--green); background: var(--green-lt); }
 
-  .option-marker {
+  .check-box {
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
     border: 2px solid #BBC5D4;
     margin-top: 1px;
     transition: all 0.15s;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  .option.selected .option-marker {
-    border-color: var(--navy);
-    background: var(--navy);
-  }
-  .option.selected .option-marker::after {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
     background: var(--white);
   }
-  .option-text {
-    font-size: 14.5px;
-    line-height: 1.5;
+  .check-item.checked .check-box {
+    border-color: var(--green);
+    background: var(--green);
+  }
+  .check-item.checked .check-box::after {
+    content: '';
+    width: 11px;
+    height: 7px;
+    border-left: 2.5px solid var(--white);
+    border-bottom: 2.5px solid var(--white);
+    transform: rotate(-45deg) translateY(-1px);
+  }
+
+  .check-content { flex: 1; }
+  .check-title {
+    font-size: 15px;
+    font-weight: 500;
     color: var(--navy);
-    padding-top: 1px;
+    line-height: 1.4;
+    margin-bottom: 3px;
   }
+  .check-sub {
+    font-size: 13px;
+    color: var(--mid);
+    line-height: 1.5;
+  }
+  .check-item.checked .check-title { color: var(--green); }
 
-  /* ── Submit ── */
-  .submit-btn {
-    display: block;
-    width: 100%;
-    padding: 13px;
-    background: var(--navy);
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14.5px;
-    font-weight: 600;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-    letter-spacing: 0.02em;
+  /* ── Progress indicator ── */
+  .progress-wrap {
+    margin-bottom: 24px;
   }
-  .submit-btn:hover:not(:disabled) {
-    background: var(--teal);
-    transform: translateY(-1px);
+  .progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
   }
-  .submit-btn:disabled {
-    opacity: 0.35;
-    cursor: default;
-    transform: none;
+  .progress-text {
+    font-size: 13px;
+    color: var(--mid);
+    font-weight: 500;
   }
-
-  /* ── Feedback ── */
-  .feedback {
-    display: none;
-    margin-top: 20px;
-    border-radius: 10px;
+  .progress-bar-bg {
+    height: 5px;
+    background: var(--rule);
+    border-radius: 3px;
     overflow: hidden;
-    animation: slideIn 0.3s ease;
   }
-  .feedback.visible { display: block; }
+  .progress-bar {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 3px;
+    transition: width 0.35s ease;
+  }
 
-  @keyframes slideIn {
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--rule);
+    margin: 24px 0;
+  }
+
+  /* ── Reminder box ── */
+  .reminder {
+    background: var(--amber-lt);
+    border: 1.5px solid var(--amber);
+    border-radius: 9px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .reminder-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .reminder p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--navy);
+  }
+  .reminder strong { font-weight: 600; }
+
+  /* ── CTA ── */
+  .cta-block {
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+  .cta-block.visible { display: block; }
+
+  @keyframes fadeUp {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  .fb-top {
-    padding: 14px 20px;
+  .cta-header {
+    background: var(--green);
+    border-radius: 10px 10px 0 0;
+    padding: 16px 22px;
     display: flex;
     align-items: center;
     gap: 10px;
   }
-  .fb-top.correct  { background: var(--green); }
-  .fb-top.near     { background: var(--teal); }
-  .fb-top.reflect  { background: #5C6F8A; }
-
-  .fb-top-icon { font-size: 18px; flex-shrink: 0; }
-  .fb-top h3 {
+  .cta-header-icon { font-size: 20px; }
+  .cta-header h3 {
     font-family: 'DM Serif Display', serif;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--white);
     font-weight: 400;
   }
 
-  .fb-body {
-    padding: 18px 20px 20px;
+  .cta-body {
     background: var(--white);
-    border: 2px solid #DDE3EC;
+    border: 2px solid var(--rule);
     border-top: none;
     border-radius: 0 0 10px 10px;
+    padding: 20px 22px 22px;
   }
-  .fb-body p {
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--slate);
-    margin-bottom: 9px;
-  }
-  .fb-body p:last-child { margin-bottom: 0; }
-  .fb-body strong { color: var(--navy); }
-
-  .adkar-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--navy);
-    color: var(--white);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 20px;
-    margin-bottom: 12px;
-  }
-
-  /* ── Nav buttons ── */
-  .nav-row {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 14px;
-  }
-  .nav-btn {
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    border: none;
-  }
-  .nav-btn.next {
-    background: var(--teal);
-    color: var(--white);
-  }
-  .nav-btn.next:hover { background: #156070; }
-  .nav-btn.reset {
-    background: none;
-    border: 1.5px solid #BBC5D4;
-    color: var(--slate);
-  }
-  .nav-btn.reset:hover { border-color: var(--navy); color: var(--navy); }
-
-  /* ── Summary ── */
-  .summary-card {
-    display: none;
-    background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    animation: slideIn 0.4s ease;
-  }
-  .summary-card.visible { display: block; }
-
-  .summary-header {
-    background: var(--navy);
-    padding: 24px 32px 22px;
-  }
-  .summary-header h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-    color: var(--white);
-    font-weight: 400;
-  }
-  .summary-header p {
-    font-size: 14px;
-    color: rgba(255,255,255,0.65);
-    margin-top: 6px;
-  }
-  .summary-body { padding: 28px 32px 32px; }
-
-  .summary-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 16px 0;
-    border-bottom: 1px solid #EDF1F7;
-  }
-  .summary-row:last-of-type { border-bottom: none; }
-
-  .summary-pill {
-    flex-shrink: 0;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    min-width: 90px;
-    text-align: center;
-  }
-  .pill-a { background: #E3EAF5; color: var(--navy); }
-  .pill-d { background: var(--rose-lt); color: var(--rose); }
-  .pill-k { background: #EDE9F8; color: #5B3FA0; }
-  .pill-ab { background: var(--green-lt); color: var(--green); }
-  .pill-r { background: var(--amber-lt); color: var(--amber); }
-
-  .summary-text { font-size: 14px; line-height: 1.6; color: var(--slate); }
-  .summary-text strong { color: var(--navy); }
-
-  .takeaway-box {
-    margin-top: 24px;
-    background: var(--teal-lt);
-    border: 1.5px solid var(--teal);
-    border-radius: 9px;
-    padding: 18px 22px;
-  }
-  .takeaway-box p {
+  .cta-body p {
     font-size: 14.5px;
     line-height: 1.7;
-    color: var(--navy);
+    color: var(--slate);
+    margin-bottom: 10px;
   }
-  .takeaway-box strong { font-weight: 600; }
+  .cta-body p:last-child { margin-bottom: 0; }
+  .cta-body strong { color: var(--navy); }
 
-  .jordan-cue {
+  .step-list {
+    margin: 14px 0;
+    counter-reset: steps;
+  }
+  .step-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    background: var(--navy);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 1px;
+  }
+  .step-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--slate);
+    padding-top: 3px;
+  }
+  .step-text strong { color: var(--navy); }
+
+  .barrier-rule {
+    margin-top: 18px;
+    background: #EEF2F8;
+    border-left: 4px solid var(--navy);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+  }
+  .barrier-rule p {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--navy);
+    margin-bottom: 0;
+  }
+  .barrier-rule strong { font-weight: 600; }
+
+  .continue-cue {
     margin-top: 20px;
     background: var(--navy);
     border-radius: 9px;
-    padding: 18px 22px;
+    padding: 16px 20px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
   }
-  .jordan-cue-icon { font-size: 22px; flex-shrink: 0; }
-  .jordan-cue p {
+  .continue-cue-icon { font-size: 18px; flex-shrink: 0; }
+  .continue-cue p {
     font-size: 14px;
-    line-height: 1.6;
     color: rgba(255,255,255,0.85);
+    line-height: 1.5;
   }
-  .jordan-cue strong { color: var(--white); }
+  .continue-cue strong { color: var(--white); }
 
   @media (max-width: 500px) {
-    .intro-card, .scenario-body, .summary-body { padding-left: 20px; padding-right: 20px; }
-    .scenario-header { padding-left: 20px; padding-right: 20px; }
-    .intro-card h1 { font-size: 22px; }
-    .summary-header { padding: 20px; }
+    .card-header { padding: 22px 22px 20px; }
+    .card-body   { padding: 22px 20px 28px; }
+    .card-header h1 { font-size: 21px; }
   }
 </style>
 </head>
 <body>
 
-<div class="wrapper">
-
-  <!-- Intro -->
-  <div class="intro-card">
-    <div class="lesson-tag">Lesson 2 · Diagnostic Warm-Up</div>
-    <h1>What Would You Do?<br><em>Five signals. One principle.</em></h1>
-    <p>You've just reviewed all five ADKAR diagnostic cards. Before you meet Jordan, test your diagnostic instincts with five real-leader situations. Read what the employee is saying or doing — then choose the most effective first response. All options are plausible.</p>
+<div class="card">
+  <div class="card-header">
+    <div class="lesson-tag">Lesson 2 · Transition Check</div>
+    <h1>You've observed. Now <em>formalise</em>.</h1>
+    <p>You've just reviewed all five ADKAR diagnostic cards and noted what you're seeing in your employee. Before moving to the diagnostic activity, take two minutes to confirm you're ready.</p>
   </div>
 
-  <!-- Progress -->
-  <div class="progress-row">
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="progressFill"></div>
+  <div class="card-body">
+
+    <div class="reminder">
+      <span class="reminder-icon">📓</span>
+      <p>You should have observation notes in the <strong>Observing My Employee</strong> section of your workbook — one entry per ADKAR element. If you haven't filled those in yet, go back now before continuing.</p>
     </div>
-    <span class="progress-label" id="progressLabel">0 of 5</span>
+
+    <p class="checklist-label">Confirm you've completed each observation</p>
+
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <span class="progress-text" id="progressText">0 of 5 completed</span>
+        <span class="progress-text" id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="checklist" id="checklist">
+      <div class="check-item" onclick="toggleCheck(this, 0)">
+        <div class="check-box"></div>
+        <div class="check-content">
+          <div class="check-title">🧭 Awareness — I've noted what I'm hearing or seeing</div>
+          <div class="check-sub">Do they clearly understand why this change is happening?</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this, 1)">
+        <div class="check-box"></div>
+        <div class="check-content">
+          <div class="check-title">❤️ Desire — I've noted what I'm hearing or seeing</div>
+          <div class="check-sub">Do they personally want to support this change?</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this, 2)">
+        <div class="check-box"></div>
+        <div class="check-content">
+          <div class="check-title">📘 Knowledge — I've noted what I'm hearing or seeing</div>
+          <div class="check-sub">Do they know what they're supposed to do differently?</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this, 3)">
+        <div class="check-box"></div>
+        <div class="check-content">
+          <div class="check-title">💪 Ability — I've noted what I'm hearing or seeing</div>
+          <div class="check-sub">Can they perform consistently in real work conditions?</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this, 4)">
+        <div class="check-box"></div>
+        <div class="check-content">
+          <div class="check-title">🏁 Reinforcement — I've noted what I'm hearing or seeing</div>
+          <div class="check-sub">Are new behaviours sticking, or are old habits creeping back?</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA — revealed when all 5 checked -->
+    <div class="cta-block" id="ctaBlock">
+      <div class="cta-header">
+        <span class="cta-header-icon">✓</span>
+        <h3>Good — now open the Quick Scan handout</h3>
+      </div>
+      <div class="cta-body">
+        <p>You have raw observations for all five elements. The Quick Scan handout turns those observations into a scored diagnosis. Open it alongside your workbook notes.</p>
+
+        <div class="step-list">
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <span class="step-text">Score each element <strong>1–5</strong> using your observation notes as evidence</span>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <span class="step-text">Work <strong>left to right</strong>: Awareness → Desire → Knowledge → Ability → Reinforcement</span>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <span class="step-text">Mark the <strong>first element scoring 3 or below</strong> as your Barrier Point</span>
+          </div>
+        </div>
+
+        <div class="barrier-rule">
+          <p><strong>If all scores are 4 or above:</strong> focus on Reinforcement — the gains are there but need active support to stick. Keep the completed Quick Scan beside your workbook. You'll use both when you reach the Apply to Your Employee section.</p>
+        </div>
+
+        <div class="continue-cue" style="margin-top:20px;">
+          <span class="continue-cue-icon">▶</span>
+          <p><strong>Once your Quick Scan is complete</strong>, return here and continue to the Diagnostic Practice activity below.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
-
-  <!-- Scenario card -->
-  <div class="scenario-card" id="scenarioCard">
-    <div class="scenario-header">
-      <div class="scenario-num" id="scenarioNum">1</div>
-      <div>
-        <div class="scenario-role" id="scenarioRole"></div>
-        <div class="scenario-quote" id="scenarioQuote"></div>
-      </div>
-    </div>
-    <div class="scenario-body">
-      <div class="prompt-label">What's your first move?</div>
-      <div class="options" id="optionsList"></div>
-      <button class="submit-btn" id="submitBtn" onclick="submitAnswer()" disabled>See the answer</button>
-      <div class="feedback" id="feedbackPanel"></div>
-      <div class="nav-row" id="navRow" style="display:none">
-        <button class="nav-btn reset" onclick="resetCurrent()">↩ Try again</button>
-        <button class="nav-btn next" id="nextBtn" onclick="nextScenario()">Next →</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Summary -->
-  <div class="summary-card" id="summaryCard">
-    <div class="summary-header">
-      <h2>That's all five — well done.</h2>
-      <p>Here's the pattern across each scenario.</p>
-    </div>
-    <div class="summary-body">
-      <div class="summary-row">
-        <span class="summary-pill pill-a">Awareness</span>
-        <p class="summary-text"><strong>"Who even decided this?"</strong> — When someone's questioning the decision itself, they haven't yet accepted the <em>reason</em> for the change. Clarifying the business case and urgency comes before anything else.</p>
-      </div>
-      <div class="summary-row">
-        <span class="summary-pill pill-d">Desire</span>
-        <p class="summary-text"><strong>"I'll do it, but I'm not happy."</strong> — Understanding doesn't create buy-in. Desire gaps need listening and honest conversations about personal impact — not more information or pressure.</p>
-      </div>
-      <div class="summary-row">
-        <span class="summary-pill pill-k">Knowledge</span>
-        <p class="summary-text"><strong>"I'm not sure what I'm supposed to do."</strong> — Confusion about process or expectations is a Knowledge gap. Targeted instruction, job aids, and clarity about what "good" looks like are the right tools here.</p>
-      </div>
-      <div class="summary-row">
-        <span class="summary-pill pill-ab">Ability</span>
-        <p class="summary-text"><strong>"I know what to do — it just takes me twice as long."</strong> — Knowledge and Ability are different. Ability gaps need practice time, coaching in real conditions, and removing barriers — not more training.</p>
-      </div>
-      <div class="summary-row">
-        <span class="summary-pill pill-r">Reinforcement</span>
-        <p class="summary-text"><strong>"We did it for a while, then things slipped."</strong> — Change erodes without active follow-through. Recognition, accountability, and visible leadership consistency are what keep new behaviours from fading.</p>
-      </div>
-
-      <div class="takeaway-box">
-        <p><strong>The single most important principle:</strong> Address the <em>first</em> missing element — not the most obvious one, not the easiest one. Work left to right through A → D → K → A → R. Fixing a later gap before an earlier one almost never works.</p>
-      </div>
-
-      <div class="jordan-cue">
-        <span class="jordan-cue-icon">👤</span>
-        <p><strong>Now apply it to Jordan.</strong> You've already noted your observations for your own employee. In the scenario that follows, you'll see what it looks like to diagnose — and misdiagnose — a real situation in real time.</p>
-      </div>
-    </div>
-  </div>
-
 </div>
 
 <script>
-const scenarios = [
-  {
-    num: 1,
-    role: "Employee comment · team meeting",
-    quote: "\"Who even decided this was a problem? The old system worked for us.\"",
-    adkar: "AWARENESS",
-    pillClass: "pill-a",
-    options: [
-      { text: "Explain the business rationale and what happens if the organisation doesn't change", correct: true },
-      { text: "Acknowledge their frustration and move on — they'll come around", correct: false },
-      { text: "Encourage them to speak to their colleagues who are on board", correct: false },
-      { text: "Schedule a knowledge session so they understand the new process", correct: false },
-    ],
-    feedback: {
-      correct: {
-        type: "correct", icon: "✓", heading: "Right — this is an Awareness gap",
-        adkar: "AWARENESS",
-        body: [
-          "They're questioning the premise of the change, not the process. That's an <strong>Awareness gap</strong>: the reason for change isn't clear or credible to them yet.",
-          "The move that helps: re-explain the business case, make the risk of <em>not</em> changing visible, and confirm understanding rather than assuming alignment.",
-          "Nothing else — training, social proof, patience — will land until they believe the change is genuinely necessary."
-        ]
-      },
-      wrong: {
-        type: "reflect", icon: "→", heading: "Not quite — go back one step",
-        adkar: "AWARENESS",
-        body: [
-          "This employee is challenging the premise of the change, not asking how to do it. That's an <strong>Awareness gap</strong> — the business reason hasn't landed.",
-          "Social proof, knowledge sessions, or patience won't help here. They first need to understand <em>why</em> this change is necessary and what happens if it doesn't happen.",
-          "The right first move: clearly and credibly re-explain the case for change."
-        ]
-      }
-    }
-  },
-  {
-    num: 2,
-    role: "1:1 check-in · three weeks post-launch",
-    quote: "\"I'll do it — I just don't see what's in it for me. My old way was faster.\"",
-    adkar: "DESIRE",
-    pillClass: "pill-d",
-    options: [
-      { text: "Walk them through the new process step by step to build their confidence", correct: false },
-      { text: "Listen to what feels like a loss for them personally before responding", correct: true },
-      { text: "Remind them the change is mandatory and performance will be monitored", correct: false },
-      { text: "Share data showing the new process improves outcomes across the team", correct: false },
-    ],
-    feedback: {
-      correct: {
-        type: "correct", icon: "✓", heading: "Yes — Desire gaps need listening first",
-        adkar: "DESIRE",
-        body: [
-          "They understand the change and are complying — but they're not personally on board. That's a <strong>Desire gap</strong>.",
-          "The instinct to present data or reinforce consequences usually deepens resistance here. What they need first is to feel heard.",
-          "Ask an open question. Find out what specifically feels like a loss. That conversation shapes what comes next."
-        ]
-      },
-      wrong: {
-        type: "reflect", icon: "→", heading: "This is a Desire gap — not Knowledge or pressure",
-        adkar: "DESIRE",
-        body: [
-          "They're complying, but reluctantly. The issue isn't confusion about the process — it's that they don't see personal value in the change. That's a <strong>Desire gap</strong>.",
-          "Pushing harder or adding information rarely closes it. Desire gaps open up when people feel unheard or when their personal stake hasn't been addressed.",
-          "Listen before responding. Find out what feels like a loss to them specifically."
-        ]
-      }
-    }
-  },
-  {
-    num: 3,
-    role: "Walk-by comment · hallway",
-    quote: "\"I've been through the training, but honestly I'm still not clear on the steps.\"",
-    adkar: "KNOWLEDGE",
-    pillClass: "pill-k",
-    options: [
-      { text: "Give them time — it'll come with practice", correct: false },
-      { text: "Offer targeted role-specific guidance and point them to a job aid", correct: true },
-      { text: "Ask if there's a personal reason they're resistant to the change", correct: false },
-      { text: "Book them in for the next available training run", correct: false },
-    ],
-    feedback: {
-      correct: {
-        type: "correct", icon: "✓", heading: "Right — this is a Knowledge gap",
-        adkar: "KNOWLEDGE",
-        body: [
-          "They've had training but can't yet describe what they're supposed to do. That's a <strong>Knowledge gap</strong> — the learning hasn't translated into clear expectations.",
-          "Generic training often doesn't match real work conditions. The fix: targeted instruction specific to their role, a job aid they can use in the moment, and clarity about what good performance actually looks like.",
-          "Waiting for practice to fill the gap, or assuming there's a personal resistance issue, will cost time."
-        ]
-      },
-      wrong: {
-        type: "reflect", icon: "→", heading: "Not quite — this is a Knowledge gap",
-        adkar: "KNOWLEDGE",
-        body: [
-          "They've been through training but still can't describe the steps. That's a <strong>Knowledge gap</strong> — not a Desire issue, and not something practice alone will fix if they don't know what to practice.",
-          "The most effective response: targeted guidance specific to their role, a concrete job aid, and clarity about what 'good' looks like in their real work context.",
-          "Booking more generic training repeats the problem. Role-specific support is what's missing."
-        ]
-      }
-    }
-  },
-  {
-    num: 4,
-    role: "Team debrief · end of week",
-    quote: "\"I know exactly what to do — it just takes me twice as long when things get busy.\"",
-    adkar: "ABILITY",
-    pillClass: "pill-ab",
-    options: [
-      { text: "Ask a Desire question — find out if they're actually committed to the change", correct: false },
-      { text: "Run another training session to reinforce the process", correct: false },
-      { text: "Coach them through real tasks during busy periods and reduce competing demands temporarily", correct: true },
-      { text: "Set a performance target and check in at the end of the month", correct: false },
-    ],
-    feedback: {
-      correct: {
-        type: "correct", icon: "✓", heading: "Exactly right — Knowledge and Ability are different",
-        adkar: "ABILITY",
-        body: [
-          "They can describe what to do but can't execute consistently under pressure. That's an <strong>Ability gap</strong> — not a Knowledge or Desire problem.",
-          "More training won't help — they already know the steps. What they need is supported practice in real conditions: coaching alongside them during a busy period, temporary workload relief, and space to build the habit without fear of failure.",
-          "Performance targets without support tend to increase anxiety, not capability."
-        ]
-      },
-      wrong: {
-        type: "reflect", icon: "→", heading: "This is an Ability gap — not Knowledge or Desire",
-        adkar: "ABILITY",
-        body: [
-          "They said they know what to do — so this isn't a Knowledge or Desire gap. The issue is performance under real conditions. That's an <strong>Ability gap</strong>.",
-          "More training, a Desire conversation, or a performance target all miss the point here. Ability gaps close with practice in real work: hands-on coaching, reduced competing pressure, and a safe environment to build the new habit.",
-          "The gap is between knowing and doing — bridge it with support during actual work, not before or after."
-        ]
-      }
-    }
-  },
-  {
-    num: 5,
-    role: "Check-in · two months post-launch",
-    quote: "\"We were doing really well for a while. Things have slipped a bit since the pressure picked up.\"",
-    adkar: "REINFORCEMENT",
-    pillClass: "pill-r",
-    options: [
-      { text: "Restart training — they've clearly forgotten the process", correct: false },
-      { text: "Actively recognise what's still going well and reset expectations on what's drifting", correct: true },
-      { text: "Assume it's a seasonal dip — wait and see how the next quarter looks", correct: false },
-      { text: "Send a reminder about the importance of the change and why it was introduced", correct: false },
-    ],
-    feedback: {
-      correct: {
-        type: "correct", icon: "✓", heading: "Right — this is a Reinforcement gap",
-        adkar: "REINFORCEMENT",
-        body: [
-          "Early adoption was there — but it's fading. That's a <strong>Reinforcement gap</strong>: the behaviours aren't being sustained because the environment has stopped actively supporting them.",
-          "The fix isn't training or more communication — it's visible follow-through: recognising what's still working, resetting expectations clearly on what's drifting, and maintaining accountability.",
-          "Change erodes when leaders assume the job is done at go-live. Reinforcement is active work, not a passive outcome."
-        ]
-      },
-      wrong: {
-        type: "reflect", icon: "→", heading: "This is a Reinforcement gap — not Knowledge or Awareness",
-        adkar: "REINFORCEMENT",
-        body: [
-          "They had the behaviours. They're slipping. That's a <strong>Reinforcement gap</strong> — not a training issue or an awareness problem.",
-          "Restating why the change matters, or retraining people who already know the process, signals that leadership has lost focus — which usually accelerates the drift.",
-          "What works: actively recognise what's still going well, reset expectations on what isn't, and stay visible. Reinforcement is a leadership behaviour, not a one-time event."
-        ]
-      }
-    }
-  }
-];
+  const checked = [false, false, false, false, false];
 
-let current = 0;
-let selectedOption = null;
-let answered = false;
-
-function renderScenario(index) {
-  const s = scenarios[index];
-  selectedOption = null;
-  answered = false;
-
-  document.getElementById('scenarioNum').textContent = s.num;
-  document.getElementById('scenarioRole').textContent = s.role;
-  document.getElementById('scenarioQuote').innerHTML = s.quote;
-
-  const optList = document.getElementById('optionsList');
-  optList.innerHTML = '';
-  s.options.forEach((opt, i) => {
-    const div = document.createElement('div');
-    div.className = 'option';
-    div.dataset.index = i;
-    div.innerHTML = `<div class="option-marker"></div><span class="option-text">${opt.text}</span>`;
-    div.onclick = () => selectOption(div, i);
-    optList.appendChild(div);
-  });
-
-  document.getElementById('submitBtn').disabled = true;
-  document.getElementById('submitBtn').style.display = 'block';
-  document.getElementById('feedbackPanel').className = 'feedback';
-  document.getElementById('feedbackPanel').innerHTML = '';
-  document.getElementById('navRow').style.display = 'none';
-
-  updateProgress(index);
-}
-
-function selectOption(el, idx) {
-  if (answered) return;
-  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedOption = idx;
-  document.getElementById('submitBtn').disabled = false;
-}
-
-function submitAnswer() {
-  if (selectedOption === null) return;
-  answered = true;
-  const s = scenarios[current];
-  const chosen = s.options[selectedOption];
-  const fb = chosen.correct ? s.feedback.correct : s.feedback.wrong;
-
-  document.querySelectorAll('.option').forEach(o => {
-    o.classList.add('disabled');
-    o.onclick = null;
-  });
-  document.getElementById('submitBtn').style.display = 'none';
-
-  const panel = document.getElementById('feedbackPanel');
-  panel.innerHTML = `
-    <div class="fb-top ${fb.type}">
-      <span class="fb-top-icon">${fb.icon}</span>
-      <h3>${fb.heading}</h3>
-    </div>
-    <div class="fb-body">
-      <span class="adkar-pill ${s.pillClass}">${fb.adkar}</span>
-      ${fb.body.map(b => `<p>${b}</p>`).join('')}
-    </div>
-  `;
-  panel.classList.add('visible');
-
-  const navRow = document.getElementById('navRow');
-  navRow.style.display = 'flex';
-  const nextBtn = document.getElementById('nextBtn');
-  if (current === scenarios.length - 1) {
-    nextBtn.textContent = 'See summary →';
-  } else {
-    nextBtn.textContent = 'Next →';
+  function toggleCheck(el, idx) {
+    checked[idx] = !checked[idx];
+    el.classList.toggle('checked', checked[idx]);
+    updateProgress();
   }
 
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
+  function updateProgress() {
+    const count = checked.filter(Boolean).length;
+    const pct = Math.round((count / 5) * 100);
 
-function resetCurrent() {
-  renderScenario(current);
-}
+    document.getElementById('progressText').textContent = `${count} of 5 completed`;
+    document.getElementById('progressPct').textContent = `${pct}%`;
+    document.getElementById('progressBar').style.width = pct + '%';
 
-function nextScenario() {
-  if (current < scenarios.length - 1) {
-    current++;
-    renderScenario(current);
-    document.getElementById('scenarioCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } else {
-    document.getElementById('scenarioCard').style.display = 'none';
-    document.querySelector('.progress-row').style.display = 'none';
-    const sum = document.getElementById('summaryCard');
-    sum.classList.add('visible');
-    sum.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const cta = document.getElementById('ctaBlock');
+    if (count === 5) {
+      cta.classList.add('visible');
+      setTimeout(() => {
+        cta.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 200);
+    } else {
+      cta.classList.remove('visible');
+    }
   }
-}
-
-function updateProgress(index) {
-  const pct = (index / scenarios.length) * 100;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = `${index} of ${scenarios.length}`;
-}
-
-// Init
-renderScenario(0);
 </script>
 </body>
 </html>
