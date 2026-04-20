@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADKAR Hotspot Quiz — Lesson 2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:#1a3a5c;--teal:#2a7a6f;--teal-light:#e8f5f3;--amber:#c8793a;--amber-light:#fdf3eb;
+    --slate:#4a5568;--light:#f7f9fc;--border:#e2e8f0;--correct:#2a7a6f;--correct-light:#e8f5f3;
+    --incorrect:#c0392b;--incorrect-light:#fdf0ef;--shadow:0 4px 24px rgba(26,58,92,.10);--radius:12px;
+    --a1:#7c5cbf;--a1-light:#f0ecfa;--d:#2a7a6f;--d-light:#e8f5f3;--k:#2a6a9a;--k-light:#e8f2fa;
+    --a2:#c8793a;--a2-light:#fdf3eb;--r:#c0392b;--r-light:#fdf0ef;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--light);color:var(--navy);min-height:100vh}
+  .header{background:var(--navy);padding:16px 28px;display:flex;align-items:center;justify-content:space-between}
+  .header-brand{font-family:'DM Serif Display',serif;color:white;font-size:17px}
+  .header-label{font-size:11px;color:rgba(255,255,255,.55);font-weight:500;letter-spacing:1px;text-transform:uppercase}
+  .container{max-width:780px;margin:0 auto;padding:36px 20px 60px}
+  .intro-tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--amber);background:var(--amber-light);border-radius:20px;padding:4px 12px;margin-bottom:14px}
+  h1{font-family:'DM Serif Display',serif;font-size:26px;color:var(--navy);line-height:1.25;margin-bottom:8px}
+  .intro-text{font-size:14px;color:var(--slate);line-height:1.65;margin-bottom:28px}
+  .diagram-wrap{background:white;border-radius:var(--radius);border:1px solid var(--border);padding:28px 20px 20px;margin-bottom:24px;box-shadow:var(--shadow);overflow-x:auto}
+  .adkar-flow{display:flex;align-items:center;justify-content:center;gap:0;min-width:560px}
+  .adkar-node{position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform .18s ease}
+  .adkar-node:hover{transform:translateY(-3px)}
+  .node-box{width:100px;border-radius:10px;padding:14px 10px 12px;text-align:center;border:2px solid transparent;transition:all .2s ease;position:relative}
+  .node-box.completed{opacity:.75}
+  .node-box.active{transform:scale(1.04);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+  .node-number{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:24px;height:24px;border-radius:50%;font-size:12px;font-weight:700;color:white;display:flex;align-items:center;justify-content:center;border:2px solid white}
+  .node-check{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:24px;height:24px;border-radius:50%;background:#2a7a6f;font-size:13px;color:white;display:none;align-items:center;justify-content:center;border:2px solid white}
+  .node-box.completed .node-number{display:none}
+  .node-box.completed .node-check{display:flex}
+  .node-title{font-size:13px;font-weight:700;margin-bottom:4px}
+  .node-sub{font-size:11px;font-style:italic;opacity:.85;line-height:1.3}
+  .node-a1 .node-box{background:var(--a1-light);border-color:var(--a1)}.node-a1 .node-number{background:var(--a1)}.node-a1 .node-title{color:var(--a1)}.node-a1 .node-sub{color:var(--a1)}
+  .node-d .node-box{background:var(--d-light);border-color:var(--d)}.node-d .node-number{background:var(--d)}.node-d .node-title{color:var(--d)}.node-d .node-sub{color:var(--d)}
+  .node-k .node-box{background:var(--k-light);border-color:var(--k)}.node-k .node-number{background:var(--k)}.node-k .node-title{color:var(--k)}.node-k .node-sub{color:var(--k)}
+  .node-a2 .node-box{background:var(--a2-light);border-color:var(--a2)}.node-a2 .node-number{background:var(--a2)}.node-a2 .node-title{color:var(--a2)}.node-a2 .node-sub{color:var(--a2)}
+  .node-r .node-box{background:var(--r-light);border-color:var(--r)}.node-r .node-number{background:var(--r)}.node-r .node-title{color:var(--r)}.node-r .node-sub{color:var(--r)}
+  .arrow{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#cbd5e0;font-size:20px;margin-bottom:4px}
+  .diagram-note{text-align:center;font-size:11px;color:#999;font-style:italic;margin-top:14px;border-top:1px dashed #e2e8f0;padding-top:10px}
+  .progress-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .progress-dots{display:flex;gap:8px}
+  .dot{width:28px;height:8px;border-radius:4px;background:var(--border);transition:background .3s ease}
+  .dot.done{background:var(--teal)}.dot.active{background:var(--navy)}
+  .progress-label{font-size:13px;color:var(--slate)}
+  .reset-btn{font-size:12px;color:var(--slate);background:white;border:1px solid var(--border);border-radius:6px;padding:5px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+  .reset-btn:hover{border-color:var(--navy);color:var(--navy)}
+  .question-panel{background:white;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;animation:fadeUp .3s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .panel-header{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .panel-badge{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:20px;white-space:nowrap}
+  .panel-title{font-size:13px;font-weight:500;color:var(--slate);font-style:italic}
+  .panel-body{padding:20px 22px}
+  .scenario-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--slate);margin-bottom:6px}
+  .scenario-box{font-size:13px;line-height:1.7;color:var(--navy);margin-bottom:6px;padding:14px 16px;background:var(--light);border-radius:8px;border-left:3px solid var(--navy)}
+  .question-text{font-size:14px;font-weight:600;color:var(--navy);margin:14px 0 16px}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .option-btn{background:white;border:2px solid var(--border);border-radius:8px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.5;color:var(--navy);cursor:pointer;text-align:left;transition:all .18s ease;display:flex;align-items:flex-start;gap:10px}
+  .option-btn:hover:not(:disabled){border-color:var(--teal);background:var(--teal-light)}
+  .option-btn:disabled{cursor:default}
+  .option-btn.correct{border-color:var(--correct);background:var(--correct-light)}
+  .option-btn.incorrect{border-color:var(--incorrect);background:var(--incorrect-light)}
+  .option-btn.reveal{border-color:var(--correct);background:var(--correct-light);opacity:.7}
+  .option-letter{min-width:22px;height:22px;border-radius:50%;background:var(--border);color:var(--slate);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .18s}
+  .option-btn.correct .option-letter{background:var(--correct);color:white}
+  .option-btn.incorrect .option-letter{background:var(--incorrect);color:white}
+  .option-btn.reveal .option-letter{background:var(--correct);color:white}
+  .feedback{margin-top:16px;padding:14px 16px;border-radius:8px;font-size:13px;line-height:1.65;display:none;animation:fadeUp .25s ease}
+  .feedback.correct{background:var(--correct-light);border-left:3px solid var(--correct);color:#1a4a40;display:block}
+  .feedback.incorrect{background:var(--incorrect-light);border-left:3px solid var(--incorrect);color:#6b1a14;display:block}
+  .feedback-label{font-weight:700;margin-bottom:4px;font-size:12px;letter-spacing:.5px;text-transform:uppercase}
+  .next-btn{margin-top:16px;display:none;background:var(--navy);color:white;border:none;border-radius:8px;padding:11px 24px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+  .next-btn:hover{background:#0f2540;transform:translateY(-1px)}
+  .next-btn.visible{display:inline-block}
+  .placeholder{padding:24px 22px;text-align:center;color:var(--slate);font-size:14px;font-style:italic}
+  .completion{display:none;background:var(--navy);border-radius:var(--radius);padding:32px 28px;text-align:center;animation:fadeUp .4s ease}
+  .completion.visible{display:block}
+  .completion h2{font-family:'DM Serif Display',serif;color:white;font-size:22px;margin-bottom:10px}
+  .completion p{color:rgba(255,255,255,.8);font-size:14px;line-height:1.65;margin-bottom:20px}
+  .completion-score{display:inline-block;background:var(--teal);color:white;font-size:28px;font-weight:700;padding:12px 28px;border-radius:10px;margin-bottom:20px}
+  .restart-btn{background:white;color:var(--navy);border:none;border-radius:8px;padding:10px 22px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+  .restart-btn:hover{background:var(--teal-light)}
+  @media(max-width:600px){.container{padding:24px 14px 48px}h1{font-size:21px}.node-box{width:86px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-brand">Oliver</div>
+  <div class="header-label">ADKAR · Lesson 2 · Diagnostic Practice</div>
+</div>
+<div class="container">
+  <div class="intro-tag">Diagnostic Practice</div>
+  <h1>What's Missing? — ADKAR in Action</h1>
+  <p class="intro-text">Each hotspot describes a real situation. Click an element, read what the employee is saying, and choose the right leader response.</p>
+
+  <div class="diagram-wrap">
+    <div class="adkar-flow">
+      <div class="adkar-node node-a1" onclick="openQuestion(0)">
+        <div class="node-box" id="box-0"><div class="node-number">1</div><div class="node-check">✓</div><div class="node-title">Awareness</div><div class="node-sub">"I understand why"</div></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="adkar-node node-d" onclick="openQuestion(1)">
+        <div class="node-box" id="box-1"><div class="node-number">2</div><div class="node-check">✓</div><div class="node-title">Desire</div><div class="node-sub">"I choose to support"</div></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="adkar-node node-k" onclick="openQuestion(2)">
+        <div class="node-box" id="box-2"><div class="node-number">3</div><div class="node-check">✓</div><div class="node-title">Knowledge</div><div class="node-sub">"I know how"</div></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="adkar-node node-a2" onclick="openQuestion(3)">
+        <div class="node-box" id="box-3"><div class="node-number">4</div><div class="node-check">✓</div><div class="node-title">Ability</div><div class="node-sub">"I can do it"</div></div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="adkar-node node-r" onclick="openQuestion(4)">
+        <div class="node-box" id="box-4"><div class="node-number">5</div><div class="node-check">✓</div><div class="node-title">Reinforcement</div><div class="node-sub">"I keep doing it"</div></div>
+      </div>
+    </div>
+    <div class="diagram-note">Click each element to reveal a real situation — then choose the right response</div>
+  </div>
+
+  <div class="progress-row">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="progress-dots">
+        <div class="dot" id="dot-0"></div><div class="dot" id="dot-1"></div>
+        <div class="dot" id="dot-2"></div><div class="dot" id="dot-3"></div><div class="dot" id="dot-4"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">0 / 5 answered</div>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">Reset</button>
+  </div>
+
+  <div id="questionPanel" class="question-panel">
+    <div class="placeholder">Click any numbered element on the diagram above to begin.</div>
+  </div>
+
+  <div class="completion" id="completion">
+    <h2>Diagnostic practice complete.</h2>
+    <div class="completion-score" id="scoreDisplay"></div>
+    <p id="completionMsg"></p>
+    <button class="restart-btn" onclick="resetAll()">↺ Try again</button>
+  </div>
+</div>
+
+<script>
+const questions=[
+  {
+    element:"Awareness",color:"#7c5cbf",colorLight:"#f0ecfa",quote:'"I understand why"',
+    scenario:"A team member says: \"I heard we're changing the system, but I'm not sure why — is this actually happening?\"",
+    question:"What do you do first?",
+    options:[
+      "Schedule them for training on the new process.",
+      "Go back and clearly explain why the change is happening and what's at risk if it doesn't.",
+      "Have a conversation about their commitment and attitude.",
+      "Pair them with a colleague for hands-on practice support."
+    ],
+    correct:1,
+    feedbackCorrect:"Right. Before anything else, people need to understand why the change is happening and believe it's necessary. No amount of training or pressure will help until the reason is clear and credible. Start there.",
+    feedbackIncorrect:"Not quite. The employee isn't confused about how to change — they don't know why it's happening. Go back to the reason, the urgency, and what's at risk. That's what's missing here."
+  },
+  {
+    element:"Desire",color:"#2a7a6f",colorLight:"#e8f5f3",quote:'"I choose to support"',
+    scenario:"A team member understands the change and can explain it clearly. But they seem disengaged and say: \"I'll do it — I just don't see why it has to change.\"",
+    question:"What's your next move?",
+    options:[
+      "Send them back to the communication materials to review the rationale.",
+      "Remind them it's a company requirement and move on.",
+      "Sit down, listen, and explore what feels personally at stake for them.",
+      "Increase your check-ins to monitor their progress more closely."
+    ],
+    correct:2,
+    feedbackCorrect:"Exactly. They already understand — so more information won't help. What's missing is a personal reason to commit. Listening, acknowledging concerns, and addressing what's in it for them is the right move here.",
+    feedbackIncorrect:"They already understand the change — so repeating the rationale or adding oversight won't close this gap. What's missing is personal motivation. The right move is to listen and explore what feels at stake for them."
+  },
+  {
+    element:"Knowledge",color:"#2a6a9a",colorLight:"#e8f2fa",quote:'"I know how"',
+    scenario:"After go-live, a team member keeps asking the same process questions and makes avoidable errors. They say: \"I just don't know what the right steps are in this situation.\"",
+    question:"What does this person actually need?",
+    options:[
+      "A conversation about why the change matters and its business impact.",
+      "More time and coaching in real work conditions.",
+      "Stronger accountability and more frequent follow-up.",
+      "Clear role-specific guidance, job aids, and clarified expectations."
+    ],
+    correct:3,
+    feedbackCorrect:"Correct. The employee is telling you exactly what's missing: they don't know the steps. Targeted instruction, clear expectations, and practical job aids are the right response — not pressure or more practice time before the knowledge is in place.",
+    feedbackIncorrect:"Look at what the employee is actually saying: they don't know the steps. That points to a knowledge gap, not a motivation or practice issue. Role-specific guidance and job aids are what's needed first."
+  },
+  {
+    element:"Ability",color:"#c8793a",colorLight:"#fdf3eb",quote:'"I can do it"',
+    scenario:"A team member completed training and passed the assessment. But under real workload they freeze, make errors, and revert to old habits. They say: \"I know what to do — it just takes me so much longer.\"",
+    question:"What do you do next?",
+    options:[
+      "Send them back to training to reinforce the steps.",
+      "Offer coaching and protected practice time in real working conditions.",
+      "Reduce their targets temporarily to ease the pressure.",
+      "Re-explain the business reason and urgency for the change."
+    ],
+    correct:1,
+    feedbackCorrect:"Exactly. Knowing what to do and being able to do it consistently under pressure are different things. They need coaching alongside real work, time to build fluency, and a safe environment to make mistakes. More training won't close this gap.",
+    feedbackIncorrect:"They already know the process — so training or motivation won't help here. The gap is between knowing and doing under real conditions. That requires coaching, practice time, and the space to struggle without consequence."
+  },
+  {
+    element:"Reinforcement",color:"#c0392b",colorLight:"#fdf0ef",quote:'"I keep doing it"',
+    scenario:"Three months after a successful launch, team members are drifting back to old habits. Someone says: \"No one checks anymore — the old way is just easier.\"",
+    question:"What does this require from you as a leader?",
+    options:[
+      "Revisit the original communication — the why clearly wasn't clear enough.",
+      "Run another training session to correct the regression.",
+      "Have individual conversations to rebuild motivation and commitment.",
+      "Re-establish recognition, accountability, and consistent follow-through."
+    ],
+    correct:3,
+    feedbackCorrect:"Spot on. The change worked — the issue isn't understanding or motivation, it's follow-through. Without active reinforcement, old habits return because they're easier and no one is holding the line. Recognition, accountability, and consistency are what sustain change.",
+    feedbackIncorrect:"The launch was successful — so the original communication and training did their job. What's fading now is the follow-through. Revisiting the why or retraining won't fix a reinforcement gap. Consistent accountability and recognition will."
+  }
+];
+
+let answered=new Array(5).fill(false),correct=new Array(5).fill(false),current=-1;
+
+function openQuestion(i){
+  current=i;const q=questions[i];const L=['A','B','C','D'];
+  const opts=q.options.map((opt,idx)=>{
+    let cls='';
+    if(answered[i]){if(idx===q.correct&&correct[i])cls='correct';else if(idx===q.correct)cls='reveal';}
+    return`<button class="option-btn ${cls}" ${answered[i]?'disabled':''} onclick="selectAnswer(${i},${idx})"><span class="option-letter">${L[idx]}</span>${opt}</button>`;
+  }).join('');
+  const fb=answered[i]?`<div class="feedback ${correct[i]?'correct':'incorrect'}"><div class="feedback-label">${correct[i]?'✓ Correct':'✗ Not quite'}</div>${correct[i]?q.feedbackCorrect:q.feedbackIncorrect}</div>`:'';
+  const nb=answered[i]?`<button class="next-btn visible" onclick="closePanel()">${answered.filter(Boolean).length<5?'Click another element to continue':'See your results →'}</button>`:'';
+  document.getElementById('questionPanel').innerHTML=`
+    <div class="panel-header"><span class="panel-badge" style="background:${q.colorLight};color:${q.color}">${q.element}</span><span class="panel-title">${q.quote}</span></div>
+    <div class="panel-body"><div class="scenario-label">The situation</div><div class="scenario-box">${q.scenario}</div><div class="question-text">${q.question}</div><div class="options">${opts}</div>${fb}${nb}</div>`;
+  document.querySelectorAll('.node-box').forEach((b,idx)=>b.classList.toggle('active',idx===i));
+}
+
+function selectAnswer(qi,selected){
+  if(answered[qi])return;
+  answered[qi]=true;correct[qi]=selected===questions[qi].correct;
+  document.getElementById('box-'+qi).classList.add('completed');
+  updateProgress();openQuestion(qi);
+  if(answered.every(Boolean))setTimeout(showCompletion,800);
+}
+
+function updateProgress(){
+  const count=answered.filter(Boolean).length;
+  document.getElementById('progressLabel').textContent=count+' / 5 answered';
+  for(let i=0;i<5;i++){const d=document.getElementById('dot-'+i);d.className='dot'+(answered[i]?' done':(i===current?' active':''));}
+}
+
+function closePanel(){
+  if(answered.every(Boolean)){showCompletion();return;}
+  document.getElementById('questionPanel').innerHTML='<div class="placeholder">Click the next element on the diagram to continue.</div>';
+  document.querySelectorAll('.node-box').forEach(b=>b.classList.remove('active'));
+}
+
+function showCompletion(){
+  const score=correct.filter(Boolean).length;
+  document.getElementById('questionPanel').style.display='none';
+  document.getElementById('completion').classList.add('visible');
+  document.getElementById('scoreDisplay').textContent=score+' / 5 correct';
+  let msg='';
+  if(score===5)msg="You identified the right response in every situation. You're ready to apply this — go back now to your ADKAR Employee Quick Scan.";
+  else if(score>=3)msg="Good diagnostic instincts. Review the situations that tripped you up — each gap requires a different response. Then return to your Quick Scan.";
+  else msg="Diagnosis takes practice. Return to the diagnostic cards, review what each gap looks and sounds like, then try again before moving to the Quick Scan.";
+  document.getElementById('completionMsg').textContent=msg;
+}
+
+function resetAll(){
+  answered=new Array(5).fill(false);correct=new Array(5).fill(false);current=-1;
+  for(let i=0;i<5;i++){document.getElementById('box-'+i).classList.remove('completed','active');document.getElementById('dot-'+i).className='dot';}
+  document.getElementById('progressLabel').textContent='0 / 5 answered';
+  document.getElementById('questionPanel').style.display='';
+  document.getElementById('questionPanel').innerHTML='<div class="placeholder">Click any numbered element on the diagram above to begin.</div>';
+  document.getElementById('completion').classList.remove('visible');
+}
+</script>
+</body>
+</html>
