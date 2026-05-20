@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How Pension Administration Works</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.5rem;min-height:100vh}
+.shell{max-width:620px;margin:0 auto}
+.setup{background:#E1F5EE;border-radius:12px;padding:.85rem 1.1rem;font-size:.84rem;color:#014040;margin-bottom:1rem;line-height:1.55}
+.setup strong{display:block;font-weight:600;margin-bottom:.2rem}
+.top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+.flow-title{font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#696267}
+.meta{display:flex;gap:.75rem;align-items:center}
+.ctr{font-size:.78rem;color:#b4b2a9}
+.restart{background:none;border:none;font-size:.77rem;color:#696267;cursor:pointer;text-decoration:underline;padding:0}
+.restart:hover{color:#038C8C}
+.track{position:relative;padding-left:2.5rem;margin-bottom:1rem}
+.track::before{content:'';position:absolute;left:13px;top:22px;bottom:22px;width:2px;background:#e0ded7}
+.step{position:relative;margin-bottom:.65rem;cursor:pointer;border-radius:12px}
+.step:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.dot{position:absolute;left:-2.5rem;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;border:2px solid #e0ded7;background:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#b4b2a9;transition:all .25s;z-index:1}
+.step.active .dot{background:#038C8C;border-color:#038C8C;color:#fff;box-shadow:0 0 0 4px rgba(3,140,140,.12)}
+.step.done .dot{background:#E1F5EE;border-color:#15C7C7;color:#038C8C}
+.step-card{background:#fff;border-radius:12px;border:1.5px solid #e8e6e0;padding:.9rem 1rem;transition:all .25s}
+.step.active .step-card{border-color:#038C8C;background:#FAFFFD}
+.step.done .step-card{border-color:#9FE1CB;background:#FAFFFD}
+.step-lbl{font-size:.7rem;color:#696267;font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.2rem}
+.step-title{font-size:.95rem;font-weight:700;color:#111;margin-bottom:.3rem}
+.step-body{font-size:.84rem;color:#5F5E5A;line-height:1.55;display:none}
+.step.active .step-body{display:block}
+.why{margin-top:.6rem;padding:.55rem .7rem;background:#FAEEDA;border-radius:8px;font-size:.79rem;color:#633806;display:flex;gap:.4rem;line-height:1.45}
+.nav{display:flex;gap:.55rem}
+.nbtn{flex:1;padding:.65rem;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;border:none;transition:background .2s}
+.nbtn-back{background:#f1efe8;color:#696267}.nbtn-back:hover:not(:disabled){background:#e8e6e0}
+.nbtn-back:disabled{opacity:.35;cursor:default}
+.nbtn-next{background:#038C8C;color:#fff}.nbtn-next:hover:not(:disabled){background:#014040}
+.nbtn-next:disabled{background:#b4b2a9;cursor:default}
+.nbtn-back:focus-visible,.nbtn-next:focus-visible{outline:3px solid #014040;outline-offset:2px}
+.done-msg{background:#E1F5EE;border:1px solid #038C8C;border-radius:12px;padding:1rem;text-align:center;font-size:.86rem;color:#014040;margin-top:.75rem;display:none;line-height:1.5}
+.done-msg strong{display:block;margin-bottom:.3rem;font-size:.92rem}
+.wb{background:#8CFFDF;border-radius:10px;padding:.7rem .9rem;font-size:.8rem;color:#174538;margin-top:.75rem;display:flex;gap:.4rem;line-height:1.5}
+.wb strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="setup">
+    <strong>🧠 How does a remittance become a pension?</strong>
+    This stepper shows the six steps that happen every month — from the moment an employer submits hours to the moment those hours become part of a member's pension entitlement. Click <strong>Next</strong> to move through each step, or click any step title to jump to it. Click <strong>Start over</strong> to reset.
+  </div>
+  <div class="top-row">
+    <div class="flow-title">Monthly remittance cycle</div>
+    <div class="meta">
+      <div class="ctr" id="ctr" aria-live="polite"></div>
+      <button class="restart" onclick="restart()" aria-label="Start over from step 1">↺ Start over</button>
+    </div>
+  </div>
+  <div class="track" id="track" role="list" aria-label="Remittance process steps"></div>
+  <div class="nav">
+    <button class="nbtn nbtn-back" id="btn-back" onclick="move(-1)" aria-label="Previous step">← Back</button>
+    <button class="nbtn nbtn-next" id="btn-next" onclick="move(1)" aria-label="Next step">Next →</button>
+  </div>
+  <div class="done-msg" id="done">
+    <strong>✅ You've traced the full remittance cycle</strong>
+    This process runs every month for every employer Oliver works with — across thousands of members simultaneously. Every step must be accurate. A single error in Step 1 can affect what a member receives in retirement decades later.
+  </div>
+  <div class="wb"><span>📓</span><span><strong>Workbook — Module 4:</strong> After completing this stepper, note the step where an error would be hardest to catch and explain why in your workbook.</span></div>
+</div>
+<script>
+const steps=[
+  {lbl:"Step 1",title:"Employer submits hours",
+   body:"Each month, the employer sends a file listing hours worked by each union member — regular hours, overtime, and double time recorded separately. This is the remittance submission.",
+   why:"Why it matters: The number of hours submitted is the foundation of everything. If the hours are wrong here, every calculation downstream is also wrong."},
+  {lbl:"Step 2",title:"Oliver validates the data",
+   body:"Oliver checks the submission against plan rules and member records. Are the hours reasonable? Is the member active? Is the employer in good standing? Anything unusual is flagged as a warning before processing continues.",
+   why:"Why it matters: Validation is the quality gate. Errors caught here are easy to fix. Errors that pass through become permanent records."},
+  {lbl:"Step 3",title:"Contribution rate is applied",
+   body:"The collective agreement sets the contribution rate per hour worked. Oliver looks up the member's occupation and level — apprentice, journeyman, foreman — and applies the correct rate. Overtime and double time may use different calculations.",
+   why:"Why it matters: One member might have multiple occupation codes, each with a different rate. Applying the wrong rate is a LAYERED RULES complexity — and it compounds over time."},
+  {lbl:"Step 4",title:"Employer and employee shares calculated",
+   body:"Most plans split contributions between the employer and the employee. Oliver calculates each party's share based on the collective agreement. Some plans also have a voluntary contribution option tracked in a separate account.",
+   why:"Why it matters: Both shares must be recorded separately and correctly. A member's personal contributions earn interest — which affects their entitlement on exit."},
+  {lbl:"Step 5",title:"Contributions posted to member record",
+   body:"Oliver posts the contributions to the member's permanent pension record. This month's hours and contributions are added to the accumulating total. The record now reflects one more month of the member's working life.",
+   why:"Why it matters: This is the TIME complexity in action. Every month's post adds another layer to a record that may span 35+ years. Each post must be correct — it cannot easily be undone."},
+  {lbl:"Step 6",title:"Pension entitlement grows",
+   body:"Accumulated contributions — combined with the plan formula, interest credits, and actuarial assumptions — build toward the member's final pension amount at retirement. The member does not see this number change month to month, but it is growing with every cycle.",
+   why:"Why it matters: This is the promise being kept. Every remittance cycle is one more instalment on the retirement income that member will depend on for the rest of their life."},
+];
+let cur=0;
+function render(){
+  document.getElementById('ctr').textContent=`Step ${cur+1} of ${steps.length}`;
+  document.getElementById('track').innerHTML=steps.map((s,i)=>`
+    <div class="step ${i<cur?'done':i===cur?'active':''}" role="listitem" tabindex="0" id="s${i}"
+         onclick="jump(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){jump(${i});event.preventDefault()}"
+         aria-current="${i===cur?'step':'false'}" aria-label="${s.lbl}: ${s.title}${i<cur?' — completed':''}">
+      <div class="dot" aria-hidden="true">${i<cur?'✓':i+1}</div>
+      <div class="step-card">
+        <div class="step-lbl">${s.lbl}</div>
+        <div class="step-title">${s.title}</div>
+        <div class="step-body">${s.body}<div class="why"><span>💡</span><span>${s.why}</span></div></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('btn-back').disabled=cur===0;
+  const atEnd=cur===steps.length-1;
+  const nxt=document.getElementById('btn-next');
+  nxt.disabled=atEnd;
+  nxt.textContent=atEnd?'Done ✓':'Next →';
+  document.getElementById('done').style.display=atEnd?'block':'none';
+}
+function move(d){
+  cur=Math.max(0,Math.min(steps.length-1,cur+d));
+  render();
+  document.getElementById('s'+cur).scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function jump(i){cur=i;render();}
+function restart(){cur=0;render();}
+render();
+</script>
+</body>
+</html>
