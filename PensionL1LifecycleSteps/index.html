@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sequencing — Pension Lifecycle</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.shell{max-width:580px;width:100%}
+h2{font-size:1.05rem;font-weight:700;color:#111;margin-bottom:.3rem}
+.sub{font-size:.88rem;color:#696267;margin-bottom:1.2rem}
+.instruction{font-size:.82rem;color:#038C8C;font-weight:600;background:#E1F5EE;border-radius:8px;padding:.6rem .9rem;margin-bottom:1.2rem;display:flex;gap:.4rem;align-items:flex-start}
+/* SLOTS */
+.slots{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.2rem}
+.slot-row{display:flex;align-items:center;gap:.65rem}
+.slot-num{width:32px;height:32px;border-radius:50%;background:#e8e6e0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#696267;flex-shrink:0}
+.drop-zone{flex:1;min-height:56px;border:2px dashed #d3d1c7;border-radius:10px;display:flex;align-items:center;padding:.5rem .75rem;background:#fff;transition:all .2s}
+.drop-zone.over{border-color:#038C8C;background:#E1F5EE}
+.drop-zone.filled{border-style:solid;border-color:#e8e6e0}
+.placed{display:flex;align-items:center;gap:.55rem;width:100%;pointer-events:none}
+.placed-icon{font-size:1.15rem}
+.placed-label{font-size:.92rem;font-weight:600;color:#111}
+.placed-sub{font-size:.78rem;color:#696267;margin-left:.1rem}
+.remove-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:#c9c7c0;font-size:.9rem;padding:4px;pointer-events:all;line-height:1}
+.remove-btn:hover{color:#9C2E8B}
+.remove-btn:focus-visible{outline:2px solid #9C2E8B;border-radius:4px}
+/* POOL */
+.pool-label{font-size:.78rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#696267;margin-bottom:.5rem}
+.pool{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.2rem}
+.item{display:flex;align-items:center;gap:.55rem;background:#fff;border:1.5px solid #e8e6e0;border-radius:10px;padding:.65rem .9rem;transition:all .2s}
+.item.draggable{cursor:grab}
+.item.draggable:hover{border-color:#038C8C;background:#E1F5EE}
+.item.dragging{opacity:.3}
+.item.placed-away{display:none}
+.item-icon{font-size:1.15rem}
+.item-content{flex:1}
+.item-label{font-size:.92rem;font-weight:600;color:#111}
+.item-sub{font-size:.78rem;color:#696267}
+.drag-hint{font-size:.72rem;color:#c9c7c0}
+/* KEYBOARD MOVE BUTTONS */
+.move-btns{display:flex;gap:.3rem;margin-left:auto}
+.mv{background:#f1efe8;border:1px solid #e8e6e0;border-radius:6px;padding:3px 7px;font-size:.78rem;cursor:pointer;color:#696267;line-height:1.4}
+.mv:hover{background:#E1F5EE;border-color:#038C8C;color:#014040}
+.mv:focus-visible{outline:2px solid #038C8C;border-radius:4px}
+.mv:disabled{opacity:.3;cursor:default}
+/* ACTIONS */
+.actions{display:flex;gap:.65rem}
+.btn{flex:1;padding:.7rem;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:background .2s}
+.btn-check{background:#038C8C;color:#fff}
+.btn-check:hover{background:#014040}
+.btn-check:disabled{background:#b4b2a9;cursor:default}
+.btn-check:focus-visible,.btn-reset:focus-visible{outline:3px solid #014040;outline-offset:2px}
+.btn-reset{background:#f1efe8;color:#696267}
+.btn-reset:hover{background:#e8e6e0}
+.result{margin-top:.9rem;border-radius:10px;padding:.95rem 1.1rem;font-size:.88rem;line-height:1.6;display:none}
+.result.show{display:block}
+.result.correct{background:#E1F5EE;border:1px solid #038C8C;color:#014040}
+.result.wrong{background:#FFF8FE;border:1px solid #9C2E8B;color:#4a0a3d}
+.slot-correct .drop-zone{border-color:#038C8C!important;border-style:solid!important;background:#E1F5EE}
+.slot-wrong .drop-zone{border-color:#9C2E8B!important;border-style:solid!important;background:#FFF8FE}
+@media(max-width:480px){
+  body{padding:1rem}
+  .drag-hint{display:none}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <h2>Put the lifecycle stages in order</h2>
+  <p class="sub">From first to last — Entry through to Payment.</p>
+  <div class="instruction">
+    <span>💡</span>
+    <span><strong>Drag</strong> a card from below into a numbered slot — or use the <strong>↑ ↓ Move buttons</strong> to reorder without dragging.</span>
+  </div>
+
+  <div class="slots" id="slots" aria-label="Ordering slots"></div>
+
+  <div class="pool-label">Available stages</div>
+  <div class="pool" id="pool" aria-label="Stages to place"></div>
+
+  <div class="actions">
+    <button class="btn btn-check" id="check-btn" onclick="checkAnswer()" disabled aria-label="Check my answer">Check my answer</button>
+    <button class="btn btn-reset" onclick="resetAll()" aria-label="Reset and start over">↺ Reset</button>
+  </div>
+  <div class="result" id="result" role="alert"></div>
+</div>
+
+<script>
+const CORRECT=['entry','active','exit','payment'];
+const META={
+  entry:{icon:'🚉',label:'Entry',sub:'Join union — record created'},
+  active:{icon:'📈',label:'Active',sub:'Hours accumulate, pension grows'},
+  exit:{icon:'🚪',label:'Exit',sub:'Retirement, termination, or death'},
+  payment:{icon:'💳',label:'Payment',sub:'Monthly income or lump sum'},
+};
+const POOL_ORDER=['payment','exit','entry','active']; // shuffled start
+
+let slots=[null,null,null,null];
+let dragging=null;
+
+function renderSlots(){
+  const el=document.getElementById('slots');
+  el.innerHTML=slots.map((id,i)=>`
+    <div class="slot-row" id="slot-row-${i}">
+      <div class="slot-num" aria-hidden="true">${i+1}</div>
+      <div class="drop-zone ${id?'filled':''}" id="dz-${i}"
+           aria-label="Slot ${i+1}${id?': '+META[id].label:' — empty'}"
+           ondragover="allowDrop(event)" ondrop="drop(event,${i})"
+           ondragleave="e=>document.getElementById('dz-${i}').classList.remove('over')">
+        ${id?`<div class="placed">
+          <span class="placed-icon" aria-hidden="true">${META[id].icon}</span>
+          <div>
+            <div class="placed-label">${META[id].label}</div>
+            <div class="placed-sub">${META[id].sub}</div>
+          </div>
+          <button class="remove-btn" onclick="removeFromSlot(${i})" aria-label="Remove ${META[id].label} from slot ${i+1}">✕</button>
+        </div>`:''}
+      </div>
+    </div>`).join('');
+  // add dragleave properly
+  slots.forEach((_,i)=>{
+    const dz=document.getElementById('dz-'+i);
+    if(dz) dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+  });
+}
+
+function renderPool(){
+  const el=document.getElementById('pool');
+  el.innerHTML=POOL_ORDER.map(id=>{
+    const inSlot=slots.includes(id);
+    const slotIdx=slots.indexOf(id);
+    return `<div class="item ${inSlot?'placed-away':'draggable'}" id="item-${id}"
+      draggable="${!inSlot}"
+      ondragstart="dragStart(event,'${id}')"
+      aria-label="${META[id].label}: ${META[id].sub}">
+      <span class="item-icon" aria-hidden="true">${META[id].icon}</span>
+      <div class="item-content">
+        <div class="item-label">${META[id].label}</div>
+        <div class="item-sub">${META[id].sub}</div>
+      </div>
+      <span class="drag-hint" aria-hidden="true">drag</span>
+      <div class="move-btns">
+        ${[0,1,2,3].map(s=>!slots[s]?`<button class="mv" onclick="moveToSlot('${id}',${s})" aria-label="Place ${META[id].label} in slot ${s+1}">${s+1}</button>`:'').join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function render(){renderSlots();renderPool();updateCheck();}
+
+function dragStart(e,id){dragging=id;setTimeout(()=>{const el=document.getElementById('item-'+id);if(el)el.classList.add('dragging');},0);}
+function allowDrop(e){e.preventDefault();e.currentTarget.classList.add('over');}
+function drop(e,idx){
+  e.preventDefault();
+  e.currentTarget.classList.remove('over');
+  if(!dragging)return;
+  placeItem(dragging,idx);
+  dragging=null;
+  document.querySelectorAll('.item').forEach(el=>el.classList.remove('dragging'));
+}
+
+function placeItem(id,idx){
+  // If already in another slot, clear it
+  slots.forEach((s,i)=>{if(s===id)slots[i]=null;});
+  // If slot has something, return it to pool (it stays, just visible again)
+  slots[idx]=id;
+  clearResult();
+  render();
+}
+
+function moveToSlot(id,idx){
+  if(slots[idx])return; // slot occupied — user should use numbered buttons for empty slots only
+  placeItem(id,idx);
+}
+
+function removeFromSlot(idx){
+  slots[idx]=null;
+  clearResult();
+  render();
+}
+
+function updateCheck(){
+  document.getElementById('check-btn').disabled=slots.some(s=>s===null);
+}
+
+function clearResult(){
+  document.getElementById('result').className='result';
+  document.querySelectorAll('.slot-row').forEach(el=>{el.className='slot-row';});
+}
+
+function checkAnswer(){
+  clearResult();
+  const allOk=slots.every((s,i)=>s===CORRECT[i]);
+  slots.forEach((s,i)=>{
+    const row=document.getElementById('slot-row-'+i);
+    row.className='slot-row '+(s===CORRECT[i]?'slot-correct':'slot-wrong');
+  });
+  const r=document.getElementById('result');
+  if(allOk){
+    r.className='result show correct';
+    r.innerHTML='<strong>✅ Perfect order!</strong> Entry → Active → Exit → Payment. Every pension member moves through these four stages. Olive spent over 35 years in the Active stage alone.';
+  }else{
+    r.className='result show wrong';
+    r.innerHTML=`<strong>❌ Not quite.</strong> The correct order is: <strong>Entry → Active → Exit → Payment</strong>. Think of it as a journey: join, build, leave, receive. Slots highlighted in purple need adjusting.`;
+  }
+}
+
+function resetAll(){
+  slots=[null,null,null,null];
+  clearResult();
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
