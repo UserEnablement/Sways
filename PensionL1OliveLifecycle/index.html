@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Olive's Pension Journey</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.5rem;min-height:100vh}
+.shell{max-width:620px;margin:0 auto}
+.setup{background:#90F8F8;border-radius:12px;padding:.85rem 1.1rem;font-size:.84rem;color:#014040;margin-bottom:1rem;line-height:1.55}
+.setup strong{display:block;font-weight:600;margin-bottom:.2rem}
+.top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+.flow-title{font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#696267}
+.meta{display:flex;gap:.75rem;align-items:center}
+.ctr{font-size:.78rem;color:#b4b2a9}
+.restart{background:none;border:none;font-size:.77rem;color:#696267;cursor:pointer;text-decoration:underline;padding:0}
+.restart:hover{color:#038C8C}
+.track{position:relative;padding-left:2.5rem;margin-bottom:1rem}
+.track::before{content:'';position:absolute;left:13px;top:22px;bottom:22px;width:2px;background:#e0ded7}
+.step{position:relative;margin-bottom:.65rem;cursor:pointer;border-radius:12px}
+.step:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.dot{position:absolute;left:-2.5rem;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;border:2px solid #e0ded7;background:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#b4b2a9;transition:all .25s;z-index:1}
+.step.active .dot{background:#038C8C;border-color:#038C8C;color:#fff;box-shadow:0 0 0 4px rgba(3,140,140,.12)}
+.step.done .dot{background:#E1F5EE;border-color:#15C7C7;color:#038C8C}
+.step-card{background:#fff;border-radius:12px;border:1.5px solid #e8e6e0;padding:.9rem 1rem;transition:all .25s}
+.step.active .step-card{border-color:#038C8C;background:#FAFFFD}
+.step.done .step-card{border-color:#9FE1CB;background:#FAFFFD}
+.step-lbl{font-size:.7rem;color:#038C8C;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.2rem}
+.step-title{font-size:.95rem;font-weight:700;color:#111;margin-bottom:.3rem}
+.step-body{font-size:.84rem;color:#5F5E5A;line-height:1.55;display:none}
+.step.active .step-body{display:block}
+.link{margin-top:.6rem;padding:.55rem .7rem;background:#E1F5EE;border-radius:8px;font-size:.79rem;color:#014040;display:flex;gap:.4rem;line-height:1.45}
+.link strong{font-weight:600;color:#038C8C}
+.nav{display:flex;gap:.55rem}
+.nbtn{flex:1;padding:.65rem;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;border:none;transition:background .2s}
+.nbtn-back{background:#f1efe8;color:#696267}.nbtn-back:hover:not(:disabled){background:#e8e6e0}
+.nbtn-back:disabled{opacity:.35;cursor:default}
+.nbtn-next{background:#038C8C;color:#fff}.nbtn-next:hover:not(:disabled){background:#014040}
+.nbtn-next:disabled{background:#b4b2a9;cursor:default}
+.nbtn-back:focus-visible,.nbtn-next:focus-visible{outline:3px solid #014040;outline-offset:2px}
+.done-msg{background:#E1F5EE;border:1px solid #038C8C;border-radius:12px;padding:1rem;text-align:center;font-size:.86rem;color:#014040;margin-top:.75rem;display:none;line-height:1.5}
+.done-msg strong{display:block;margin-bottom:.3rem;font-size:.92rem}
+.wb{background:#8CFFDF;border-radius:10px;padding:.7rem .9rem;font-size:.8rem;color:#174538;margin-top:.75rem;display:flex;gap:.4rem;line-height:1.5}
+.wb strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="setup">
+    <strong>👤 Follow Olive through her entire pension journey</strong>
+    You have already seen how the remittance process works step by step. Now watch those same steps play out across 40 years of a real person's life. Each milestone in Olive's story connects to a concept you've already learned. Click <strong>Next</strong> to advance, or click any milestone to jump to it.
+  </div>
+  <div class="top-row">
+    <div class="flow-title">Olive's pension milestones — age 25 to 65</div>
+    <div class="meta">
+      <div class="ctr" id="ctr" aria-live="polite"></div>
+      <button class="restart" onclick="restart()" aria-label="Start over from age 25">↺ Start over</button>
+    </div>
+  </div>
+  <div class="track" id="track" role="list" aria-label="Olive's pension journey"></div>
+  <div class="nav">
+    <button class="nbtn nbtn-back" id="btn-back" onclick="move(-1)" aria-label="Previous milestone">← Back</button>
+    <button class="nbtn nbtn-next" id="btn-next" onclick="move(1)" aria-label="Next milestone">Next →</button>
+  </div>
+  <div class="done-msg" id="done">
+    <strong>✅ Olive's full journey — from apprentice to retiree</strong>
+    Every milestone above is a record in Oliver. Together they tell the story of 40 years of work — and produce one monthly number that Olive will live on for the rest of her life.
+  </div>
+  <div class="wb"><span>📓</span><span><strong>Workbook — Module 4:</strong> Choose the milestone in Olive's journey that surprised you most. Write one sentence explaining why it matters for her pension record.</span></div>
+</div>
+<script>
+const steps=[
+  {lbl:"Age 25 — Entry",title:"Olive joins IBEW Local 353",
+   body:"Olive registers with her union and begins working as an apprentice electrician. Oliver creates her pension record — a permanent file that will track every hour, contribution, and life event for the next 40 years.",
+   link:"Lifecycle connection: this is the ENTRY stage. The record created today is the starting point for everything that follows."},
+  {lbl:"Age 28 — Life event",title:"Olive gets married",
+   body:"Olive's spouse becomes the legal default beneficiary of her pension — not because Olive chose it, but because provincial pension legislation requires it. Oliver records the spousal information in her member record.",
+   link:"Concept connection: PEOPLE change. This is also why pension is different from H&W — her spouse has legal rights by law, not by Olive's choice."},
+  {lbl:"Age 35 — Change",title:"Olive moves to a new employer",
+   body:"Olive stays in the same IBEW local but joins a different employer. The contribution rate changes because the new employer is covered by a different collective agreement. Oliver links the new agreement to Olive's record. Her previous contributions remain intact.",
+   link:"Lifecycle connection: still in the ACTIVE stage. LAYERED RULES complexity — a new collective agreement rate now applies. Her full history is preserved."},
+  {lbl:"Age 42 — Risk",title:"Olive has a gap year",
+   body:"Olive works only 200 hours this year — well below the plan's 350-hour active threshold. Oliver flags her record. If she falls below the threshold for a second consecutive year, she risks bulk termination from the active member list at year-end.",
+   link:"Concept connection: PEOPLE change, and their circumstances affect their status. Bulk termination means she exits the active list — not that her contributions disappear. Her accumulated entitlement is still hers."},
+  {lbl:"Age 55 — Milestone",title:"Olive becomes eligible for early retirement",
+   body:"Under her plan rules, members can retire as early as age 55 with a reduced pension. Oliver calculates what Olive would receive if she retired today. She decides to keep working and build a larger monthly payment.",
+   link:"Lifecycle connection: Olive is still ACTIVE but has reached a decision point. The EXIT stage options are now available to her."},
+  {lbl:"Age 65 — Payment",title:"Olive retires",
+   body:"Olive chooses a Joint & Survivor pension option — her monthly payment is slightly reduced, but if she dies first, her spouse will receive 60% of her pension for the rest of their life. Oliver generates her full retirement package and initiates monthly payments.",
+   link:"Lifecycle connection: Olive has moved from ACTIVE through EXIT into PAYMENT. Every hour worked, every contribution made, and every life event recorded since age 25 feeds into the calculation that produces her monthly number."},
+];
+let cur=0;
+function render(){
+  document.getElementById('ctr').textContent=`Milestone ${cur+1} of ${steps.length}`;
+  document.getElementById('track').innerHTML=steps.map((s,i)=>`
+    <div class="step ${i<cur?'done':i===cur?'active':''}" role="listitem" tabindex="0" id="s${i}"
+         onclick="jump(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){jump(${i});event.preventDefault()}"
+         aria-current="${i===cur?'step':'false'}" aria-label="${s.lbl}: ${s.title}${i<cur?' — completed':''}">
+      <div class="dot" aria-hidden="true">${i<cur?'✓':i+1}</div>
+      <div class="step-card">
+        <div class="step-lbl">${s.lbl}</div>
+        <div class="step-title">${s.title}</div>
+        <div class="step-body">${s.body}<div class="link"><span>🔗</span><span>${s.link}</span></div></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('btn-back').disabled=cur===0;
+  const atEnd=cur===steps.length-1;
+  const nxt=document.getElementById('btn-next');
+  nxt.disabled=atEnd;
+  nxt.textContent=atEnd?'Done ✓':'Next →';
+  document.getElementById('done').style.display=atEnd?'block':'none';
+}
+function move(d){
+  cur=Math.max(0,Math.min(steps.length-1,cur+d));
+  render();
+  document.getElementById('s'+cur).scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function jump(i){cur=i;render();}
+function restart(){cur=0;render();}
+render();
+</script>
+</body>
+</html>
