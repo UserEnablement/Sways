@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DB vs DC — Pension Foundations</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.5rem;min-height:100vh}
+.shell{max-width:680px;margin:0 auto}
+.intro{background:#E1F5EE;border-radius:12px;padding:.85rem 1.1rem;font-size:.85rem;color:#014040;margin-bottom:1rem;display:flex;gap:.5rem;align-items:flex-start;line-height:1.5}
+.intro strong{font-weight:600}
+.collapse-btn{background:none;border:none;font-size:.78rem;color:#038C8C;cursor:pointer;text-decoration:underline;padding:0 0 .6rem;display:block}
+.collapse-btn:focus-visible{outline:2px solid #038C8C;border-radius:3px}
+.matrix{background:#fff;border-radius:14px;border:1px solid #e8e6e0;overflow:hidden}
+.hdr{display:grid;grid-template-columns:1.2fr 1fr 1fr;border-bottom:1px solid #e8e6e0}
+.hcell{padding:.8rem 1rem;font-size:.82rem;font-weight:700;letter-spacing:.02em}
+.hcell.feat{background:#F1F0F1;color:#696267}
+.hcell.db{background:#8CFFDF;color:#174538;text-align:center}
+.hcell.dc{background:#B3D8F8;color:#0C447C;text-align:center}
+.row{display:grid;grid-template-columns:1.2fr 1fr 1fr;border-bottom:.5px solid #f1efe8;cursor:pointer;transition:background .12s}
+.row:last-child{border-bottom:none}
+.row:hover .cell{background:#fafaf8}
+.row.open .cell{background:#fafaf8}
+.row:focus{outline:2px solid #038C8C;outline-offset:-2px}
+.cell{padding:.8rem 1rem;font-size:.84rem;line-height:1.45;transition:background .12s}
+.cell.feat{font-weight:600;color:#111;border-right:1px solid #f1efe8;display:flex;justify-content:space-between;align-items:center;gap:.4rem}
+.cell.db{color:#174538;border-right:.5px solid #f1efe8}
+.cell.dc{color:#0C447C}
+.chev{font-size:.7rem;color:#b4b2a9;transition:transform .2s;flex-shrink:0}
+.row.open .chev{transform:rotate(180deg)}
+.detail{display:none;border-bottom:.5px solid #f1efe8;background:#fafaf8}
+.row.open+.detail{display:grid;grid-template-columns:1.2fr 1fr 1fr}
+.dcell{padding:.65rem 1rem .85rem;font-size:.79rem;color:#5F5E5A;line-height:1.5;border-right:.5px solid #ece9e0}
+.dcell:last-child{border-right:none}
+.dcell.lbl{font-style:italic;font-size:.75rem;color:#b4b2a9}
+.olive{background:#E1F5EE;border-radius:10px;padding:.85rem 1rem;margin-top:1rem;font-size:.84rem;color:#014040;display:flex;gap:.5rem;line-height:1.5}
+.olive strong{display:block;margin-bottom:.2rem;font-weight:600}
+@media(max-width:500px){
+  .hdr,.row,.detail{grid-template-columns:1fr}
+  .hcell.feat,.cell.lbl{display:none}
+  .cell.db::before{content:"📊 DB";display:block;font-weight:700;font-size:.72rem;color:#174538;margin-bottom:.2rem}
+  .cell.dc::before{content:"📈 DC";display:block;font-weight:700;font-size:.72rem;color:#0C447C;margin-bottom:.2rem}
+  .dcell.lbl{display:none}
+  .dcell.db::before{content:"Example (DB)";display:block;font-weight:600;font-size:.71rem;color:#174538;margin-bottom:.2rem}
+  .dcell.dc::before{content:"Example (DC)";display:block;font-weight:600;font-size:.71rem;color:#0C447C;margin-bottom:.2rem}
+  .row:hover .cell,.row.open .cell{background:inherit}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="intro">
+    <span>💡</span>
+    <span><strong>How to use this table:</strong> Each row compares one feature of DB and DC pension plans. <strong>Click any row</strong> to reveal a real-world example from Olive's plan. Read all five rows, then answer the reflection question in your workbook.</span>
+  </div>
+  <button class="collapse-btn" onclick="collapseAll()">Collapse all examples ↑</button>
+  <div class="matrix" role="table" aria-label="Defined Benefit vs Defined Contribution comparison">
+    <div class="hdr" role="row">
+      <div class="hcell feat" role="columnheader">Feature</div>
+      <div class="hcell db" role="columnheader">📊 Defined Benefit (DB)</div>
+      <div class="hcell dc" role="columnheader">📈 Defined Contribution (DC)</div>
+    </div>
+    <div id="rows"></div>
+  </div>
+  <div class="olive">
+    <span style="font-size:1.1rem;flex-shrink:0">👤</span>
+    <div><strong>Olive's plan</strong>Olive is in a Defined Benefit plan through her IBEW union. She knows exactly what her monthly pension will be before she retires — the formula is set by her collective agreement. Her employer carries the investment risk, not her.</div>
+  </div>
+</div>
+<script>
+const rows=[
+  {feat:"Payout type",
+   db:"Fixed monthly amount — set by a formula",
+   dc:"Varies — depends on how investments performed",
+   edb:"Olive's formula: years of service × 1.5% × final average earnings. She can calculate her exact monthly pension years before she retires.",
+   edc:"A DC member might have $180,000 at retirement — but whether that becomes $1,200 or $1,800/month depends on market performance."},
+  {feat:"Who carries investment risk",
+   db:"The employer",
+   dc:"The member",
+   edb:"If Olive's plan's investments underperform, her employer must make up the shortfall. Olive's monthly amount doesn't change.",
+   edc:"If markets drop the year before a DC member retires, their retirement income drops with them. There is no employer safety net."},
+  {feat:"Predictability at retirement",
+   db:"Highly predictable — guaranteed for life",
+   dc:"Variable — depends on markets and account balance",
+   edb:"Olive can plan her retirement budget years in advance. Her DB pension is a known, reliable number.",
+   edc:"DC members often don't know their exact retirement income until they are close to retiring and see their account balance."},
+  {feat:"Common in",
+   db:"Union plans, public sector, large employers",
+   dc:"Private-sector employers, newer plans",
+   edb:"IBEW, UFCW, CUPE, Teamsters — most union pension plans are Defined Benefit. These are the plans Oliver primarily administers.",
+   edc:"Many private-sector companies have shifted to DC plans in recent decades to reduce their financial exposure."},
+  {feat:"Oliver's role",
+   db:"Record contributions, calculate DB entitlement at retirement",
+   dc:"Track contributions and account balance",
+   edb:"Oliver records every hour Olive works and every contribution made. At retirement, it applies the DB formula using 40 years of data.",
+   edc:"Oliver tracks deposits into the DC account. The investment platform (custodian) manages the returns — that is outside Oliver's scope."},
+];
+let open=[];
+function render(){
+  document.getElementById('rows').innerHTML=rows.map((r,i)=>`
+    <div class="row${open.includes(i)?' open':''}" role="row" tabindex="0"
+      onclick="toggle(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){toggle(${i});event.preventDefault()}"
+      aria-expanded="${open.includes(i)}" aria-label="${r.feat}: click to ${open.includes(i)?'hide':'show'} example">
+      <div class="cell feat" role="cell">${r.feat}<span class="chev" aria-hidden="true">▼</span></div>
+      <div class="cell db" role="cell">${r.db}</div>
+      <div class="cell dc" role="cell">${r.dc}</div>
+    </div>
+    <div class="detail" role="row" aria-hidden="${!open.includes(i)}">
+      <div class="dcell lbl" role="cell">Example</div>
+      <div class="dcell db" role="cell">${r.edb}</div>
+      <div class="dcell dc" role="cell">${r.edc}</div>
+    </div>`).join('');
+}
+function toggle(i){
+  const idx=open.indexOf(i);
+  if(idx>=0)open.splice(idx,1); else open.push(i);
+  render();
+}
+function collapseAll(){open=[];render();}
+render();
+</script>
+</body>
+</html>
