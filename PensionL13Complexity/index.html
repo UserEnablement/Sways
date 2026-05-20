@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Formative Check — Complexity</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.5rem;min-height:100vh}
+.shell{max-width:640px;margin:0 auto}
+.setup{background:#E1F5EE;border-radius:12px;padding:.85rem 1.1rem;font-size:.85rem;color:#014040;margin-bottom:1.25rem;line-height:1.55}
+.setup strong{font-weight:600;display:block;margin-bottom:.25rem}
+.prog-row{display:flex;align-items:center;gap:.6rem;margin-bottom:1.25rem}
+.pips{display:flex;gap:5px;flex:1}
+.pip{flex:1;height:3px;border-radius:2px;background:#e0ded7;transition:background .3s}
+.pip.done{background:#038C8C}.pip.active{background:#15C7C7}
+.ctr{font-size:.78rem;color:#696267;white-space:nowrap}
+.card{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.5rem;margin-bottom:.75rem}
+.badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:6px;margin-bottom:.85rem;color:#1D5F73;background:#E6F1FB}
+.qtext{font-size:1rem;font-weight:600;color:#111;line-height:1.5;margin-bottom:.3rem}
+.ctx{font-size:.82rem;color:#696267;margin-bottom:1rem;line-height:1.45}
+.hint{font-size:.8rem;color:#038C8C;margin-bottom:.9rem;display:flex;gap:.3rem;align-items:flex-start}
+.opts{display:flex;flex-direction:column;gap:.5rem}
+.opt{display:flex;align-items:center;gap:.65rem;padding:.8rem .95rem;border-radius:10px;border:1.5px solid #e8e6e0;cursor:pointer;font-size:.9rem;color:#111;background:#fff;text-align:left;width:100%;transition:all .15s}
+.opt:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.opt:hover:not(:disabled){border-color:#15C7C7;background:#E1F5EE}
+.letter{width:24px;height:24px;border-radius:50%;background:#f1efe8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#696267;flex-shrink:0;transition:all .2s}
+.opt.correct{border-color:#038C8C;background:#E1F5EE}.opt.correct .letter{background:#038C8C;color:#fff}
+.opt.wrong{border-color:#9C2E8B;background:#FFF8FE}.opt.wrong .letter{background:#9C2E8B;color:#fff}
+.opt:disabled{cursor:default}
+.fb{border-radius:10px;padding:.9rem 1rem;margin-top:.85rem;font-size:.86rem;line-height:1.6;display:none}
+.fb.show{display:block}
+.fb.correct{background:#E1F5EE;border:1px solid #038C8C;color:#014040}
+.fb.wrong{background:#FFF8FE;border:1px solid #9C2E8B;color:#4a0a3d}
+.fb strong{display:block;margin-bottom:.3rem}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1rem}
+.btn-next{background:#038C8C;color:#fff;border:none;padding:.6rem 1.3rem;border-radius:8px;font-size:.86rem;font-weight:600;cursor:pointer;display:none}
+.btn-next:hover{background:#014040}
+.btn-next:focus-visible{outline:3px solid #014040;outline-offset:2px}
+.btn-restart{background:none;border:none;color:#696267;font-size:.8rem;cursor:pointer;text-decoration:underline}
+.score{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:2rem;text-align:center;display:none}
+.score-num{font-size:2.8rem;font-weight:600;color:#038C8C;margin:.75rem 0 .3rem}
+.score-msg{font-size:.95rem;color:#111;font-weight:500;margin-bottom:.5rem}
+.score-sub{font-size:.85rem;color:#696267;margin-bottom:1.5rem;line-height:1.5}
+.btn-again{background:#038C8C;color:#fff;border:none;padding:.7rem 1.75rem;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer}
+.btn-again:hover{background:#014040}
+.wb-note{background:#8CFFDF;border-radius:10px;padding:.75rem 1rem;font-size:.82rem;color:#174538;margin-top:.75rem;display:flex;gap:.4rem;line-height:1.5}
+.wb-note strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="setup">
+    <strong>🎯 Formative check — Three sources of complexity</strong>
+    Five scenarios. For each one, decide which source of complexity it represents: TIME, LAYERED RULES, or PEOPLE. You will get immediate feedback explaining why. This is not graded — it is a chance to check your own thinking before moving on.
+  </div>
+  <div class="prog-row">
+    <div class="pips" id="pips"></div>
+    <div class="ctr" id="ctr"></div>
+  </div>
+  <div id="quiz" aria-live="polite"></div>
+  <div class="score" id="score" tabindex="-1">
+    <div style="font-size:2.2rem">🏛️</div>
+    <div class="score-num" id="score-num"></div>
+    <div class="score-msg" id="score-msg"></div>
+    <div class="score-sub" id="score-sub"></div>
+    <button class="btn-again" onclick="restart()">Try again</button>
+    <div class="wb-note" style="margin-top:1rem;text-align:left"><span>📓</span><span><strong>Workbook:</strong> Complete the three-source complexity table now, using what you just practised.</span></div>
+  </div>
+</div>
+<script>
+const qs=[
+  {badge:"Scenario 1",
+   ctx:"A member joined the plan in 1998 and worked for 12 different employers over 25 years. Each employer submitted hours at different rates.",
+   q:"Which source of complexity does this represent?",
+   opts:["⏳ TIME — decades of layered records","📋 LAYERED RULES — different agreements","👥 PEOPLE — the member changed jobs"],
+   correct:0,
+   fb:{y:"Correct — this is primarily a TIME complexity. 25 years of records across 12 employers, each with their own rates, must all be stored permanently and used in the retirement calculation.",
+       n:"Close, but the core challenge here is TIME — the volume and permanence of records over a 25-year career. Job changes affect the data, but tracking decades of history is the TIME complexity."}},
+  {badge:"Scenario 2",
+   ctx:"A member worked in Ontario for 20 years, then moved to Quebec. Their pension plan is registered in Ontario, but Quebec's Supplemental Pension Plans Act has different vesting rules.",
+   q:"Which source of complexity does this represent?",
+   opts:["⏳ TIME — long career history","📋 LAYERED RULES — two provinces, two sets of rules","👥 PEOPLE — the member moved"],
+   correct:1,
+   fb:{y:"Exactly right — this is LAYERED RULES. Ontario and Quebec have separate pension legislation with different requirements. Both may apply depending on how the plan is structured.",
+       n:"While the member did move (PEOPLE), the core challenge is that two provinces have different pension laws — and both may need to be applied. That is LAYERED RULES complexity."}},
+  {badge:"Scenario 3",
+   ctx:"A member gets divorced. Their former spouse applies for a division of the pension under Ontario family law. The pension administrator must split the entitlement earned during the marriage.",
+   q:"Which source of complexity does this represent?",
+   opts:["⏳ TIME — the marriage happened years ago","📋 LAYERED RULES — family law intersects with pension law","👥 PEOPLE — a life event changed the member's situation"],
+   correct:2,
+   fb:{y:"Correct — this is a PEOPLE complexity. The member's life changed (divorce), and that change directly affects who is entitled to the pension and in what proportion. Oliver must track and act on it.",
+       n:"This is primarily a PEOPLE complexity — a life event (divorce) created a new entitlement situation that the plan must respond to. LAYERED RULES also applies, but the trigger is the personal life change."}},
+  {badge:"Scenario 4",
+   ctx:"An employer submitted incorrect hours for a member in 2011. The error was small — only 40 hours — but was never corrected. The member is now 63 and approaching retirement.",
+   q:"What is the most likely consequence of this uncorrected error?",
+   opts:["No consequence — small errors average out over time","The member's monthly pension may be lower than it should be — for the rest of their life","The employer will be automatically notified and will correct it","Oliver's system flags and auto-corrects historical errors"],
+   correct:1,
+   fb:{y:"Correct — this is exactly why TIME complexity matters so much. A 40-hour error from 2011 feeds into the formula that calculates Olive's pension for the next 20+ years. Small errors compound.",
+       n:"Pension calculations use the complete historical record. A 40-hour error from 2011 reduces the contributions on file, which reduces the entitlement calculated at retirement — and that lower payment continues every month for the rest of the member's life."}},
+  {badge:"Scenario 5",
+   ctx:"A plan administrator receives a remittance from an employer in Manitoba. The plan is registered federally under the PBSA, but the employer has members in both Manitoba and Nova Scotia — each with different provincial requirements.",
+   q:"Which source of complexity does this represent?",
+   opts:["⏳ TIME — contributions span many years","📋 LAYERED RULES — federal and two provincial laws all apply","👥 PEOPLE — members are in different locations"],
+   correct:1,
+   fb:{y:"Correct — LAYERED RULES. Federal PBSA applies to the plan, but Manitoba and Nova Scotia each have their own pension requirements for residents. The plan must comply with all three simultaneously.",
+       n:"While members are in different provinces (PEOPLE), the core challenge is that the plan must comply with federal law AND two different provincial laws at the same time. That is LAYERED RULES."}},
+];
+let cur=0,score=0,answered=false;
+function render(){
+  const q=qs[cur];
+  document.getElementById('pips').innerHTML=qs.map((_,i)=>`<div class="pip ${i<cur?'done':i===cur?'active':''}" aria-hidden="true"></div>`).join('');
+  document.getElementById('ctr').textContent=`${cur+1} / ${qs.length}`;
+  document.getElementById('quiz').innerHTML=`
+    <div class="card">
+      <div class="badge">${q.badge}</div>
+      <div class="ctx">${q.ctx}</div>
+      <div class="qtext">${q.q}</div>
+      <div class="hint">💡 Think about whether this is about the length of time, the overlap of rules, or a change in someone's life.</div>
+      <div class="opts" role="group">
+        ${q.opts.map((o,i)=>`<button class="opt" id="o${i}" onclick="choose(${i})" aria-label="${'ABCDE'[i]}: ${o.replace(/<[^>]+>/g,'')}">
+          <span class="letter" aria-hidden="true">${'ABCDE'[i]}</span><span>${o}</span>
+        </button>`).join('')}
+      </div>
+      <div class="fb" id="fb" role="alert"></div>
+      <div class="nav">
+        <button class="btn-restart" onclick="restart()">↺ Start over</button>
+        <button class="btn-next" id="btn-next" onclick="advance()">${cur<qs.length-1?'Next →':'See results'}</button>
+      </div>
+    </div>`;
+  answered=false;
+}
+function choose(idx){
+  if(answered)return;
+  answered=true;
+  const q=qs[cur];
+  const ok=idx===q.correct;
+  if(ok)score++;
+  q.opts.forEach((_,i)=>{
+    const el=document.getElementById('o'+i);
+    el.disabled=true;
+    if(i===q.correct)el.classList.add('correct');
+    else if(i===idx)el.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb');
+  fb.className='fb show '+(ok?'correct':'wrong');
+  fb.innerHTML=`<strong>${ok?'✅ Correct!':'❌ Not quite —'}</strong>${ok?q.fb.y:q.fb.n}`;
+  document.getElementById('btn-next').style.display='block';
+  fb.focus();
+}
+function advance(){
+  cur++;
+  if(cur>=qs.length){
+    document.getElementById('quiz').style.display='none';
+    document.querySelector('.prog-row').style.display='none';
+    const pct=Math.round(score/qs.length*100);
+    document.getElementById('score-num').textContent=`${score} / ${qs.length}`;
+    document.getElementById('score-msg').textContent=pct>=80?'Strong grasp of the three sources of complexity.':pct>=60?'Good progress — review any scenarios that surprised you.':'Revisit the Three Sources section, then try again.';
+    document.getElementById('score-sub').textContent='If any scenario surprised you, scroll back and re-read the source it represents before moving on.';
+    const sc=document.getElementById('score');
+    sc.style.display='block';sc.focus();
+  }else render();
+}
+function restart(){
+  cur=0;score=0;answered=false;
+  document.getElementById('quiz').style.display='block';
+  document.querySelector('.prog-row').style.display='flex';
+  document.getElementById('score').style.display='none';
+  render();
+}
+document.addEventListener('keydown',e=>{
+  if(answered||document.getElementById('score').style.display==='block')return;
+  const i='12345'.indexOf(e.key);
+  if(i>=0&&i<qs[cur].opts.length)choose(i);
+});
+render();
+</script>
+</body>
+</html>
