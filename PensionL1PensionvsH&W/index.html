@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pension vs Health & Welfare — Pension Foundations</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.5rem;min-height:100vh}
+.shell{max-width:680px;margin:0 auto}
+.intro{background:#E1F5EE;border-radius:12px;padding:.85rem 1.1rem;font-size:.85rem;color:#014040;margin-bottom:1rem;display:flex;gap:.5rem;align-items:flex-start;line-height:1.5}
+.intro strong{font-weight:600}
+.warn{background:#F1F0F1;border-left:4px solid #1D5F73;border-radius:0 10px 10px 0;padding:.75rem 1rem;font-size:.84rem;color:#1D5F73;font-weight:600;margin-bottom:.75rem}
+.collapse-btn{background:none;border:none;font-size:.78rem;color:#038C8C;cursor:pointer;text-decoration:underline;padding:0 0 .6rem;display:block}
+.matrix{background:#fff;border-radius:14px;border:1px solid #e8e6e0;overflow:hidden}
+.hdr{display:grid;grid-template-columns:1.2fr 1fr 1fr;border-bottom:1px solid #e8e6e0}
+.hcell{padding:.8rem 1rem;font-size:.82rem;font-weight:700;letter-spacing:.02em}
+.hcell.feat{background:#F1F0F1;color:#696267}
+.hcell.pen{background:#90F8F8;color:#014040;text-align:center}
+.hcell.hw{background:#B3D8F8;color:#0C447C;text-align:center}
+.row{display:grid;grid-template-columns:1.2fr 1fr 1fr;border-bottom:.5px solid #f1efe8;cursor:pointer;transition:background .12s}
+.row:last-child{border-bottom:none}
+.row:hover .cell{background:#fafaf8}
+.row.open .cell{background:#fafaf8}
+.row:focus{outline:2px solid #038C8C;outline-offset:-2px}
+.cell{padding:.8rem 1rem;font-size:.84rem;line-height:1.45;transition:background .12s}
+.cell.feat{font-weight:600;color:#111;border-right:1px solid #f1efe8;display:flex;justify-content:space-between;align-items:center;gap:.4rem}
+.cell.pen{color:#014040;border-right:.5px solid #f1efe8}
+.cell.hw{color:#0C447C}
+.chev{font-size:.7rem;color:#b4b2a9;transition:transform .2s;flex-shrink:0}
+.row.open .chev{transform:rotate(180deg)}
+.detail{display:none;border-bottom:.5px solid #f1efe8;background:#fafaf8}
+.row.open+.detail{display:grid;grid-template-columns:1.2fr 1fr 1fr}
+.dcell{padding:.65rem 1rem .85rem;font-size:.79rem;color:#5F5E5A;line-height:1.5;border-right:.5px solid #ece9e0}
+.dcell:last-child{border-right:none}
+.dcell.lbl{font-style:italic;font-size:.75rem;color:#b4b2a9}
+.olive{background:#E1F5EE;border-radius:10px;padding:.85rem 1rem;margin-top:1rem;font-size:.84rem;color:#014040;display:flex;gap:.5rem;line-height:1.5}
+.olive strong{display:block;margin-bottom:.2rem;font-weight:600}
+@media(max-width:500px){
+  .hdr,.row,.detail{grid-template-columns:1fr}
+  .hcell.feat,.dcell.lbl{display:none}
+  .cell.pen::before{content:"🏛️ Pension";display:block;font-weight:700;font-size:.72rem;color:#014040;margin-bottom:.2rem}
+  .cell.hw::before{content:"💊 H&W";display:block;font-weight:700;font-size:.72rem;color:#0C447C;margin-bottom:.2rem}
+  .dcell.pen::before{content:"Example (Pension)";display:block;font-weight:600;font-size:.71rem;color:#014040;margin-bottom:.2rem}
+  .dcell.hw::before{content:"Example (H&W)";display:block;font-weight:600;font-size:.71rem;color:#0C447C;margin-bottom:.2rem}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="warn">⚠️ Applying health &amp; welfare rules to a pension record — or vice versa — is one of the most common errors in plan administration.</div>
+  <div class="intro">
+    <span>💡</span>
+    <span><strong>How to use this table:</strong> Each row compares one feature of pension plans and health &amp; welfare plans. <strong>Click any row</strong> to reveal what this means in a real situation. After reviewing all rows, complete the reflection question in your workbook before moving on.</span>
+  </div>
+  <button class="collapse-btn" onclick="collapseAll()">Collapse all examples ↑</button>
+  <div class="matrix" role="table" aria-label="Pension plan vs Health and Welfare comparison">
+    <div class="hdr" role="row">
+      <div class="hcell feat" role="columnheader">Feature</div>
+      <div class="hcell pen" role="columnheader">🏛️ Pension plan</div>
+      <div class="hcell hw" role="columnheader">💊 Health &amp; welfare</div>
+    </div>
+    <div id="rows"></div>
+  </div>
+  <div class="olive">
+    <span style="font-size:1.1rem;flex-shrink:0">👤</span>
+    <div><strong>Olive at age 42 — leaving her job</strong>Olive leaves her employer. Her drug coverage and dental end on her last day — health &amp; welfare tracks active coverage. But her pension contributions stay on file, locked in. They belong to her and will wait until she retires. The money does not disappear.</div>
+  </div>
+</div>
+<script>
+const rows=[
+  {feat:"What it tracks",
+   pen:"Money — contributions accumulate over an entire career",
+   hw:"Coverage — are you eligible for benefits today?",
+   epen:"Olive's pension record is a 40-year financial history. Every contribution made from age 25 to 65 is on file and builds her retirement entitlement.",
+   ehw:"Olive's H&W record answers one question: does she have active coverage right now? Yesterday's coverage history is not relevant."},
+  {feat:"Time horizon",
+   pen:"Decades — the entire working life",
+   hw:"Current year — renewed annually",
+   epen:"An error in Olive's pension record from 2009 can still affect her retirement payment in 2035. Pension data is permanent.",
+   ehw:"H&W plans are typically renegotiated and renewed every 1–2 years. If rates or coverage change, it affects the current period only."},
+  {feat:"What happens when a member leaves employment",
+   pen:"Contributions are preserved — locked in until retirement",
+   hw:"Coverage ends immediately on the last day of employment",
+   epen:"When Olive leaves her job, her pension contributions do not disappear. They transfer to a Locked-In Retirement Account (LIRA) and wait until she retires.",
+   ehw:"Olive's drug benefits, dental, vision, and life coverage all stop on her last day. There is no 'locked-in' equivalent for H&W."},
+  {feat:"Spouse rights",
+   pen:"Spouse has legal default rights — set by provincial law",
+   hw:"Beneficiary is the member's own choice",
+   epen:"In every Canadian province, Olive's spouse automatically has legal rights to her pension. This cannot be changed without a formal written waiver — it is set by the Pension Benefits Act, not by Olive.",
+   ehw:"Olive can name anyone as her H&W beneficiary — a sibling, a friend, or no one. It is entirely her decision."},
+  {feat:"Governed by",
+   pen:"Pension Benefits Acts (provincial legislation)",
+   hw:"Insurance contracts (renewed with carriers)",
+   epen:"Ontario uses the Pension Benefits Act. BC uses the Pension Benefits Standards Act. Quebec uses the Supplemental Pension Plans Act. Oliver must comply with whichever province applies to each member.",
+   ehw:"H&W coverage is defined by the contract between the employer/union and the insurance carrier. It can be renegotiated at renewal. No provincial pension law applies."},
+];
+let open=[];
+function render(){
+  document.getElementById('rows').innerHTML=rows.map((r,i)=>`
+    <div class="row${open.includes(i)?' open':''}" role="row" tabindex="0"
+      onclick="toggle(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){toggle(${i});event.preventDefault()}"
+      aria-expanded="${open.includes(i)}" aria-label="${r.feat}: click to ${open.includes(i)?'hide':'show'} example">
+      <div class="cell feat" role="cell">${r.feat}<span class="chev" aria-hidden="true">▼</span></div>
+      <div class="cell pen" role="cell">${r.pen}</div>
+      <div class="cell hw" role="cell">${r.hw}</div>
+    </div>
+    <div class="detail" role="row" aria-hidden="${!open.includes(i)}">
+      <div class="dcell lbl" role="cell">Example</div>
+      <div class="dcell pen" role="cell">${r.epen}</div>
+      <div class="dcell hw" role="cell">${r.ehw}</div>
+    </div>`).join('');
+}
+function toggle(i){
+  const idx=open.indexOf(i);
+  if(idx>=0)open.splice(idx,1); else open.push(i);
+  render();
+}
+function collapseAll(){open=[];render();}
+render();
+</script>
+</body>
+</html>
