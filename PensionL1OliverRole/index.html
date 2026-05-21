@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Oliver's Role — Flashcard Scenarios</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;min-height:100vh;padding:1.5rem}
+.shell{max-width:720px;margin:0 auto}
+
+.setup{background:#E1F5EE;border-radius:12px;padding:.9rem 1.1rem;font-size:.84rem;color:#014040;margin-bottom:1.25rem;line-height:1.55;display:flex;gap:.6rem;align-items:flex-start}
+.setup strong{font-weight:600}
+
+/* DECK */
+.deck{display:flex;flex-direction:column;gap:1rem;margin-bottom:1.25rem}
+
+/* CARD */
+.card{border-radius:16px;border:2px solid #e8e6e0;background:#fff;overflow:hidden;transition:border-color .25s,box-shadow .25s;cursor:pointer}
+.card:hover{border-color:#038C8C;box-shadow:0 2px 12px rgba(3,140,140,.10)}
+.card:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.card.revealed{border-color:#038C8C;cursor:default}
+.card.revealed:hover{box-shadow:none}
+
+/* FRONT */
+.front{padding:1.25rem 1.4rem}
+.card-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.card-num{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#696267}
+.flip-hint{font-size:.75rem;color:#038C8C;font-weight:500;display:flex;align-items:center;gap:.3rem;transition:opacity .2s}
+.card.revealed .flip-hint{opacity:0;pointer-events:none}
+.scenario-label{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#1D5F73;background:#E6F1FB;padding:3px 9px;border-radius:6px;margin-bottom:.65rem;display:inline-block}
+.scenario-text{font-size:1rem;font-weight:600;color:#111;line-height:1.55;margin-bottom:.65rem}
+.question{font-size:.9rem;font-weight:700;color:#038C8C;line-height:1.4}
+
+/* ANSWER */
+.answer{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .3s}
+.answer.open{max-height:400px;opacity:1}
+.answer.closed{opacity:0}
+.answer-inner{border-top:1.5px solid #E1F5EE;padding:1.1rem 1.4rem 1.25rem}
+.answer-label{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#038C8C;margin-bottom:.55rem;display:flex;align-items:center;gap:.4rem}
+.answer-main{font-size:.92rem;font-weight:600;color:#014040;line-height:1.55;margin-bottom:.75rem}
+.answer-detail{font-size:.85rem;color:#333;line-height:1.6;margin-bottom:.75rem}
+.key-point{background:#E1F5EE;border-left:3px solid #038C8C;border-radius:0 8px 8px 0;padding:.6rem .85rem;font-size:.82rem;color:#014040;line-height:1.5}
+.key-point strong{font-weight:600;display:block;margin-bottom:.2rem}
+
+/* CARD COLOURS */
+.card-1 .scenario-label{color:#174538;background:#8CFFDF}
+.card-1 .question{color:#174538}
+.card-1.revealed{border-color:#37A586}
+.card-1 .answer-label{color:#174538}
+.card-1 .answer-main{color:#014040}
+.card-1 .key-point{background:#8CFFDF;border-color:#174538}
+
+.card-2 .scenario-label{color:#0C447C;background:#B3D8F8}
+.card-2 .question{color:#185FA5}
+.card-2.revealed{border-color:#3273AC}
+.card-2 .answer-label{color:#185FA5}
+.card-2 .answer-main{color:#0C447C}
+.card-2 .key-point{background:#E6F1FB;border-color:#3273AC;color:#0C447C}
+
+.card-3 .scenario-label{color:#4a0a3d;background:#FFF8FE}
+.card-3 .question{color:#9C2E8B}
+.card-3.revealed{border-color:#9C2E8B}
+.card-3 .answer-label{color:#9C2E8B}
+.card-3 .answer-main{color:#4a0a3d}
+.card-3 .key-point{background:#FFF8FE;border-color:#9C2E8B;color:#4a0a3d}
+
+/* RESET */
+.reset-row{display:flex;justify-content:space-between;align-items:center}
+.progress{font-size:.82rem;color:#696267}
+.progress strong{color:#038C8C;font-weight:600}
+.btn-reset{background:none;border:1.5px solid #e8e6e0;border-radius:8px;padding:.5rem 1rem;font-size:.82rem;color:#696267;cursor:pointer;font-family:inherit;transition:all .2s}
+.btn-reset:hover{border-color:#038C8C;color:#038C8C;background:#E1F5EE}
+.btn-reset:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+
+.wb{background:#8CFFDF;border-radius:10px;padding:.75rem 1rem;font-size:.82rem;color:#174538;margin-top:1rem;display:flex;gap:.45rem;line-height:1.5}
+.wb strong{font-weight:600}
+
+/* all-done message */
+.all-done{background:#E1F5EE;border:1.5px solid #038C8C;border-radius:12px;padding:1.1rem 1.25rem;text-align:center;font-size:.9rem;color:#014040;margin-bottom:1rem;display:none;line-height:1.6}
+.all-done strong{display:block;font-size:1rem;margin-bottom:.3rem}
+
+@media(max-width:480px){
+  body{padding:1rem}
+  .front{padding:1rem 1.1rem}
+  .answer-inner{padding:.9rem 1.1rem 1rem}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="setup">
+    <span style="font-size:1.1rem;flex-shrink:0">🃏</span>
+    <span><strong>Oliver's role — three applied scenarios.</strong> Read each situation and think about your answer. Then <strong>click the card</strong> to reveal who handles it and why. Use your keyboard: Tab to a card, Enter or Space to flip it.</span>
+  </div>
+
+  <div class="all-done" id="all-done">
+    <strong>✅ All three scenarios complete</strong>
+    Oliver records, calculates, and executes — but it does not set rules, carry investment risk, or make administrative decisions. Those belong to the union, the employer, and the plan administrator.
+  </div>
+
+  <div class="deck" id="deck">
+
+    <!-- CARD 1 -->
+    <div class="card card-1" id="card-0" tabindex="0" role="button"
+         onclick="flip(0)" onkeydown="if(event.key==='Enter'||event.key===' '){flip(0);event.preventDefault()}"
+         aria-expanded="false" aria-label="Scenario 1 — click to reveal answer">
+      <div class="front">
+        <div class="card-meta">
+          <span class="card-num">Scenario 1 of 3</span>
+          <span class="flip-hint" aria-hidden="true">Click to reveal ↓</span>
+        </div>
+        <div class="scenario-label">Contribution rates</div>
+        <div class="scenario-text">A member calls Oliver's support team. They are confused because their pension contribution was higher this month than last month. They want to know why their rate changed.</div>
+        <div class="question">Who sets contribution rates — and what is Oliver's role?</div>
+      </div>
+      <div class="answer closed" id="ans-0">
+        <div class="answer-inner">
+          <div class="answer-label">✅ Answer</div>
+          <div class="answer-main">The union and employer set the rate — through the collective agreement. Oliver did not change it.</div>
+          <div class="answer-detail">Contribution rates are negotiated between the union and the employer and written into the collective agreement. When a new agreement comes into effect, rates may change. Oliver reads those rates from the agreement and applies them to each remittance — but it has no authority to set or modify them.</div>
+          <div class="key-point">
+            <strong>The distinction that matters</strong>
+            Oliver applies the rate. The collective agreement sets the rate. If a member or employer has questions about why a rate changed, the answer comes from the plan administrator or the union — not from Oliver.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="card card-2" id="card-1" tabindex="0" role="button"
+         onclick="flip(1)" onkeydown="if(event.key==='Enter'||event.key===' '){flip(1);event.preventDefault()}"
+         aria-expanded="false" aria-label="Scenario 2 — click to reveal answer">
+      <div class="front">
+        <div class="card-meta">
+          <span class="card-num">Scenario 2 of 3</span>
+          <span class="flip-hint" aria-hidden="true">Click to reveal ↓</span>
+        </div>
+        <div class="scenario-label">Investment performance</div>
+        <div class="scenario-text">The pension fund lost 8% of its value in the markets this year. A DB plan member calls, worried that their monthly retirement payment will decrease because of the poor returns.</div>
+        <div class="question">Who is responsible for making up the shortfall — and what does Oliver do?</div>
+      </div>
+      <div class="answer closed" id="ans-1">
+        <div class="answer-inner">
+          <div class="answer-label">✅ Answer</div>
+          <div class="answer-main">The employer (plan sponsor) carries the investment risk — not the member, and not Oliver.</div>
+          <div class="answer-detail">In a Defined Benefit plan, the member is promised a specific monthly amount based on a formula — years of service, benefit rate, and average earnings. That promise does not change because markets dropped. If the fund's assets fall short of what is needed to pay those promised amounts, the employer must make up the difference. This is exactly what makes DB plans valuable to members: the investment risk is carried by the employer.</div>
+          <div class="key-point">
+            <strong>The distinction that matters</strong>
+            Oliver calculates and records contributions and entitlements. It does not hold the investment portfolio, guarantee returns, or fund deficiencies. Investment management belongs to the custodian. Funding obligations belong to the employer.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3 -->
+    <div class="card card-3" id="card-2" tabindex="0" role="button"
+         onclick="flip(2)" onkeydown="if(event.key==='Enter'||event.key===' '){flip(2);event.preventDefault()}"
+         aria-expanded="false" aria-label="Scenario 3 — click to reveal answer">
+      <div class="front">
+        <div class="card-meta">
+          <span class="card-num">Scenario 3 of 3</span>
+          <span class="flip-hint" aria-hidden="true">Click to reveal ↓</span>
+        </div>
+        <div class="scenario-label">Pension payroll discrepancy</div>
+        <div class="scenario-text">A retiree notices that their January pension payment was $12 less than their December payment. They call to find out why. The plan administrator wants to investigate.</div>
+        <div class="question">What is Oliver's role here — and who makes the decision about what to do?</div>
+      </div>
+      <div class="answer closed" id="ans-2">
+        <div class="answer-inner">
+          <div class="answer-label">✅ Answer</div>
+          <div class="answer-main">Oliver processes pension payroll and holds the complete record. The plan administrator investigates and decides what action to take.</div>
+          <div class="answer-detail">Oliver generates pension payroll — it calculates and issues the monthly payments based on the member's entitlement on record. If a payment amount changes unexpectedly, Oliver's records are the source of truth for investigating why: the payment history, any adjustments posted, the entitlement calculation. But Oliver does not decide what happened or what to do about it — that is the plan administrator's role. Oliver executes and records; the administrator reviews and decides.</div>
+          <div class="key-point">
+            <strong>The distinction that matters</strong>
+            Oliver is the platform — it holds the data and runs the calculations. The plan administrator is the decision-maker — they use Oliver's data to investigate, communicate with the member, and direct any corrections. Oliver does not communicate directly with members about their payments.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /deck -->
+
+  <div class="reset-row">
+    <div class="progress" id="progress"><strong>0</strong> of 3 revealed</div>
+    <button class="btn-reset" onclick="resetAll()" aria-label="Reset all cards">↺ Reset all cards</button>
+  </div>
+
+  <div class="wb">
+    <span>📓</span>
+    <span><strong>Workbook — Module 6:</strong> After all three cards, write the one distinction that matters most in your day-to-day work with Oliver.</span>
+  </div>
+
+</div><!-- /shell -->
+
+<script>
+const revealed=[false,false,false];
+
+function flip(i){
+  if(revealed[i]) return;
+  revealed[i]=true;
+
+  const card=document.getElementById('card-'+i);
+  const ans=document.getElementById('ans-'+i);
+
+  card.classList.add('revealed');
+  card.removeAttribute('role');
+  card.setAttribute('tabindex','-1');
+  card.setAttribute('aria-expanded','true');
+  card.style.cursor='default';
+
+  ans.classList.remove('closed');
+  ans.classList.add('open');
+
+  updateProgress();
+}
+
+function updateProgress(){
+  const count=revealed.filter(Boolean).length;
+  document.getElementById('progress').innerHTML=`<strong>${count}</strong> of 3 revealed`;
+  if(count===3){
+    document.getElementById('all-done').style.display='block';
+    document.getElementById('all-done').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+
+function resetAll(){
+  revealed.fill(false);
+  [0,1,2].forEach(i=>{
+    const card=document.getElementById('card-'+i);
+    const ans=document.getElementById('ans-'+i);
+    card.classList.remove('revealed');
+    card.setAttribute('role','button');
+    card.setAttribute('tabindex','0');
+    card.setAttribute('aria-expanded','false');
+    card.style.cursor='';
+    ans.classList.remove('open');
+    ans.classList.add('closed');
+  });
+  document.getElementById('all-done').style.display='none';
+  updateProgress();
+}
+
+// Keyboard: also allow arrow keys to navigate between cards
+document.addEventListener('keydown',e=>{
+  const focused=document.activeElement;
+  const cards=['card-0','card-1','card-2'];
+  const idx=cards.indexOf(focused?.id);
+  if(idx===-1) return;
+  if(e.key==='ArrowDown'&&idx<2){
+    e.preventDefault();
+    document.getElementById(cards[idx+1]).focus();
+  } else if(e.key==='ArrowUp'&&idx>0){
+    e.preventDefault();
+    document.getElementById(cards[idx-1]).focus();
+  }
+});
+</script>
+</body>
+</html>
