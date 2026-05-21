@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Four Exit Types — Pension Foundations</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.5rem;min-height:100vh}
+.shell{max-width:660px;margin:0 auto}
+.setup{background:#E1F5EE;border-radius:12px;padding:.85rem 1.1rem;font-size:.84rem;color:#014040;margin-bottom:1.1rem;line-height:1.55}
+.setup strong{display:block;font-weight:600;margin-bottom:.2rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1rem}
+.tile{background:#fff;border-radius:14px;border:2px solid #e8e6e0;padding:1.1rem;cursor:pointer;transition:all .2s;position:relative}
+.tile:hover{border-color:#038C8C;background:#FAFFFD;transform:translateY(-1px);box-shadow:0 3px 10px rgba(3,140,140,.1)}
+.tile.open{border-color:#038C8C;background:#FAFFFD}
+.tile:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.tile-top{display:flex;align-items:center;gap:.7rem;margin-bottom:.5rem}
+.tile-icon{font-size:1.6rem}
+.tile-name{font-size:1rem;font-weight:700;color:#111}
+.tile-tag{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:6px;margin-left:auto}
+.tile-def{font-size:.84rem;color:#696267;line-height:1.5;margin-bottom:.5rem}
+.tile-detail{display:none;border-top:1px solid #e8e6e0;padding-top:.75rem;margin-top:.5rem}
+.tile.open .tile-detail{display:block}
+.detail-label{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#696267;margin-bottom:.3rem}
+.detail-text{font-size:.82rem;color:#111;line-height:1.5;margin-bottom:.6rem}
+.detail-text:last-child{margin-bottom:0}
+.olive-note{background:#90F8F8;border-radius:8px;padding:.55rem .7rem;font-size:.79rem;color:#014040;line-height:1.45;display:flex;gap:.4rem}
+.chev{position:absolute;top:.9rem;right:.9rem;font-size:.72rem;color:#b4b2a9;transition:transform .2s}
+.tile.open .chev{transform:rotate(180deg)}
+.hint{font-size:.78rem;color:#038C8C;text-align:center;margin-bottom:1rem}
+.quiz-section{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.25rem;margin-top:.75rem}
+.quiz-label{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9C2E8B;margin-bottom:.7rem}
+.q-text{font-size:.95rem;font-weight:600;color:#111;margin-bottom:.25rem}
+.q-ctx{font-size:.82rem;color:#696267;margin-bottom:.9rem;line-height:1.45}
+.opts{display:flex;flex-direction:column;gap:.45rem;margin-bottom:.75rem}
+.opt{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;border-radius:9px;border:1.5px solid #e8e6e0;cursor:pointer;font-size:.88rem;color:#111;background:#fff;text-align:left;width:100%;transition:all .15s}
+.opt:hover:not(:disabled){border-color:#038C8C;background:#E1F5EE}
+.opt:focus-visible{outline:2px solid #038C8C;outline-offset:2px}
+.ltr{width:22px;height:22px;border-radius:50%;background:#f1efe8;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#696267;flex-shrink:0;transition:all .2s}
+.opt.correct{border-color:#038C8C;background:#E1F5EE}.opt.correct .ltr{background:#038C8C;color:#fff}
+.opt.wrong{border-color:#9C2E8B;background:#FFF8FE}.opt.wrong .ltr{background:#9C2E8B;color:#fff}
+.opt:disabled{cursor:default}
+.fb{border-radius:9px;padding:.8rem 1rem;font-size:.84rem;line-height:1.55;display:none}
+.fb.show{display:block}
+.fb.ok{background:#E1F5EE;border:1px solid #038C8C;color:#014040}
+.fb.no{background:#FFF8FE;border:1px solid #9C2E8B;color:#4a0a3d}
+.fb strong{display:block;margin-bottom:.25rem}
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:.75rem}
+.btn-next{background:#038C8C;color:#fff;border:none;padding:.6rem 1.25rem;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;display:none}
+.btn-next:hover{background:#014040}
+.btn-next:focus-visible{outline:3px solid #014040;outline-offset:2px}
+.btn-reset{background:none;border:none;font-size:.78rem;color:#696267;cursor:pointer;text-decoration:underline}
+.done{background:#E1F5EE;border:1px solid #038C8C;border-radius:12px;padding:1rem;text-align:center;font-size:.86rem;color:#014040;display:none;line-height:1.5}
+.done strong{display:block;margin-bottom:.3rem;font-size:.92rem}
+.wb{background:#8CFFDF;border-radius:10px;padding:.7rem .9rem;font-size:.8rem;color:#174538;margin-top:.75rem;display:flex;gap:.4rem;line-height:1.5}
+.wb strong{font-weight:600}
+@media(max-width:480px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="setup">
+    <strong>🔍 The four exit types — explore each one</strong>
+    Every pension member leaves the plan in one of four ways. Click each tile to reveal the full definition, what triggers it, and what happens to the member's contributions. Then answer the scenario below.
+  </div>
+  <div class="hint">📌 Click each tile to expand it</div>
+  <div class="grid" id="tiles"></div>
+
+  <div class="quiz-section">
+    <div class="quiz-label">🎯 Apply it — scenario</div>
+    <div id="qblock"></div>
+    <div class="done" id="done">
+      <strong>✅ You know the four exit types</strong>
+      Each exit type triggers a different set of calculations and entitlements in Oliver. The exit type is one of the first things confirmed when a member's record moves out of Active status.
+    </div>
+  </div>
+
+  <div class="wb"><span>📓</span><span><strong>Workbook — Module 5:</strong> Name all four exit types and write one example for each in the exit types table.</span></div>
+</div>
+
+<script>
+const exits=[
+  {icon:"🏁",name:"Retirement",
+   tag:"Age-based",tagFill:"#E1F5EE",tagColor:"#014040",
+   def:"The member has reached the plan's retirement age and begins receiving their pension.",
+   trigger:"Most plans allow early retirement at age 55 (with a reduced benefit) and normal retirement at 65. The exact ages depend on the plan rules in the collective agreement.",
+   contributions:"Contributions are not returned — they are converted into a monthly pension payment. The member chooses a payment option (life only, guaranteed period, joint & survivor, or CPP integration).",
+   olive:"Olive could retire at 55 with a reduced pension, or wait until 65 for the full amount. She chooses to work until 65 to maximize her monthly payment."},
+  {icon:"🚪",name:"Voluntary termination",
+   tag:"Member's choice",tagFill:"#B3D8F8",tagColor:"#0C447C",
+   def:"The member leaves employment before reaching retirement age — by their own decision.",
+   trigger:"The member resigns, moves to a non-covered employer, moves out of country, or otherwise leaves the plan voluntarily. They are not required to retire or be removed by the plan.",
+   contributions:"Locked-in contributions transfer to a Locked-In Retirement Account (LIRA) — they cannot be taken as cash. Non-locked-in amounts (if any) may be returned. The split is determined by the Income Tax Act and provincial rules.",
+   olive:"If Olive moves back to her home country at age 50, this is a voluntary termination. Her locked-in pension transfers to a LIRA and waits until she is eligible to draw it down."},
+  {icon:"📋",name:"Forced / bulk termination",
+   tag:"Plan-initiated",tagFill:"#FFF8FE",tagColor:"#9C2E8B",
+   def:"The plan removes a member from the active list because they have been inactive for too long — typically two or more consecutive years below the minimum hours threshold.",
+   trigger:"Oliver flags members who fall below the plan's activity threshold (often 350 hours per year). At year-end, those who have been below threshold for two consecutive years are bulk-terminated. The plan administrator must send a statement by March 31 the following year.",
+   contributions:"Same as voluntary termination — locked-in funds go to a LIRA, non-locked-in may be returned. The member's contributions are preserved. Bulk termination affects active status, not ownership of funds.",
+   olive:"Olive worked only 200 hours in her gap year (age 42). If she does the same the following year, Oliver will bulk-terminate her active record. Her contributions stay hers — but she exits the active member list."},
+  {icon:"💔",name:"Death",
+   tag:"Beneficiary event",tagFill:"#F1F0F1",tagColor:"#1D5F73",
+   def:"The member dies before or during retirement. The pension entitlement passes to the spouse or estate.",
+   trigger:"Occurs at any point — during the active stage, after termination, or during retirement. The timing affects the benefit calculation.",
+   contributions:"If the member dies while active or after voluntary termination: the spouse (by default, under provincial law) receives the commuted value or an ongoing pension, depending on the plan. If the member dies during retirement: the payment option chosen at retirement determines what the spouse receives (e.g. 60% under a joint & survivor option).",
+   olive:"If Olive dies in retirement, her Joint & Survivor option means her spouse receives 60% of her monthly pension for the rest of their life. If she had chosen a life-only option, payments would stop."},
+];
+
+const qs=[
+  {ctx:"A member worked in construction for 18 years. She stops working entirely at age 48 — not by choice, but because she ran out of eligible hours for two consecutive years.",
+   q:"What type of exit is this?",
+   opts:["Retirement","Voluntary termination","Forced / bulk termination","Death"],correct:2,
+   fb:{y:"Correct. The plan removes her from the active list because she has been inactive for two consecutive years below the hours threshold. This is forced/bulk termination — not her choice.",
+       n:"She did not choose to leave, and she did not retire or die. The plan initiates this exit because she fell below the minimum activity threshold for two consecutive years. That is forced/bulk termination."}},
+];
+
+let answered=false;
+
+function renderTiles(){
+  document.getElementById('tiles').innerHTML=exits.map((e,i)=>`
+    <div class="tile" id="tile${i}" tabindex="0" role="button"
+      onclick="toggleTile(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){toggleTile(${i});event.preventDefault()}"
+      aria-expanded="false" aria-label="${e.name} — click to expand">
+      <span class="chev" aria-hidden="true">▼</span>
+      <div class="tile-top">
+        <span class="tile-icon" aria-hidden="true">${e.icon}</span>
+        <span class="tile-name">${e.name}</span>
+        <span class="tile-tag" style="background:${e.tagFill};color:${e.tagColor}">${e.tag}</span>
+      </div>
+      <div class="tile-def">${e.def}</div>
+      <div class="tile-detail">
+        <div class="detail-label">What triggers it</div>
+        <div class="detail-text">${e.trigger}</div>
+        <div class="detail-label">What happens to contributions</div>
+        <div class="detail-text">${e.contributions}</div>
+        <div class="olive-note"><span>👤</span><span>${e.olive}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function toggleTile(i){
+  const tile=document.getElementById('tile'+i);
+  const isOpen=tile.classList.contains('open');
+  tile.classList.toggle('open',!isOpen);
+  tile.setAttribute('aria-expanded',!isOpen);
+}
+
+function renderQ(){
+  const q=qs[0];
+  document.getElementById('qblock').innerHTML=`
+    <div class="q-ctx">${q.ctx}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="opts" role="group">
+      ${q.opts.map((o,i)=>`<button class="opt" id="o${i}" onclick="choose(${i})" aria-label="${'ABCD'[i]}: ${o}">
+        <span class="ltr" aria-hidden="true">${'ABCD'[i]}</span><span>${o}</span>
+      </button>`).join('')}
+    </div>
+    <div class="fb" id="fb" role="alert"></div>
+    <div class="btn-row">
+      <button class="btn-reset" onclick="resetQ()">↺ Reset</button>
+      <button class="btn-next" id="btn-next" onclick="showDone()">Continue →</button>
+    </div>`;
+  answered=false;
+}
+
+function choose(idx){
+  if(answered)return;
+  answered=true;
+  const q=qs[0];
+  const ok=idx===q.correct;
+  q.opts.forEach((_,i)=>{
+    const el=document.getElementById('o'+i);
+    el.disabled=true;
+    if(i===q.correct)el.classList.add('correct');
+    else if(i===idx)el.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb');
+  fb.className='fb show '+(ok?'ok':'no');
+  fb.innerHTML=`<strong>${ok?'✅ Correct!':'❌ Not quite —'}</strong>${ok?q.fb.y:q.fb.n}`;
+  document.getElementById('btn-next').style.display='block';
+  fb.focus();
+}
+
+function showDone(){
+  document.getElementById('qblock').style.display='none';
+  document.getElementById('done').style.display='block';
+}
+
+function resetQ(){renderQ();answered=false;}
+
+renderTiles();
+renderQ();
+</script>
+</body>
+</html>
