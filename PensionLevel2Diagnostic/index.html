@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pre-Course Diagnostic — Level 2</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;min-height:100vh}
+.shell{max-width:600px;margin:0 auto}
+.intro{background:#E1F5EE;border-radius:12px;padding:.85rem 1.1rem;font-size:.84rem;color:#014040;margin-bottom:1.1rem;line-height:1.55}
+.intro strong{font-weight:600;display:block;margin-bottom:.2rem}
+.prog-row{display:flex;align-items:center;gap:.6rem;margin-bottom:1.1rem}
+.pips{display:flex;gap:5px;flex:1}
+.pip{flex:1;height:3px;border-radius:2px;background:#e0ded7;transition:background .3s}
+.pip.done{background:#038C8C}.pip.active{background:#15C7C7}
+.ctr{font-size:.78rem;color:#696267;white-space:nowrap}
+.card{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.3rem;margin-bottom:.7rem}
+.badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:6px;margin-bottom:.85rem;color:#1D5F73;background:#E6F1FB}
+.qtext{font-size:1rem;font-weight:600;color:#111;line-height:1.5;margin-bottom:1rem}
+.opts{display:flex;flex-direction:column;gap:.5rem}
+.opt{display:flex;align-items:center;gap:.65rem;padding:.8rem .95rem;border-radius:10px;border:1.5px solid #e8e6e0;cursor:pointer;font-size:.9rem;color:#111;background:#fff;text-align:left;width:100%;transition:all .15s}
+.opt:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.opt:hover:not(:disabled){border-color:#15C7C7;background:#E1F5EE}
+.letter{width:24px;height:24px;border-radius:50%;background:#f1efe8;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#696267;flex-shrink:0;transition:all .2s}
+.opt.correct{border-color:#038C8C;background:#E1F5EE}.opt.correct .letter{background:#038C8C;color:#fff}
+.opt.wrong{border-color:#9C2E8B;background:#FFF8FE}.opt.wrong .letter{background:#9C2E8B;color:#fff}
+.opt:disabled{cursor:default}
+.fb{border-radius:10px;padding:.9rem 1rem;margin-top:.85rem;font-size:.86rem;line-height:1.6;display:none}
+.fb.show{display:block}
+.fb.correct{background:#E1F5EE;border:1px solid #038C8C;color:#014040}
+.fb.wrong{background:#FFF8FE;border:1px solid #9C2E8B;color:#4a0a3d}
+.fb strong{display:block;margin-bottom:.3rem}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1rem}
+.btn-next{background:#038C8C;color:#fff;border:none;padding:.6rem 1.3rem;border-radius:8px;font-size:.86rem;font-weight:600;cursor:pointer;display:none}
+.btn-next:hover{background:#014040}
+.btn-next:focus-visible{outline:3px solid #014040;outline-offset:2px}
+.btn-restart{background:none;border:none;color:#696267;font-size:.8rem;cursor:pointer;text-decoration:underline}
+/* Results screens */
+.result{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:2rem;text-align:center;display:none}
+.result-icon{font-size:2.6rem;margin-bottom:.5rem}
+.result-title{font-size:1.1rem;font-weight:700;color:#111;margin-bottom:.5rem}
+.result-sub{font-size:.88rem;color:#696267;line-height:1.55;margin-bottom:1.4rem}
+.score-display{font-size:2.2rem;font-weight:700;color:#038C8C;margin-bottom:1rem}
+.gap-list{text-align:left;background:#f8f7f4;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.4rem}
+.gap-list-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#696267;margin-bottom:.6rem}
+.gap-item{display:flex;align-items:center;gap:.5rem;padding:.4rem 0;font-size:.86rem;color:#333}
+.gap-item .gap-icon{flex-shrink:0}
+.btn-primary{background:#038C8C;color:#fff;border:none;padding:.75rem 1.8rem;border-radius:8px;font-size:.92rem;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.btn-primary:hover{background:#014040}
+.btn-secondary{background:none;color:#696267;border:1.5px solid #e0ded7;padding:.7rem 1.6rem;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;margin-top:.6rem;display:inline-block;text-decoration:none}
+.btn-secondary:hover{border-color:#038C8C;color:#038C8C}
+.btn-row{display:flex;flex-direction:column;align-items:center;gap:.3rem}
+.ready-banner{background:#E1F5EE;border:1.5px solid #038C8C;border-radius:10px;padding:.7rem 1rem;font-size:.84rem;color:#014040;margin-bottom:1rem}
+.review-banner{background:#FAEEDA;border:1.5px solid #F0C040;border-radius:10px;padding:.7rem 1rem;font-size:.84rem;color:#633806;margin-bottom:1rem}
+.block-banner{background:#FFF8FE;border:1.5px solid #9C2E8B;border-radius:10px;padding:.7rem 1rem;font-size:.84rem;color:#4a0a3d;margin-bottom:1rem}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="intro">
+    <strong>⚡ Before you begin — 5 quick questions</strong>
+    This is not a test. It takes about two minutes. It checks whether you have the Level 1 foundation you need for this lesson — and tells you exactly where to look if you don't.
+  </div>
+  <div class="prog-row">
+    <div class="pips" id="pips"></div>
+    <div class="ctr" id="ctr"></div>
+  </div>
+  <div id="quiz" aria-live="polite"></div>
+
+  <div class="result" id="result-ready" tabindex="-1">
+    <div class="result-icon">✅</div>
+    <div class="result-title">You're ready for Level 2</div>
+    <div class="score-display" id="score-ready"></div>
+    <div class="result-sub">You have the Level 1 foundation this lesson builds on. Continue to the lesson below.</div>
+  </div>
+
+  <div class="result" id="result-review" tabindex="-1">
+    <div class="result-icon">📘</div>
+    <div class="result-title">Strong foundation — a couple of gaps flagged</div>
+    <div class="score-display" id="score-review"></div>
+    <div class="result-sub">You're in good shape overall. Before continuing, take a few minutes to review the specific Level 1 modules below — then come back to Level 2.</div>
+    <div class="gap-list" id="gap-list-review">
+      <div class="gap-list-title">Recommended review</div>
+    </div>
+  </div>
+
+  <div class="result" id="result-block" tabindex="-1">
+    <div class="result-icon">📗</div>
+    <div class="result-title">We recommend starting with Level 1</div>
+    <div class="score-display" id="score-block"></div>
+    <div class="result-sub">Level 2 builds directly on Level 1: Pension Foundations. A few key concepts aren't quite locked in yet — completing Level 1 first will make this lesson click much faster.</div>
+    <div class="gap-list" id="gap-list-block">
+      <div class="gap-list-title">Modules to review</div>
+    </div>
+  </div>
+
+  <div class="btn-row" id="action-buttons" style="display:none;margin-top:.5rem">
+    <a href="#" class="btn-primary" id="btn-continue">Continue to Level 2 →</a>
+    <button class="btn-secondary" onclick="restart()">↺ Retake the diagnostic</button>
+  </div>
+</div>
+<script>
+const qs=[
+  {badge:"Question 1 of 5",
+   q:"What is the main difference between a DB and DC pension plan?",
+   opts:[
+     "In DB the member chooses investments; in DC the employer chooses them",
+     "In DB the employer carries investment risk; in DC the member carries it",
+     "DB plans are only for government employees",
+     "There is no practical difference — both pay a fixed monthly amount",
+   ],
+   correct:1,
+   module:"Level 1, Module 2 — DB vs DC",
+   fb:{y:"Correct. In a Defined Benefit plan, the employer guarantees the payout and carries the investment risk. In a Defined Contribution plan, the payout depends on investment performance — the member carries that risk.",
+       n:"In a DB plan, the employer carries investment risk and guarantees a formula-based payout. In a DC plan, the member's payout depends on investment performance. This is the foundational distinction Level 2 builds on."}},
+  {badge:"Question 2 of 5",
+   q:"What happens to a member's pension contributions when they leave their job before retirement?",
+   opts:[
+     "They are paid out immediately as cash",
+     "They are forfeited and returned to the employer",
+     "They are preserved and locked in — the member cannot access them as cash",
+     "They transfer automatically to the member's RRSP",
+   ],
+   correct:2,
+   module:"Level 1, Module 4 — Pension vs H&W",
+   fb:{y:"Correct. Pension contributions are preserved and locked in when a member leaves employment — they belong to the member and wait until retirement. This is different from health & welfare coverage, which ends immediately.",
+       n:"Pension contributions are preserved and locked in — they do not disappear and are not paid out as cash on exit (in most cases). They wait for the member in a locked-in vehicle until retirement age. This is a key distinction from health & welfare benefits, which end on the last day of employment."}},
+  {badge:"Question 3 of 5",
+   q:"Which of the following best describes a source of pension administration complexity?",
+   opts:[
+     "Pension records only need to be kept for 2–3 years",
+     "TIME — pension calculations use decades of historical records, where one error can affect retirement income permanently",
+     "Pension plans are simpler to administer than health & welfare plans",
+     "Pension rules are identical across every Canadian province",
+   ],
+   correct:1,
+   module:"Level 1, Module 3 — Why Pension Is Complex",
+   fb:{y:"Correct. TIME is one of the three sources of pension complexity — decades of records where a single error can compound and affect a member's retirement income for the rest of their life.",
+       n:"Pension calculations rely on complete historical records — sometimes 30+ years. A single error from years ago can still affect what a member receives at retirement. This is the TIME source of complexity, and it is central to why Level 2 focuses so much on getting things right the first time."}},
+  {badge:"Question 4 of 5",
+   q:"What are the four stages of the pension lifecycle, in order?",
+   opts:[
+     "Active → Entry → Exit → Payment",
+     "Entry → Active → Exit → Payment",
+     "Entry → Exit → Active → Payment",
+     "Payment → Active → Exit → Entry",
+   ],
+   correct:1,
+   module:"Level 1, Module 5 — The Pension Lifecycle",
+   fb:{y:"Correct. Every pension member moves through Entry → Active → Exit → Payment. Join, build, leave, receive.",
+       n:"The correct order is Entry → Active → Exit → Payment. Every pension member's record moves through these four stages — and Level 2 covers what happens operationally within each one."}},
+  {badge:"Question 5 of 5",
+   q:"Which of the following does Oliver do?",
+   opts:[
+     "Sets the contribution rates in a collective agreement",
+     "Manages the investment portfolio of pension funds",
+     "Records member history, processes remittances, and calculates contributions and exit entitlements",
+     "Provides legal advice on pension splits during divorce",
+   ],
+   correct:2,
+   module:"Level 1, Module 6 — Oliver's Role",
+   fb:{y:"Correct. Oliver administers — it records member history, processes remittances, and calculates contributions and exits. It does not set rules, manage investments, or provide legal advice.",
+       n:"Oliver's role is administrative: recording, processing, and calculating. It does not set contribution rates (that's the union), manage investments (that's the custodian), or provide legal advice. Understanding this boundary matters throughout Level 2."}},
+];
+let cur=0,score=0,answered=false;
+const gaps=[];
+
+function render(){
+  const q=qs[cur];
+  document.getElementById('pips').innerHTML=qs.map((_,i)=>`<div class="pip ${i<cur?'done':i===cur?'active':''}" aria-hidden="true"></div>`).join('');
+  document.getElementById('ctr').textContent=`${cur+1} / ${qs.length}`;
+  document.getElementById('quiz').innerHTML=`
+    <div class="card">
+      <div class="badge">${q.badge}</div>
+      <div class="qtext">${q.q}</div>
+      <div class="opts" role="group">
+        ${q.opts.map((o,i)=>`<button class="opt" id="o${i}" onclick="choose(${i})" aria-label="${'ABCD'[i]}: ${o}">
+          <span class="letter" aria-hidden="true">${'ABCD'[i]}</span><span>${o}</span>
+        </button>`).join('')}
+      </div>
+      <div class="fb" id="fb" role="alert"></div>
+      <div class="nav">
+        <button class="btn-restart" onclick="restart()">↺ Start over</button>
+        <button class="btn-next" id="btn-next" onclick="advance()">${cur<qs.length-1?'Next →':'See results'}</button>
+      </div>
+    </div>`;
+  answered=false;
+}
+function choose(idx){
+  if(answered)return;answered=true;
+  const q=qs[cur];const ok=idx===q.correct;
+  if(ok)score++;else gaps.push(q.module);
+  q.opts.forEach((_,i)=>{
+    const el=document.getElementById('o'+i);el.disabled=true;
+    if(i===q.correct)el.classList.add('correct');
+    else if(i===idx)el.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb');
+  fb.className='fb show '+(ok?'correct':'wrong');
+  fb.innerHTML=`<strong>${ok?'✅ Correct!':'❌ Not quite —'}</strong>${ok?q.fb.y:q.fb.n}`;
+  document.getElementById('btn-next').style.display='block';
+  fb.focus();
+}
+function advance(){
+  cur++;
+  if(cur>=qs.length){
+    document.getElementById('quiz').style.display='none';
+    document.querySelector('.prog-row').style.display='none';
+    showResults();
+  } else render();
+}
+function showResults(){
+  document.getElementById('action-buttons').style.display='flex';
+  const btn=document.getElementById('btn-continue');
+  if(score>=5){
+    document.getElementById('result-ready').style.display='block';
+    document.getElementById('score-ready').textContent=`${score} / 5`;
+    document.getElementById('result-ready').focus();
+    btn.textContent='Continue to Level 2 →';
+  } else if(score>=3){
+    document.getElementById('result-review').style.display='block';
+    document.getElementById('score-review').textContent=`${score} / 5`;
+    const list=document.getElementById('gap-list-review');
+    gaps.forEach(g=>{list.innerHTML+=`<div class="gap-item"><span class="gap-icon">📘</span><span>${g}</span></div>`;});
+    document.getElementById('result-review').focus();
+    btn.textContent='Continue to Level 2 →';
+  } else {
+    document.getElementById('result-block').style.display='block';
+    document.getElementById('score-block').textContent=`${score} / 5`;
+    const list=document.getElementById('gap-list-block');
+    [...new Set(gaps)].forEach(g=>{list.innerHTML+=`<div class="gap-item"><span class="gap-icon">📗</span><span>${g}</span></div>`;});
+    document.getElementById('result-block').focus();
+    btn.textContent='Go to Level 1: Pension Foundations →';
+  }
+}
+function restart(){
+  cur=0;score=0;answered=false;gaps.length=0;
+  document.getElementById('quiz').style.display='block';
+  document.querySelector('.prog-row').style.display='flex';
+  ['result-ready','result-review','result-block'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('action-buttons').style.display='none';
+  render();
+}
+document.addEventListener('keydown',e=>{
+  if(answered)return;
+  const i='1234'.indexOf(e.key);
+  if(i>=0&&i<qs[cur].opts.length)choose(i);
+});
+render();
+</script>
+</body>
+</html>
