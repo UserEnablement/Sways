@@ -95,7 +95,7 @@ body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;m
   </div>
 
   <div class="btn-row" id="action-buttons" style="display:none;margin-top:.5rem">
-    <a href="#" class="btn-primary" id="btn-continue">Continue to Level 2 →</a>
+    <a href="https://sway.cloud.microsoft/NN8JFzxgR1JChk5c?ref=Link" target="_blank" rel="noopener" class="btn-primary" id="btn-continue">Continue to Level 2 →</a>
     <button class="btn-secondary" onclick="restart()">↺ Retake the diagnostic</button>
   </div>
 </div>
@@ -216,14 +216,20 @@ function showResults(){
     document.getElementById('result-ready').style.display='block';
     document.getElementById('score-ready').textContent=`${score} / 5`;
     document.getElementById('result-ready').focus();
-    btn.textContent='Continue to Level 2 →';
+    btn.textContent='Continue to Level 2 ↓';
+    btn.removeAttribute('href');
+    btn.removeAttribute('target');
+    btn.onclick=function(e){e.preventDefault();window.parent.postMessage('scrollToLesson','*');window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});};
   } else if(score>=3){
     document.getElementById('result-review').style.display='block';
     document.getElementById('score-review').textContent=`${score} / 5`;
     const list=document.getElementById('gap-list-review');
     gaps.forEach(g=>{list.innerHTML+=`<div class="gap-item"><span class="gap-icon">📘</span><span>${g}</span></div>`;});
     document.getElementById('result-review').focus();
-    btn.textContent='Continue to Level 2 →';
+    btn.textContent='Continue to Level 2 ↓';
+    btn.removeAttribute('href');
+    btn.removeAttribute('target');
+    btn.onclick=function(e){e.preventDefault();window.parent.postMessage('scrollToLesson','*');window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});};
   } else {
     document.getElementById('result-block').style.display='block';
     document.getElementById('score-block').textContent=`${score} / 5`;
@@ -231,6 +237,10 @@ function showResults(){
     [...new Set(gaps)].forEach(g=>{list.innerHTML+=`<div class="gap-item"><span class="gap-icon">📗</span><span>${g}</span></div>`;});
     document.getElementById('result-block').focus();
     btn.textContent='Go to Level 1: Pension Foundations →';
+    btn.href='https://sway.cloud.microsoft/NN8JFzxgR1JChk5c?ref=Link';
+    btn.target='_blank';
+    btn.rel='noopener';
+    btn.onclick=null;
   }
 }
 function restart(){
