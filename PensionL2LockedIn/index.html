@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exit Outcome Explorer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;min-height:100vh}
+.shell{max-width:640px;margin:0 auto}
+.intro{background:#E1F5EE;border-radius:12px;padding:.8rem 1rem;font-size:.84rem;color:#014040;margin-bottom:1rem;line-height:1.5}
+.intro strong{font-weight:600}
+.controls{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.1rem 1.2rem;margin-bottom:.75rem}
+.ctrl-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#696267;margin-bottom:.75rem}
+.ctrl-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.65rem}
+.ctrl-field{display:flex;flex-direction:column;gap:.3rem}
+.ctrl-field label{font-size:.78rem;font-weight:600;color:#333}
+.ctrl-field select,.ctrl-field input{padding:.44rem .65rem;border-radius:8px;border:1.5px solid #e0ded7;font-size:.86rem;font-family:inherit;background:#fff;transition:border .15s}
+.ctrl-field select:focus,.ctrl-field input:focus{outline:none;border-color:#038C8C}
+.slider-field{margin-bottom:.65rem}
+.slider-field label{font-size:.78rem;font-weight:600;color:#333;display:flex;justify-content:space-between;margin-bottom:.3rem}
+.slider-field label span{color:#038C8C;font-weight:700}
+.slider-field input[type=range]{width:100%;accent-color:#038C8C}
+.result-card{border-radius:14px;padding:1.2rem;margin-bottom:.75rem;border:2px solid transparent;transition:all .3s}
+.result-lira{background:#E1F5EE;border-color:#15C7C7}
+.result-cash{background:#E6F1FB;border-color:#9FC8F5}
+.result-split{background:#FAEEDA;border-color:#f5d88a}
+.result-label{font-size:1rem;font-weight:700;margin-bottom:.6rem}
+.result-label.lira{color:#014040}
+.result-label.cash{color:#0C447C}
+.result-label.split{color:#633806}
+.amounts{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.65rem}
+.amount-cell{background:#fff;border-radius:10px;padding:.75rem .9rem}
+.amount-cell .amt{font-size:1.2rem;font-weight:700;color:#038C8C;margin-bottom:.2rem}
+.amount-cell .amt-lbl{font-size:.74rem;color:#696267}
+.amount-cell.cash-cell .amt{color:#1D5F73}
+.amount-cell.defer-cell .amt{color:#A07020}
+.explanation{font-size:.83rem;color:#5F5E5A;line-height:1.55;margin-bottom:.5rem}
+.rule-note{font-size:.79rem;padding:.5rem .7rem;border-radius:8px;background:rgba(255,255,255,0.6);color:#555;line-height:1.45}
+.olive-card{background:#E1F5EE;border-radius:10px;padding:.75rem .9rem;font-size:.82rem;color:#014040;line-height:1.5;display:flex;gap:.4rem;margin-bottom:.65rem}
+.olive-card strong{font-weight:600}
+/* Irreversible moment + judgment */
+.irreversible{background:#FFF0F0;border:2px solid #9C2E8B;border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:.75rem;display:none}
+.irreversible.show{display:block;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.irr-hdr{font-size:.82rem;font-weight:700;color:#9C2E8B;margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.irr-scenario{font-size:.84rem;color:#5F5E5A;line-height:1.55;margin-bottom:.75rem;padding:.65rem .8rem;background:#f8f7f4;border-radius:8px;border-left:3px solid #9C2E8B}
+.irr-q{font-size:.9rem;font-weight:700;color:#111;margin-bottom:.7rem}
+.jopts{display:flex;flex-direction:column;gap:.4rem}
+.jopt{display:flex;align-items:flex-start;gap:.6rem;padding:.75rem .9rem;border-radius:10px;border:1.5px solid #e8e6e0;cursor:pointer;font-size:.84rem;color:#111;background:#fff;text-align:left;width:100%;transition:all .15s;line-height:1.45}
+.jopt:focus-visible{outline:3px solid #9C2E8B;outline-offset:2px}
+.jopt:hover:not(:disabled){border-color:#9C2E8B;background:#FFF8FE}
+.jletter{width:22px;height:22px;border-radius:50%;background:#f1efe8;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:#696267;flex-shrink:0}
+.jopt.correct{border-color:#038C8C;background:#E1F5EE}.jopt.correct .jletter{background:#038C8C;color:#fff}
+.jopt.wrong{border-color:#9C2E8B;background:#FFF8FE}.jopt.wrong .jletter{background:#9C2E8B;color:#fff}
+.jopt.partial{border-color:#F0C040;background:#FFFBEA}.jopt.partial .jletter{background:#F0C040;color:#633806}
+.jopt:disabled{cursor:default}
+.jfb{border-radius:10px;padding:.85rem 1rem;margin-top:.7rem;font-size:.83rem;line-height:1.6;display:none}
+.jfb.show{display:block}
+.jfb.correct{background:#E1F5EE;border:1px solid #038C8C;color:#014040}
+.jfb.wrong{background:#FFF8FE;border:1px solid #9C2E8B;color:#4a0a3d}
+.jfb.partial{background:#FFFBEA;border:1px solid #F0C040;color:#633806}
+.jfb strong{display:block;margin-bottom:.3rem}
+.disclaimer{font-size:.73rem;color:#b4b2a9;text-align:center;margin-top:.5rem;line-height:1.4}
+.reset-btn{background:none;border:1.5px solid #e0ded7;border-radius:8px;padding:.4rem .8rem;font-size:.77rem;color:#696267;cursor:pointer;margin-top:.6rem}
+.reset-btn:hover{border-color:#038C8C;color:#038C8C}
+.wb{background:#8CFFDF;border-radius:10px;padding:.65rem .85rem;font-size:.79rem;color:#174538;margin-top:.7rem;display:flex;gap:.4rem;line-height:1.5}
+.wb strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="intro"><strong>🧠 Exit outcome explorer</strong> — Change the variables to see how exit type, vesting status, and account balance affect what a member receives. After exploring, a judgment scenario unlocks — involving an exit that cannot be reversed.</div>
+  <div class="controls">
+    <div class="ctrl-title">Member variables</div>
+    <div class="ctrl-row">
+      <div class="ctrl-field">
+        <label for="exit-type">Exit type</label>
+        <select id="exit-type" onchange="calc()">
+          <option value="vt">Voluntary termination</option>
+          <option value="bt">Bulk termination</option>
+          <option value="ret">Retirement</option>
+          <option value="death">Death</option>
+        </select>
+      </div>
+      <div class="ctrl-field">
+        <label for="service">Years of service</label>
+        <select id="service" onchange="calc()">
+          <option value="u2">Under 2 years</option>
+          <option value="2to5">2–5 years</option>
+          <option value="5plus" selected>5+ years</option>
+        </select>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <div class="ctrl-field">
+        <label for="province">Province</label>
+        <select id="province" onchange="calc()">
+          <option value="ON">Ontario</option>
+          <option value="BC">British Columbia</option>
+          <option value="QC">Quebec</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="ctrl-field">
+        <label for="solvency">Plan funded ratio (%)</label>
+        <input type="number" id="solvency" min="50" max="100" value="100" oninput="calc()">
+      </div>
+    </div>
+    <div class="slider-field">
+      <label for="balance">Account balance <span id="balance-display">$48,000</span></label>
+      <input type="range" id="balance" min="5000" max="200000" step="1000" value="48000" oninput="updateBalance();calc()">
+    </div>
+    <button class="reset-btn" onclick="resetDefaults()">↺ Reset to Olive's scenario</button>
+  </div>
+  <div id="result-card" class="result-card"></div>
+  <div id="olive-section" class="olive-card" style="display:none"></div>
+  <div class="irreversible" id="irr-panel">
+    <div class="irr-hdr">⛔ Irreversible moment — administrator judgment</div>
+    <div class="irr-scenario">A member called this morning to say they want to cancel their commuted value election. They chose the lump-sum LIRA transfer two weeks ago, signed the election form, and the transfer was processed to their financial institution yesterday. They say they've changed their mind and want a monthly pension instead.</div>
+    <div class="irr-q">What do you tell them — and what can the administrator actually do?</div>
+    <div class="jopts" role="group">
+      <button class="jopt" id="j0" onclick="judge(0)"><span class="jletter">A</span><span>Reverse the transfer in Oliver and reissue the pension election paperwork</span></button>
+      <button class="jopt" id="j1" onclick="judge(1)"><span class="jletter">B</span><span>Explain that once the commuted value has transferred to a financial institution, the election is final — Oliver cannot reverse a completed transfer</span></button>
+      <button class="jopt" id="j2" onclick="judge(2)"><span class="jletter">C</span><span>Escalate to legal counsel immediately — the member may have grounds to reverse under provincial pension law</span></button>
+    </div>
+    <div class="jfb" id="jfb" role="alert"></div>
+  </div>
+  <div class="wb" id="wb-irr" style="display:none"><span>📓</span><span><strong>Workbook — Section 5:</strong> Write one sentence on why pension exit elections are treated as irrevocable — and what this means for how administrators should communicate options to members before the election is made.</span></div>
+  <div class="disclaimer">All amounts are illustrative. Actual outcomes are determined by plan rules, provincial pension legislation, and the Income Tax Act.</div>
+</div>
+<script>
+let explored=0,judged=false;
+function fmt(n){return '$'+Math.round(n).toLocaleString('en-CA');}
+function updateBalance(){
+  document.getElementById('balance-display').textContent=fmt(parseInt(document.getElementById('balance').value));
+}
+function calc(){
+  explored++;
+  const exit=document.getElementById('exit-type').value;
+  const service=document.getElementById('service').value;
+  const province=document.getElementById('province').value;
+  const solvencyPct=Math.min(100,Math.max(50,parseFloat(document.getElementById('solvency').value)||100));
+  const balance=parseInt(document.getElementById('balance').value);
+  const vested=service==='5plus'||(service==='2to5'&&province!=='QC');
+  const solvRatio=solvencyPct/100;
+  let outcome,lira,cash,deferred=0,explanation,ruleNote,label,cardClass,labelClass;
+  if(exit==='ret'){
+    outcome='LIRA / MONTHLY PENSION';label='🏁 Retirement';cardClass='result-lira';labelClass='lira';
+    lira=balance*solvRatio;deferred=balance-lira;cash=0;
+    explanation='At retirement, the member\'s entitlement converts to a monthly pension or lump-sum LIRA transfer. If the plan is underfunded, the immediate transfer is solvency-adjusted; the remainder is deferred.';
+    ruleNote='Once the member elects their pension option, that election is final. The form they sign is irrevocable in most provinces.';
+  } else if(exit==='death'){
+    outcome='SURVIVOR BENEFIT';label='💔 Death — survivor benefit';cardClass='result-lira';labelClass='lira';
+    lira=balance*solvRatio;deferred=balance-lira;cash=0;
+    explanation='The member\'s entitlement passes to the surviving spouse (default beneficiary) or named beneficiary if a valid waiver is on file. The solvency adjustment applies to the immediate transfer.';
+    ruleNote='If no spouse is on record and no valid beneficiary designation exists, the entitlement goes to the estate.';
+  } else if(!vested){
+    outcome='CASH PAYOUT';label='💵 Non-locked-in — cash return';cardClass='result-cash';labelClass='cash';
+    lira=0;cash=balance;deferred=0;
+    explanation='The member has not met the vesting threshold. Their own contributions are returned as a taxable cash payment. Income tax is withheld at source.';
+    ruleNote=province==='ON'?'Ontario: 2-year vesting period under the Pension Benefits Act.':province==='BC'?'BC: Immediate vesting on employer contributions under the Pension Benefits Standards Act.':province==='QC'?'Quebec: Vesting rules under the Supplemental Pension Plans Act.':'Vesting rules vary by province and plan.';
+  } else {
+    const cashThreshold=Math.min(balance*0.08,5000);
+    cash=Math.min(cashThreshold,balance*0.15);
+    const lockedBase=balance-cash;
+    lira=lockedBase*solvRatio;deferred=lockedBase-lira;
+    outcome='SPLIT — LIRA + CASH';label='⚖️ Split payout';cardClass='result-split';labelClass='split';
+    explanation='The member is fully vested. The majority transfers to a LIRA. A small non-locked-in portion is returned as a taxable cash payment. The LIRA transfer is solvency-adjusted if the plan is underfunded.';
+    ruleNote=solvencyPct<100?`Plan is ${solvencyPct}% funded. LIRA transfer = locked-in portion × ${solvencyPct}%. Deferred ${fmt(deferred)} paid over up to 5 years.`:'Plan is fully funded — full locked-in amount transfers immediately.';
+  }
+  const rc=document.getElementById('result-card');
+  rc.className=`result-card ${cardClass}`;
+  rc.innerHTML=`
+    <div class="result-label ${labelClass}">${label}</div>
+    <div class="amounts">
+      <div class="amount-cell"><div class="amt">${fmt(lira)}</div><div class="amt-lbl">🔒 LIRA transfer (immediate)</div></div>
+      <div class="amount-cell cash-cell"><div class="amt">${fmt(cash)}</div><div class="amt-lbl">💵 Cash payout (pre-tax)</div></div>
+      ${deferred>0?`<div class="amount-cell defer-cell" style="grid-column:1/3"><div class="amt">${fmt(deferred)}</div><div class="amt-lbl">⏳ Deferred — paid over up to 5 years</div></div>`:''}
+    </div>
+    <div class="explanation">${explanation}</div>
+    <div class="rule-note">📋 ${ruleNote}</div>`;
+  const isOlive=service==='5plus'&&exit==='vt'&&parseInt(document.getElementById('balance').value)===48000;
+  const os=document.getElementById('olive-section');
+  os.style.display=isOlive?'flex':'none';
+  if(isOlive)os.innerHTML=`<span>👤</span><div><strong>Olive — age 42, bulk terminated:</strong> 19 years of service, fully vested, $48,000 entitlement. Her locked-in contributions transfer to a LIRA. A small non-locked-in portion is returned as cash. The money is hers — it cannot be spent until she retires.</div>`;
+  if(explored>=3&&!judged){
+    document.getElementById('irr-panel').classList.add('show');
+    document.getElementById('irr-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+const jfeedback=[
+  {cls:'wrong',text:'<strong>❌ Oliver cannot reverse a completed transfer.</strong> Once the commuted value has been transferred to a financial institution, the transaction is complete. Oliver\'s record reflects a finalised exit. There is no mechanism to recall funds from a financial institution through Oliver. The administrator cannot reinstate a pension option after the transfer has settled.'},
+  {cls:'correct',text:'<strong>✅ Correct — the election is final.</strong> Once the member signs the election form and the commuted value transfers, the decision is irrevocable. This is a point of no return in pension administration. The administrator\'s role going forward is to confirm in writing that the election cannot be reversed, and to ensure the member understands their options with their financial institution. This is also why administrators should ensure members have all the information they need before signing — not after.'},
+  {cls:'partial',text:'<strong>⚠️ Escalation may be warranted — but the outcome is unlikely to change.</strong> In rare cases, provincial pension legislation may provide a narrow window for reconsideration if the election was made under duress or based on incorrect information provided by the plan. However, a change of mind two weeks after a completed transfer is not grounds for reversal in most provinces. The administrator should flag it for legal review — but should not suggest to the member that reversal is likely.'},
+];
+function judge(i){
+  if(judged)return;judged=true;
+  [0,1,2].forEach(j=>{const el=document.getElementById('j'+j);if(el)el.disabled=true;});
+  const el=document.getElementById('j'+i);if(el)el.classList.add(jfeedback[i].cls);
+  if(i!==1){const c=document.getElementById('j1');if(c)c.classList.add('correct');}
+  const fb=document.getElementById('jfb');
+  if(fb){fb.className='jfb show '+jfeedback[i].cls;fb.innerHTML=jfeedback[i].text;fb.scrollIntoView({behavior:'smooth',block:'nearest'});}
+  document.getElementById('wb-irr').style.display='flex';
+}
+function resetDefaults(){
+  document.getElementById('exit-type').value='vt';document.getElementById('service').value='5plus';
+  document.getElementById('province').value='ON';document.getElementById('solvency').value=100;
+  document.getElementById('balance').value=48000;updateBalance();calc();
+}
+updateBalance();calc();
+</script>
+</body>
+</html>
