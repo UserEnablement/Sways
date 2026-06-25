@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Funded Ratio Impact Explorer</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;min-height:100vh}
+.shell{max-width:620px;margin:0 auto}
+.intro{background:#E1F5EE;border-radius:12px;padding:.8rem 1rem;font-size:.84rem;color:#014040;margin-bottom:1rem;line-height:1.5}
+.intro strong{font-weight:600}
+.controls{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.1rem 1.2rem;margin-bottom:.75rem}
+.ctrl-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#696267;margin-bottom:.85rem}
+.slider-field{margin-bottom:.9rem}
+.slider-field label{font-size:.82rem;font-weight:600;color:#333;display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.slider-field label .val{font-size:1rem;font-weight:700;color:#038C8C}
+.slider-field input[type=range]{width:100%;accent-color:#038C8C;height:6px}
+.slider-field .range-ends{display:flex;justify-content:space-between;font-size:.72rem;color:#b4b2a9;margin-top:.2rem}
+.entitlement-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.4rem}
+.entitlement-row label{font-size:.82rem;font-weight:600;color:#333;white-space:nowrap}
+.entitlement-row input{padding:.46rem .7rem;border-radius:8px;border:1.5px solid #e0ded7;font-size:.95rem;font-family:inherit;width:140px;transition:border .15s;font-weight:700}
+.entitlement-row input:focus{outline:none;border-color:#038C8C}
+.result-panel{background:#fff;border-radius:14px;border:1.5px solid #e0ded7;overflow:hidden;margin-bottom:.75rem}
+.result-header{padding:.9rem 1.1rem;background:#014040;color:#fff}
+.result-header .ratio-big{font-size:2.4rem;font-weight:700;color:#8CFFDF;display:inline}
+.result-header .ratio-label{font-size:.82rem;color:#90F8F8;margin-left:.4rem}
+.result-header .status{font-size:.8rem;color:#90F8F8;margin-top:.2rem}
+.bar-section{padding:.9rem 1.1rem}
+.bar-label-row{display:flex;justify-content:space-between;font-size:.76rem;font-weight:600;margin-bottom:.4rem}
+.bar-label-row .lbl-i{color:#038C8C}
+.bar-label-row .lbl-d{color:#A07020}
+.bar-wrap{height:28px;border-radius:8px;overflow:hidden;display:flex;background:#f1efe8;margin-bottom:.5rem}
+.bar-immediate{background:#038C8C;transition:width .4s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:.4rem}
+.bar-immediate span{font-size:.72rem;font-weight:700;color:#fff;white-space:nowrap}
+.bar-deferred{background:#F0C040;transition:width .4s ease;display:flex;align-items:center;justify-content:flex-start;padding-left:.4rem}
+.bar-deferred span{font-size:.72rem;font-weight:700;color:#633806;white-space:nowrap}
+.amounts-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.65rem}
+.amount-box{border-radius:10px;padding:.75rem .9rem}
+.amount-box.immediate{background:#E1F5EE}
+.amount-box.deferred{background:#FAEEDA}
+.amount-box .amt{font-size:1.25rem;font-weight:700;margin-bottom:.15rem}
+.amount-box.immediate .amt{color:#038C8C}
+.amount-box.deferred .amt{color:#A07020}
+.amount-box .amt-lbl{font-size:.74rem;color:#696267;line-height:1.4}
+.note-section{padding:.75rem 1.1rem;border-top:1px solid #f1efe8}
+.note-section p{font-size:.81rem;color:#5F5E5A;line-height:1.55}
+.note-section .warn{color:#9C2E8B;font-weight:600}
+/* Member impact story — dynamic */
+.member-story{padding:.75rem 1.1rem;border-top:1px solid #f1efe8;background:#f8f7f4;transition:all .3s}
+.member-story .story-label{font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#696267;margin-bottom:.35rem}
+.member-story .story-text{font-size:.82rem;color:#5F5E5A;line-height:1.55;font-style:italic}
+.member-story .story-employer{margin-top:.4rem;padding:.45rem .65rem;border-radius:7px;font-size:.79rem;line-height:1.45}
+.member-story .story-employer.ok{background:#E1F5EE;color:#014040}
+.member-story .story-employer.warn{background:#FAEEDA;color:#633806}
+.member-story .story-employer.critical{background:#FFF8FE;color:#4a0a3d}
+.oliver-role{background:#E6F1FB;border-radius:10px;padding:.75rem 1rem;margin-bottom:.75rem;font-size:.82rem;color:#1D5F73;line-height:1.5}
+.oliver-role strong{font-weight:600;display:block;margin-bottom:.2rem}
+.olive-card{background:#E1F5EE;border-radius:10px;padding:.75rem .9rem;font-size:.82rem;color:#014040;line-height:1.5;display:flex;gap:.4rem;margin-bottom:.65rem}
+.olive-card strong{font-weight:600}
+.disclaimer{font-size:.73rem;color:#b4b2a9;text-align:center;line-height:1.4}
+.reset-btn{background:none;border:1.5px solid #e0ded7;border-radius:8px;padding:.4rem .8rem;font-size:.77rem;color:#696267;cursor:pointer;margin-top:.6rem;display:block}
+.reset-btn:hover{border-color:#038C8C;color:#038C8C}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="intro"><strong>🧠 Funded ratio impact explorer</strong> — Adjust the funded ratio and entitlement to see how solvency status changes what the member receives immediately vs what is deferred. The member impact story updates dynamically to show what this means in practice.</div>
+  <div class="controls">
+    <div class="ctrl-title">Plan variables</div>
+    <div class="slider-field">
+      <label for="ratio">Funded ratio <span class="val" id="ratio-display">85%</span></label>
+      <input type="range" id="ratio" min="60" max="100" step="1" value="85" oninput="updateRatio();calc()">
+      <div class="range-ends"><span>60% — severely underfunded</span><span>100% — fully funded</span></div>
+    </div>
+    <div class="ctrl-title" style="margin-top:.2rem">Member entitlement</div>
+    <div class="entitlement-row">
+      <label for="entitlement">Calculated entitlement ($)</label>
+      <input type="number" id="entitlement" min="10000" max="500000" step="1000" value="48000" oninput="calc()">
+    </div>
+    <button class="reset-btn" onclick="resetDefaults()">↺ Reset to Olive's scenario</button>
+  </div>
+  <div class="result-panel" id="result-panel">
+    <div class="result-header">
+      <div><span class="ratio-big" id="rh-ratio">85%</span><span class="ratio-label">funded</span></div>
+      <div class="status" id="rh-status"></div>
+    </div>
+    <div class="bar-section">
+      <div class="bar-label-row">
+        <span class="lbl-i">🔒 Immediate LIRA transfer</span>
+        <span class="lbl-d">⏳ Deferred amount</span>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-immediate" id="bar-i"><span id="bar-i-pct"></span></div>
+        <div class="bar-deferred" id="bar-d"><span id="bar-d-pct"></span></div>
+      </div>
+      <div class="amounts-grid">
+        <div class="amount-box immediate">
+          <div class="amt" id="amt-immediate"></div>
+          <div class="amt-lbl">Transfers to LIRA immediately</div>
+        </div>
+        <div class="amount-box deferred" id="deferred-box">
+          <div class="amt" id="amt-deferred"></div>
+          <div class="amt-lbl">Deferred — paid over up to 5 years</div>
+        </div>
+      </div>
+    </div>
+    <div class="note-section" id="note-section"></div>
+    <div class="member-story" id="member-story"></div>
+  </div>
+  <div class="oliver-role">
+    <strong>🖥️ Oliver's role in solvency</strong>
+    Oliver records the funded ratio as configured by the plan administrator and applies it when processing exits. It does not calculate solvency — that is the actuary's role. Oliver generates the termination package showing the solvency-adjusted amounts so the member can see exactly how the calculation was applied.
+  </div>
+  <div class="olive-card">
+    <span>👤</span>
+    <div><strong>Olive — age 42, bulk termination:</strong> Plan is 85% funded. Entitlement: $48,000. Oliver calculates $48,000 × 85% = $40,800 LIRA transfer immediately. The remaining $7,200 is owed and paid over the next 5 years. Olive's total entitlement has not changed — only the timing.</div>
+  </div>
+  <div class="disclaimer">All amounts are illustrative. Actual solvency calculations are performed by a qualified actuary. Regulatory requirements on deferred payment periods vary by province and plan.</div>
+</div>
+<script>
+function fmt(n){return '$'+Math.round(n).toLocaleString('en-CA');}
+function updateRatio(){document.getElementById('ratio-display').textContent=document.getElementById('ratio').value+'%';}
+function calc(){
+  const ratio=parseInt(document.getElementById('ratio').value)/100;
+  const entitlement=parseFloat(document.getElementById('entitlement').value)||0;
+  const immediate=entitlement*ratio,deferred=entitlement-immediate;
+  const pctI=Math.round(ratio*100),pctD=100-pctI;
+  document.getElementById('rh-ratio').textContent=pctI+'%';
+  document.getElementById('rh-status').textContent=ratio>=1?'Fully funded — no solvency deficiency':ratio>=0.9?'Slightly underfunded — minor deficiency':ratio>=0.8?'Underfunded — solvency deficiency present':ratio>=0.7?'Significantly underfunded — employer solvency payments required':'Severely underfunded — regulatory intervention likely';
+  document.getElementById('bar-i').style.width=pctI+'%';
+  document.getElementById('bar-d').style.width=pctD+'%';
+  document.getElementById('bar-i-pct').textContent=pctI>15?pctI+'%':'';
+  document.getElementById('bar-d-pct').textContent=pctD>8?pctD+'%':'';
+  document.getElementById('amt-immediate').textContent=fmt(immediate);
+  document.getElementById('amt-deferred').textContent=fmt(deferred);
+  const db=document.getElementById('deferred-box');
+  db.style.display=deferred>0?'block':'none';
+  document.querySelector('.amounts-grid').style.gridTemplateColumns=deferred>0?'1fr 1fr':'1fr';
+  let note='';
+  if(ratio>=1){note='The plan is fully funded. The member receives their full calculated entitlement immediately as a LIRA transfer. No solvency adjustment applies.';}
+  else if(ratio>=0.85){note=`The plan has a ${pctD}% solvency deficiency. The member receives ${fmt(immediate)} immediately. The ${fmt(deferred)} balance is a regulatory obligation paid over up to 5 years. The member's total entitlement of ${fmt(entitlement)} remains unchanged.`;}
+  else if(ratio>=0.75){note=`<span class="warn">⚠️ Material solvency deficiency (${pctD}%).</span> The member receives ${fmt(immediate)} immediately. The ${fmt(deferred)} deferred amount is owed by the plan — employer solvency payments are required to close the gap. The regulator must be notified of the deficiency.`;}
+  else{note=`<span class="warn">⚠️ Severe underfunding — funded ratio below 75%.</span> Regulators may require a wind-up valuation. The member receives ${fmt(immediate)} immediately; the ${fmt(deferred)} balance remains a plan obligation but recovery timeline is uncertain. Legal and actuarial advice is required.`;}
+  document.getElementById('note-section').innerHTML=`<p>${note}</p>`;
+
+  // Dynamic member impact story
+  let storyText='',employerText='',employerClass='ok';
+  if(ratio>=1){
+    storyText=`"I was told my pension was ready. The administrator processed my termination, Oliver generated the package, and I received the full ${fmt(entitlement)} transfer to my LIRA within two weeks. Straightforward."`;
+    employerText='Employer obligation: regular contributions only. No solvency payments required.';
+    employerClass='ok';
+  } else if(ratio>=0.85){
+    storyText=`"The administrator explained that the plan was ${pctI}% funded. I received ${fmt(immediate)} in my LIRA right away. They told me the remaining ${fmt(deferred)} would come in instalments over the next few years. It wasn't what I expected — but they were clear about why."`;
+    employerText=`Employer obligation: regular contributions plus solvency payments to fund the ${pctD}% deficiency. The employer cannot reduce or stop solvency payments without regulatory approval.`;
+    employerClass='warn';
+  } else if(ratio>=0.75){
+    storyText=`"The ${fmt(deferred)} deferred amount worried me. The administrator said it was the plan's legal obligation — but at ${pctI}% funded, I couldn't help wondering whether the plan would actually pay it. They recommended I speak to a financial advisor."`;
+    employerText=`Employer obligation: significant solvency payments required. At ${pctI}% funded, the employer faces regulatory scrutiny. Members and their legal representatives may request actuarial reports. The plan sponsor must file a solvency report with the regulator.`;
+    employerClass='warn';
+  } else {
+    storyText=`"At ${pctI}% funded, the administrator was honest with me: they couldn't tell me when — or if — I'd receive the full ${fmt(deferred)} deferred amount. The regulator was involved. There was talk of a plan wind-up. It was not a conversation anyone wanted to have."`;
+    employerText=`⚠️ At ${pctI}% funded: regulator may order a plan wind-up valuation. If the plan winds up with insufficient assets, members may not receive their full deferred entitlements. This is a worst-case scenario — but it is a real one.`;
+    employerClass='critical';
+  }
+  document.getElementById('member-story').innerHTML=`
+    <div class="story-label">👤 What this looks like for the member</div>
+    <div class="story-text">${storyText}</div>
+    <div class="story-employer ${employerClass}">${employerText}</div>`;
+}
+function resetDefaults(){document.getElementById('ratio').value=85;document.getElementById('entitlement').value=48000;updateRatio();calc();}
+updateRatio();calc();
+</script>
+</body>
+</html>
