@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rate Scenario — Which Agreement Applies?</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;min-height:100vh}
+.shell{max-width:640px;margin:0 auto}
+.setup{background:#FAEEDA;border-radius:12px;padding:.8rem 1rem;font-size:.84rem;color:#633806;margin-bottom:1.1rem;line-height:1.5}
+.setup strong{font-weight:600;display:block;margin-bottom:.15rem}
+.prog-row{display:flex;align-items:center;gap:.6rem;margin-bottom:1.1rem}
+.pips{display:flex;gap:5px;flex:1}
+.pip{flex:1;height:3px;border-radius:2px;background:#e0ded7;transition:background .3s}
+.pip.done{background:#038C8C}.pip.active{background:#15C7C7}
+.ctr{font-size:.78rem;color:#696267;white-space:nowrap}
+.card{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.3rem;margin-bottom:.7rem}
+.badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:6px;margin-bottom:.75rem;color:#633806;background:#FAEEDA}
+.scenario{font-size:.87rem;color:#5F5E5A;line-height:1.6;margin-bottom:.85rem;padding:.75rem .9rem;background:#f8f7f4;border-radius:8px;border-left:3px solid #e0ded7}
+.qtext{font-size:.95rem;font-weight:700;color:#111;margin-bottom:.9rem}
+.opts{display:flex;flex-direction:column;gap:.45rem}
+.opt{display:flex;align-items:flex-start;gap:.65rem;padding:.8rem .95rem;border-radius:10px;border:1.5px solid #e8e6e0;cursor:pointer;font-size:.88rem;color:#111;background:#fff;text-align:left;width:100%;transition:all .15s;line-height:1.45}
+.opt:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.opt:hover:not(:disabled){border-color:#15C7C7;background:#E1F5EE}
+.letter{width:24px;height:24px;border-radius:50%;background:#f1efe8;display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:700;color:#696267;flex-shrink:0;transition:all .2s}
+.opt.correct{border-color:#038C8C;background:#E1F5EE}.opt.correct .letter{background:#038C8C;color:#fff}
+.opt.wrong{border-color:#9C2E8B;background:#FFF8FE}.opt.wrong .letter{background:#9C2E8B;color:#fff}
+.opt.partial{border-color:#F0C040;background:#FFFBEA}.opt.partial .letter{background:#F0C040;color:#633806}
+.opt:disabled{cursor:default}
+.fb{border-radius:10px;padding:.85rem 1rem;margin-top:.75rem;font-size:.84rem;line-height:1.6;display:none}
+.fb.show{display:block}
+.fb.correct{background:#E1F5EE;border:1px solid #038C8C;color:#014040}
+.fb.wrong{background:#FFF8FE;border:1px solid #9C2E8B;color:#4a0a3d}
+.fb.partial{background:#FFFBEA;border:1px solid #F0C040;color:#633806}
+.fb strong{display:block;margin-bottom:.3rem}
+/* Consequence reveal — shown after wrong answer */
+.consequence-reveal{border-radius:9px;padding:.75rem .9rem;margin-top:.55rem;font-size:.82rem;line-height:1.55;display:none;background:#FFF0F0;border:1px solid #9C2E8B;color:#4a0a3d}
+.consequence-reveal.show{display:block}
+.consequence-reveal strong{display:block;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;color:#9C2E8B}
+/* Admin action — shown after correct answer */
+.admin-action{border-radius:9px;padding:.75rem .9rem;margin-top:.55rem;font-size:.82rem;line-height:1.55;display:none;background:#E6F1FB;border:1px solid #1D5F73;color:#0C447C}
+.admin-action.show{display:block}
+.admin-action strong{display:block;font-size:.74rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem;color:#1D5F73}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:.85rem}
+.btn-next{background:#038C8C;color:#fff;border:none;padding:.58rem 1.2rem;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;display:none}
+.btn-next:hover{background:#014040}
+.btn-next:focus-visible{outline:3px solid #014040;outline-offset:2px}
+.btn-restart{background:none;border:none;color:#696267;font-size:.79rem;cursor:pointer;text-decoration:underline}
+.score{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.8rem;text-align:center;display:none}
+.score-num{font-size:2.6rem;font-weight:600;color:#038C8C;margin:.6rem 0 .3rem}
+.score-msg{font-size:.92rem;color:#111;font-weight:500;margin-bottom:.4rem}
+.score-sub{font-size:.82rem;color:#696267;margin-bottom:1.3rem;line-height:1.5}
+.btn-again{background:#038C8C;color:#fff;border:none;padding:.65rem 1.6rem;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer}
+.btn-again:hover{background:#014040}
+.wb-note{background:#8CFFDF;border-radius:10px;padding:.65rem .85rem;font-size:.8rem;color:#174538;margin-top:.7rem;display:flex;gap:.4rem;line-height:1.5}
+.wb-note strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="setup"><strong>🎯 Rate scenarios — which agreement applies?</strong> Three scenarios involving collective agreements, rates, and occupation codes. Choose the correct answer — then see the operational consequence of each choice and what the administrator must action.</div>
+  <div class="prog-row">
+    <div class="pips" id="pips"></div>
+    <div class="ctr" id="ctr"></div>
+  </div>
+  <div id="quiz" aria-live="polite"></div>
+  <div class="score" id="score" tabindex="-1">
+    <div style="font-size:2rem">📋</div>
+    <div class="score-num" id="score-num"></div>
+    <div class="score-msg" id="score-msg"></div>
+    <div class="score-sub" id="score-sub"></div>
+    <button class="btn-again" onclick="restart()">Try again</button>
+    <div class="wb-note" style="margin-top:1rem;text-align:left"><span>📓</span><span><strong>Workbook:</strong> Section 4 reflection — write one sentence on the most likely consequence of applying the wrong collective agreement to a member for six months.</span></div>
+  </div>
+</div>
+<script>
+const qs=[
+  {badge:"Scenario 1",
+   scenario:"A member is promoted from apprentice level 2 ($4.90/hr) to journeyman ($6.40/hr) on April 14. The employer submits the full April remittance — all 170 hours under the apprentice level 2 code — because that is what they had on file at the start of the month.",
+   q:"Which rate applies to the hours worked after April 14 — and what must the administrator do?",
+   opts:[
+     "Apprentice level 2 for the entire month — the rate at the start of the period applies throughout",
+     "Journeyman rate for the entire month — once promoted, the new rate applies to all hours",
+     "Journeyman rate for hours worked from April 14 onward — split required",
+     "Hold the entire batch until the employer resubmits with two separate entries",
+   ],
+   correct:2,
+   consequence:"If the full month posts at the apprentice rate, the member's contributions are understated for 16 days of journeyman work. Over a career with frequent rate changes, these gaps compound. A correction requires reversing the full April batch and reposting it in two parts.",
+   adminAction:"Split the April submission: calculate hours before April 14 at $4.90, hours from April 14 at $6.40. Update the occupation code in Oliver before reposting. Confirm with the employer that the promotion date is correct.",
+   wrongFeedback:[
+     "The rate follows the occupation and its effective date — not the reporting period. Hours before April 14 stay at the apprentice rate; hours after move to journeyman. Posting the full month at the apprentice rate understates contributions for 16 days.",
+     "Applying the journeyman rate to the full month overstates contributions for the pre-promotion period. The employer would be overcharged, and the member's record would reflect contributions they didn't earn yet. Both directions of error require correction.",
+     null,
+     "Holding is sometimes correct — but in this case the administrator can action the split themselves using the known promotion date. Sending it back to the employer adds unnecessary delay.",
+   ]},
+  {badge:"Scenario 2",
+   scenario:"A new collective agreement takes effect June 1. The journeyman rate increases from $6.05 to $6.40 per hour. Oliver has already been updated with the new rate. An employer submits May and June hours together in a late batch on June 12 — 160 May hours and 170 June hours, submitted as one combined entry.",
+   q:"What must happen before this batch posts?",
+   opts:[
+     "Post the entire batch at $6.40 — the new rate is loaded and the batch is from June",
+     "Post the entire batch at $6.05 — rate changes apply from the next full reporting period",
+     "Split the submission: May hours at $6.05, June hours at $6.40",
+     "Return the batch to the employer and ask them to resubmit May and June separately",
+   ],
+   correct:2,
+   consequence:"If the combined batch posts at $6.40, May hours are overcharged — the employer paid more than the agreement required and the member's May record is inflated. If it posts at $6.05, June hours are undercharged — the employer has underpaid and the member's June entitlement is understated. Both require reversal and correction.",
+   adminAction:"Split the batch in Oliver before posting: 160 hours at $6.05 (May), 170 hours at $6.40 (June). Document the rate change effective date in the batch notes. Oliver does not split automatically — the administrator must action this.",
+   wrongFeedback:[
+     "The new rate is loaded, but that does not mean it applies to all hours in the batch. The effective date is June 1 — May hours must still be processed at the old rate. Posting everything at $6.40 overstates May contributions and creates an employer liability.",
+     "Rate changes are not deferred to the next full period. The collective agreement specifies an effective date — June 1 — and that date governs. May hours at $6.05, June hours at $6.40. Deferring creates an underpayment for June.",
+     null,
+     "Returning the batch is unnecessary and creates delay. The administrator has all the information needed to split it: 160 May hours at $6.05, 170 June hours at $6.40. Sending it back to the employer adds friction without benefit.",
+   ]},
+  {badge:"Scenario 3",
+   scenario:"One employer has two groups of members: cable workers (Agreement A, $5.20/hr) and construction electricians (Agreement B, $6.40/hr). An administrator setting up a new cable worker accidentally assigns them to Agreement B. Three remittances post before anyone notices. The member worked 160 hours each month.",
+   q:"What is the operational consequence — and what does correcting it involve?",
+   opts:[
+     "No consequence — the member received more contributions, which is better for them",
+     "The employer overpaid contributions — a refund is straightforward to process",
+     "The member's record is inflated and the employer has overpaid — correction requires three reversals, recalculations, and reposts",
+     "Oliver flags this automatically at the next annual audit",
+   ],
+   correct:2,
+   consequence:"Three months of contributions at $6.40 instead of $5.20 = $1.20/hr overpayment × 160 hrs × 3 months = $576 employer overpayment. The member's pension record shows inflated contributions. The employer is owed a credit or refund. The member's record must be corrected — their actual entitlement is lower.",
+   adminAction:"Reverse all three batches. Recalculate at Agreement A ($5.20/hr). Repost. Issue a credit memo or refund to the employer for the $576 overpayment. Update the member's agreement assignment in Oliver before reposting. Issue a corrected statement if the annual statement has already been sent.",
+   wrongFeedback:[
+     "Higher contributions are not automatically 'better.' The employer overpaid — they are owed a refund or credit. The member's record shows an entitlement that does not reflect their actual agreement. Both need to be corrected. An inflated record that is not corrected creates a liability for the plan.",
+     "A refund is not straightforward when it spans three posted periods. Each period requires a separate reversal and repost. The correction also requires updating the agreement assignment, issuing a credit memo, and potentially correcting the member's annual statement. 'Straightforward' understates the work involved.",
+     null,
+     "Oliver does not flag agreement mismatches during routine processing if the assigned agreement is valid — it just applies it. Annual audits may catch it, but three months of wrong contributions will have posted by then. This is why setup verification matters.",
+   ]},
+];
+let cur=0,score=0,answered=false;
+function render(){
+  const q=qs[cur];
+  document.getElementById('pips').innerHTML=qs.map((_,i)=>`<div class="pip ${i<cur?'done':i===cur?'active':''}" aria-hidden="true"></div>`).join('');
+  document.getElementById('ctr').textContent=`${cur+1} / ${qs.length}`;
+  document.getElementById('quiz').innerHTML=`
+    <div class="card">
+      <div class="badge">${q.badge}</div>
+      <div class="scenario">${q.scenario}</div>
+      <div class="qtext">${q.q}</div>
+      <div class="opts" role="group">
+        ${q.opts.map((o,i)=>`<button class="opt" id="o${i}" onclick="choose(${i})" aria-label="${'ABCD'[i]}: ${o}">
+          <span class="letter" aria-hidden="true">${'ABCD'[i]}</span><span>${o}</span>
+        </button>`).join('')}
+      </div>
+      <div class="fb" id="fb" role="alert"></div>
+      <div class="consequence-reveal" id="cons-reveal"></div>
+      <div class="admin-action" id="admin-action"></div>
+      <div class="nav">
+        <button class="btn-restart" onclick="restart()">↺ Start over</button>
+        <button class="btn-next" id="btn-next" onclick="advance()">${cur<qs.length-1?'Next →':'See results'}</button>
+      </div>
+    </div>`;
+  answered=false;
+}
+function choose(idx){
+  if(answered)return;answered=true;
+  const q=qs[cur];const ok=idx===q.correct;if(ok)score++;
+  q.opts.forEach((_,i)=>{
+    const el=document.getElementById('o'+i);el.disabled=true;
+    if(i===q.correct)el.classList.add('correct');
+    else if(i===idx)el.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb');
+  fb.className='fb show '+(ok?'correct':'wrong');
+  if(ok){
+    fb.innerHTML=`<strong>✅ Correct.</strong> ${q.consequence}`;
+    const aa=document.getElementById('admin-action');
+    aa.className='admin-action show';
+    aa.innerHTML=`<strong>🖥️ Administrator action in Oliver</strong>${q.adminAction}`;
+  } else {
+    fb.innerHTML=`<strong>❌ Not quite.</strong> ${q.wrongFeedback[idx]||'Review the scenario and try again.'}`;
+    const cr=document.getElementById('cons-reveal');
+    cr.className='consequence-reveal show';
+    cr.innerHTML=`<strong>⛔ What happens if this choice posts</strong>${q.consequence}`;
+  }
+  document.getElementById('btn-next').style.display='block';
+  fb.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function advance(){
+  cur++;
+  if(cur>=qs.length){
+    document.getElementById('quiz').style.display='none';
+    document.querySelector('.prog-row').style.display='none';
+    const pct=Math.round(score/qs.length*100);
+    document.getElementById('score-num').textContent=`${score} / ${qs.length}`;
+    document.getElementById('score-msg').textContent=pct===100?'Strong understanding of how agreement rates apply and what breaks when they don\'t.':pct>=67?'Good — review the scenario you missed, focusing on the consequence.':'Revisit the Agreements and Rates module, then try again.';
+    document.getElementById('score-sub').textContent='Key principle: every wrong rate posted requires a reversal. Reversals create permanent audit entries. Getting it right at setup is always faster than correcting it later.';
+    const sc=document.getElementById('score');sc.style.display='block';sc.focus();
+  } else render();
+}
+function restart(){cur=0;score=0;answered=false;document.getElementById('quiz').style.display='block';document.querySelector('.prog-row').style.display='flex';document.getElementById('score').style.display='none';render();}
+render();
+</script>
+</body>
+</html>
