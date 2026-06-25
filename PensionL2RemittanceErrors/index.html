@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Formative Check — Where Did It Go Wrong?</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;min-height:100vh}
+.shell{max-width:640px;margin:0 auto}
+.setup{background:#E1F5EE;border-radius:12px;padding:.8rem 1rem;font-size:.84rem;color:#014040;margin-bottom:1.1rem;line-height:1.5}
+.setup strong{font-weight:600;display:block;margin-bottom:.15rem}
+.prog-row{display:flex;align-items:center;gap:.6rem;margin-bottom:1.1rem}
+.pips{display:flex;gap:5px;flex:1}
+.pip{flex:1;height:3px;border-radius:2px;background:#e0ded7;transition:background .3s}
+.pip.done{background:#038C8C}.pip.active{background:#15C7C7}
+.ctr{font-size:.78rem;color:#696267;white-space:nowrap}
+.card{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.3rem;margin-bottom:.7rem}
+.badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:6px;margin-bottom:.75rem;color:#1D5F73;background:#E6F1FB}
+.scenario{font-size:.88rem;color:#5F5E5A;line-height:1.55;margin-bottom:.85rem;padding:.7rem .85rem;background:#f8f7f4;border-radius:8px;border-left:3px solid #e0ded7}
+.qtext{font-size:.95rem;font-weight:700;color:#111;margin-bottom:.85rem}
+.steps-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.6rem}
+.step-btn{padding:.65rem .8rem;border-radius:10px;border:1.5px solid #e8e6e0;cursor:pointer;font-size:.83rem;font-weight:600;color:#333;background:#fff;text-align:left;transition:all .15s;display:flex;align-items:center;gap:.5rem}
+.step-btn:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.step-btn:hover:not(:disabled){border-color:#15C7C7;background:#E1F5EE}
+.step-num{width:22px;height:22px;border-radius:50%;background:#f1efe8;display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:700;color:#696267;flex-shrink:0}
+.step-btn.correct{border-color:#038C8C;background:#E1F5EE}.step-btn.correct .step-num{background:#038C8C;color:#fff}
+.step-btn.wrong{border-color:#9C2E8B;background:#FFF8FE}.step-btn.wrong .step-num{background:#9C2E8B;color:#fff}
+.step-btn:disabled{cursor:default}
+.fb{border-radius:10px;padding:.85rem 1rem;margin-top:.75rem;font-size:.84rem;line-height:1.6;display:none}
+.fb.show{display:block}
+.fb.correct{background:#E1F5EE;border:1px solid #038C8C;color:#014040}
+.fb.wrong{background:#FFF8FE;border:1px solid #9C2E8B;color:#4a0a3d}
+.fb strong{display:block;margin-bottom:.3rem}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:.85rem}
+.btn-next{background:#038C8C;color:#fff;border:none;padding:.58rem 1.2rem;border-radius:8px;font-size:.84rem;font-weight:600;cursor:pointer;display:none}
+.btn-next:hover{background:#014040}
+.btn-next:focus-visible{outline:3px solid #014040;outline-offset:2px}
+.btn-restart{background:none;border:none;color:#696267;font-size:.79rem;cursor:pointer;text-decoration:underline}
+.score{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.8rem;text-align:center;display:none}
+.score-num{font-size:2.6rem;font-weight:600;color:#038C8C;margin:.6rem 0 .3rem}
+.score-msg{font-size:.92rem;color:#111;font-weight:500;margin-bottom:.4rem}
+.score-sub{font-size:.82rem;color:#696267;margin-bottom:1.3rem;line-height:1.5}
+.btn-again{background:#038C8C;color:#fff;border:none;padding:.65rem 1.6rem;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer}
+.btn-again:hover{background:#014040}
+.wb-note{background:#8CFFDF;border-radius:10px;padding:.65rem .85rem;font-size:.8rem;color:#174538;margin-top:.7rem;display:flex;gap:.4rem;line-height:1.5}
+.wb-note strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="setup">
+    <strong>🎯 Formative check — Where did it go wrong?</strong>
+    Three scenarios. Each describes a remittance problem. For each one, identify which step in the 7-step remittance cycle the error occurred at. You will get immediate feedback explaining why.
+  </div>
+  <div class="prog-row">
+    <div class="pips" id="pips"></div>
+    <div class="ctr" id="ctr"></div>
+  </div>
+  <div id="quiz" aria-live="polite"></div>
+  <div class="score" id="score" tabindex="-1">
+    <div style="font-size:2rem">🔍</div>
+    <div class="score-num" id="score-num"></div>
+    <div class="score-msg" id="score-msg"></div>
+    <div class="score-sub" id="score-sub"></div>
+    <button class="btn-again" onclick="restart()">Try again</button>
+    <div class="wb-note" style="margin-top:1rem;text-align:left"><span>📓</span><span><strong>Workbook:</strong> Module 2 reflection — of the three error types, which would be hardest to catch after posting? Write one sentence.</span></div>
+  </div>
+</div>
+<script>
+const stepLabels=["Step 1 — Employer prepares","Step 2 — File submitted","Step 3 — Validation","Step 4 — Agreement identified","Step 5 — Rate applied","Step 6 — Shares calculated","Step 7 — Batch posted"];
+const qs=[
+  {badge:"Scenario 1",
+   scenario:"An employer submits 180 hours for a member who was terminated two months ago. The submission looks complete and the hours are reasonable for this employer.",
+   q:"At which step should this problem be caught?",
+   correct:2,
+   fb:{
+     y:"Correct — Step 3 is the validation gate. Oliver checks member status before any processing occurs. A terminated member triggers a warning here. If the administrator dismisses the warning, the error passes through.",
+     n:"Step 3 is the validation step — Oliver checks whether each member is active, inactive, or terminated before processing continues. This is where a terminated member should be flagged. If it passes Step 3, it will post to a closed record."
+   }
+  },
+  {badge:"Scenario 2",
+   scenario:"A journeyman electrician is submitted under the apprentice level 2 occupation code. Oliver processes the submission without flagging a warning — the hours are reasonable and the member is active.",
+   q:"At which step does the error take effect — producing a wrong contribution amount?",
+   correct:4,
+   fb:{
+     y:"Correct — Step 5 applies the rate based on the occupation code. Journeyman and apprentice level 2 have different rates in the collective agreement. The wrong code means the wrong rate — and the wrong contribution posts to the member's record.",
+     n:"The occupation code is used at Step 5 to look up the contribution rate. Journeyman and apprentice level 2 have different rates. If the wrong code is submitted, Oliver applies the wrong rate — and that amount posts to the member's record. It looks correct because no warning was generated."
+   }
+  },
+  {badge:"Scenario 3",
+   scenario:"An employer submits a remittance with all hours and occupation codes correct. The calculated contribution total is $13,100. The employer's accompanying payment is a cheque for $12,400.",
+   q:"At which step is this discrepancy flagged?",
+   correct:5,
+   fb:{
+     y:"Correct — Step 6 is where Oliver calculates the expected total from hours × rate and compares it to the payment received. A $700 variance triggers a flag the administrator must resolve before the batch can post.",
+     n:"Step 6 is where Oliver calculates employer and employee shares and compares the total to the payment submitted. A $700 shortfall between calculated ($13,100) and received ($12,400) is flagged as a variance here. The batch cannot post until the administrator resolves it."
+   }
+  },
+];
+let cur=0,score=0,answered=false;
+function render(){
+  const q=qs[cur];
+  document.getElementById('pips').innerHTML=qs.map((_,i)=>`<div class="pip ${i<cur?'done':i===cur?'active':''}" aria-hidden="true"></div>`).join('');
+  document.getElementById('ctr').textContent=`${cur+1} / ${qs.length}`;
+  document.getElementById('quiz').innerHTML=`
+    <div class="card">
+      <div class="badge">${q.badge}</div>
+      <div class="scenario">${q.scenario}</div>
+      <div class="qtext">${q.q}</div>
+      <div class="steps-grid" role="group" aria-label="Select the step">
+        ${stepLabels.map((lbl,i)=>`<button class="step-btn" id="sb${i}" onclick="choose(${i})" aria-label="${lbl}">
+          <span class="step-num" aria-hidden="true">${i+1}</span><span>${lbl.split('—')[1].trim()}</span>
+        </button>`).join('')}
+      </div>
+      <div class="fb" id="fb" role="alert"></div>
+      <div class="nav">
+        <button class="btn-restart" onclick="restart()">↺ Start over</button>
+        <button class="btn-next" id="btn-next" onclick="advance()">${cur<qs.length-1?'Next →':'See results'}</button>
+      </div>
+    </div>`;
+  answered=false;
+}
+function choose(idx){
+  if(answered)return;
+  answered=true;
+  const q=qs[cur];
+  const ok=idx===q.correct;
+  if(ok)score++;
+  stepLabels.forEach((_,i)=>{
+    const el=document.getElementById('sb'+i);
+    el.disabled=true;
+    if(i===q.correct)el.classList.add('correct');
+    else if(i===idx)el.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb');
+  fb.className='fb show '+(ok?'correct':'wrong');
+  fb.innerHTML=`<strong>${ok?'✅ Correct!':'❌ Not quite —'}</strong>${ok?q.fb.y:q.fb.n}`;
+  document.getElementById('btn-next').style.display='block';
+  fb.focus();
+}
+function advance(){
+  cur++;
+  if(cur>=qs.length){
+    document.getElementById('quiz').style.display='none';
+    document.querySelector('.prog-row').style.display='none';
+    const pct=Math.round(score/qs.length*100);
+    document.getElementById('score-num').textContent=`${score} / ${qs.length}`;
+    document.getElementById('score-msg').textContent=pct===100?'Strong understanding of where errors occur in the remittance cycle.':pct>=67?'Good — review the scenarios you missed before moving on.':'Revisit the remittance stepper, then try again.';
+    document.getElementById('score-sub').textContent='Remember: errors caught before Step 7 are easy to resolve. Errors that post become permanent records requiring a reversal.';
+    const sc=document.getElementById('score');sc.style.display='block';sc.focus();
+  }else render();
+}
+function restart(){cur=0;score=0;answered=false;document.getElementById('quiz').style.display='block';document.querySelector('.prog-row').style.display='flex';document.getElementById('score').style.display='none';render();}
+render();
+</script>
+</body>
+</html>
