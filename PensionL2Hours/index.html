@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hours Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;min-height:100vh}
+.shell{max-width:640px;margin:0 auto}
+.intro{background:#E1F5EE;border-radius:12px;padding:.8rem 1rem;font-size:.84rem;color:#014040;margin-bottom:1rem;line-height:1.5}
+.intro strong{font-weight:600}
+.card{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.2rem;margin-bottom:.75rem}
+.card-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#696267;margin-bottom:.85rem}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.6rem}
+.field{display:flex;flex-direction:column;gap:.3rem}
+.field label{font-size:.79rem;font-weight:600;color:#333}
+.field input[type=number]{padding:.45rem .7rem;border-radius:8px;border:1.5px solid #e0ded7;font-size:.92rem;font-family:inherit;width:100%;background:#fff;transition:border .15s}
+.field input:focus{outline:none;border-color:#038C8C}
+.toggle-row{display:flex;gap:.5rem;margin-bottom:.85rem}
+.toggle-btn{flex:1;padding:.55rem;border-radius:8px;border:1.5px solid #e0ded7;font-size:.82rem;font-weight:600;cursor:pointer;background:#fff;color:#696267;transition:all .2s}
+.toggle-btn.active-w{background:#1D5F73;border-color:#1D5F73;color:#fff}
+.toggle-btn.active-e{background:#038C8C;border-color:#038C8C;color:#fff}
+.toggle-btn:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.rate-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem}
+.rate-row label{font-size:.79rem;font-weight:600;color:#333;white-space:nowrap}
+.rate-row input{padding:.42rem .65rem;border-radius:8px;border:1.5px solid #e0ded7;font-size:.92rem;font-family:inherit;width:100px;transition:border .15s}
+.rate-row input:focus{outline:none;border-color:#038C8C}
+.results{border-radius:12px;border:1.5px solid #e0ded7;overflow:hidden}
+.res-hdr{display:grid;grid-template-columns:1.4fr 1fr 1fr;background:#f1efe8}
+.res-hdr div{padding:.55rem .75rem;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#696267}
+.res-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;border-top:1px solid #f1efe8}
+.res-row div{padding:.65rem .75rem;font-size:.86rem;color:#333}
+.res-label{font-weight:600;color:#555}
+.val-w{color:#1D5F73;font-weight:700}
+.val-e{color:#038C8C;font-weight:700}
+.diff-row{display:grid;grid-template-columns:1.4fr 2fr;background:#FAEEDA;border-top:1.5px solid #f5d88a}
+.diff-row div{padding:.7rem .75rem;font-size:.86rem}
+.diff-label{font-weight:700;color:#633806}
+.diff-val{font-weight:700;color:#633806}
+.projection{background:#E1F5EE;border-radius:10px;padding:.85rem 1rem;margin-top:.75rem;font-size:.83rem;color:#014040;line-height:1.55}
+.projection strong{display:block;margin-bottom:.3rem;font-weight:600}
+.proj-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.6rem}
+.proj-cell{background:#fff;border-radius:8px;padding:.6rem .75rem;text-align:center}
+.proj-cell .pnum{font-size:1.05rem;font-weight:700;color:#038C8C}
+.proj-cell .plbl{font-size:.71rem;color:#696267;margin-top:.15rem}
+.conversion-note{background:#f8f7f4;border-radius:8px;padding:.65rem .85rem;margin-top:.65rem;font-size:.79rem;color:#5F5E5A;line-height:1.5}
+.conversion-note strong{color:#038C8C}
+.disclaimer{font-size:.73rem;color:#b4b2a9;margin-top:.65rem;text-align:center;line-height:1.4}
+.olive{background:#E1F5EE;border-radius:10px;padding:.7rem .9rem;font-size:.82rem;color:#014040;line-height:1.5;margin-top:.7rem;display:flex;gap:.4rem}
+.olive strong{font-weight:600}
+.reset-btn{background:none;border:1.5px solid #e0ded7;border-radius:8px;padding:.42rem .85rem;font-size:.78rem;color:#696267;cursor:pointer;margin-top:.6rem}
+.reset-btn:hover{border-color:#038C8C;color:#038C8C}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="intro"><strong>🧠 Hours calculator</strong> — Adjust the inputs and watch the contribution amounts update in real time. Try switching between worked-hours and earned-hours plans to see the difference. The amber row shows you exactly what is at stake.</div>
+  <div class="card">
+    <div class="card-title">Plan type</div>
+    <div class="toggle-row">
+      <button class="toggle-btn" id="btn-w" onclick="setMode('w')" aria-pressed="false">⏱ Worked Hours Plan</button>
+      <button class="toggle-btn active-e" id="btn-e" onclick="setMode('e')" aria-pressed="true">💰 Earned Hours Plan</button>
+    </div>
+    <div class="card-title">Hours this month</div>
+    <div class="row">
+      <div class="field"><label for="reg">Regular hours</label><input type="number" id="reg" min="0" max="300" value="160" oninput="calc()"></div>
+      <div class="field"><label for="ot">Overtime hours (1.5×)</label><input type="number" id="ot" min="0" max="200" value="12" oninput="calc()"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label for="dt">Double-time hours (2×)</label><input type="number" id="dt" min="0" max="100" value="0" oninput="calc()"></div>
+      <div class="rate-row"><label for="rate">Rate per hour ($)</label><input type="number" id="rate" min="0.01" max="50" step="0.01" value="6.05" oninput="calc()"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Contribution results</div>
+    <div class="results" id="results"></div>
+    <div class="conversion-note" id="conv-note"></div>
+    <div class="projection" id="projection"></div>
+    <div class="olive" id="olive-note"></div>
+    <div class="disclaimer">All amounts are illustrative. Actual contributions are determined by the plan's collective agreement and applicable legislation.</div>
+    <button class="reset-btn" onclick="resetDefaults()">↺ Reset to Olive's scenario</button>
+  </div>
+</div>
+<script>
+let mode='e';
+function setMode(m){
+  mode=m;
+  document.getElementById('btn-w').className='toggle-btn'+(m==='w'?' active-w':'');
+  document.getElementById('btn-e').className='toggle-btn'+(m==='e'?' active-e':'');
+  document.getElementById('btn-w').setAttribute('aria-pressed',m==='w'?'true':'false');
+  document.getElementById('btn-e').setAttribute('aria-pressed',m==='e'?'true':'false');
+  calc();
+}
+function fmt(n){return '$'+n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function calc(){
+  const reg=parseFloat(document.getElementById('reg').value)||0;
+  const ot=parseFloat(document.getElementById('ot').value)||0;
+  const dt=parseFloat(document.getElementById('dt').value)||0;
+  const rate=parseFloat(document.getElementById('rate').value)||0;
+  const workedTotal=reg+ot+dt;
+  const otEarned=ot*1.5;
+  const dtEarned=dt*2;
+  const earnedTotal=reg+otEarned+dtEarned;
+  const contribW=workedTotal*rate;
+  const contribE=earnedTotal*rate;
+  const diff=contribE-contribW;
+  const annualDiff=diff*12;
+  const career=annualDiff*30;
+
+  // Results table
+  document.getElementById('results').innerHTML=`
+    <div class="res-hdr"><div>Hour type</div><div style="color:#1D5F73">⏱ Worked</div><div style="color:#038C8C">💰 Earned</div></div>
+    <div class="res-row"><div class="res-label">Regular hours</div><div class="val-w">${reg}</div><div class="val-e">${reg}</div></div>
+    <div class="res-row"><div class="res-label">Overtime hours</div><div class="val-w">${ot}</div><div class="val-e">${otEarned % 1 === 0 ? otEarned : otEarned.toFixed(1)}</div></div>
+    <div class="res-row"><div class="res-label">Double-time hours</div><div class="val-w">${dt}</div><div class="val-e">${dtEarned % 1 === 0 ? dtEarned : dtEarned.toFixed(1)}</div></div>
+    <div class="res-row" style="background:#f8f7f4"><div class="res-label">Total hours</div><div class="val-w">${workedTotal % 1 === 0 ? workedTotal : workedTotal.toFixed(1)}</div><div class="val-e">${earnedTotal % 1 === 0 ? earnedTotal : earnedTotal.toFixed(1)}</div></div>
+    <div class="res-row"><div class="res-label">Contribution @ ${fmt(rate)}/hr</div><div class="val-w">${fmt(contribW)}</div><div class="val-e">${fmt(contribE)}</div></div>
+    <div class="diff-row"><div class="diff-label">⚠️ Monthly difference (earned – worked)</div><div class="diff-val">${diff>=0?'+':''}${fmt(diff)}</div></div>
+  `;
+
+  // Conversion note
+  let convText='';
+  if(ot>0)convText+=`${ot} OT hours × 1.5 = ${otEarned%1===0?otEarned:otEarned.toFixed(1)} earned hours`;
+  if(dt>0)convText+=(convText?' · ':'')+`${dt} DT hours × 2 = ${dtEarned%1===0?dtEarned:dtEarned.toFixed(1)} earned hours`;
+  document.getElementById('conv-note').innerHTML=convText?`<strong>Conversion applied:</strong> ${convText}. Total earned: ${earnedTotal%1===0?earnedTotal:earnedTotal.toFixed(1)} vs ${workedTotal%1===0?workedTotal:workedTotal.toFixed(1)} worked.`:'No overtime or double time entered — worked and earned hours are equal.';
+
+  // Projection
+  document.getElementById('projection').innerHTML=`
+    <strong>📈 What this means over time</strong>
+    If this difference occurs every month (${mode==='e'?'worked hours submitted on an earned-hours plan':'earned hours plan vs worked hours plan'}):
+    <div class="proj-nums">
+      <div class="proj-cell"><div class="pnum">${fmt(Math.abs(diff))}</div><div class="plbl">Per month</div></div>
+      <div class="proj-cell"><div class="pnum">${fmt(Math.abs(annualDiff))}</div><div class="plbl">Per year</div></div>
+      <div class="proj-cell"><div class="pnum">${fmt(Math.abs(career))}</div><div class="plbl">Over 30 years</div></div>
+    </div>
+  `;
+
+  // Olive note
+  document.getElementById('olive-note').innerHTML=`<span>👤</span><div><strong>Olive's scenario (default):</strong> 160 regular + 12 OT hours on an earned-hours plan at $6.05/hr. Her earned total is 178 hours vs 172 worked. If her employer submits 172 instead of 178, her monthly contribution is understated by ${fmt(contribE-workedTotal*rate<0?0:contribE-workedTotal*rate)} — every month, for the length of her career.</div>`;
+}
+function resetDefaults(){
+  document.getElementById('reg').value=160;
+  document.getElementById('ot').value=12;
+  document.getElementById('dt').value=0;
+  document.getElementById('rate').value=6.05;
+  setMode('e');
+}
+calc();
+</script>
+</body>
+</html>
