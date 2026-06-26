@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Life Events and Beneficiary Outcomes</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;min-height:100vh}
+.shell{max-width:680px;margin:0 auto}
+.intro{background:#E1F5EE;border-radius:12px;padding:.8rem 1rem;font-size:.84rem;color:#014040;margin-bottom:1rem;line-height:1.5}
+.intro strong{font-weight:600}
+.scenario-tabs{display:flex;gap:.4rem;margin-bottom:.9rem}
+.tab{flex:1;padding:.55rem .5rem;border-radius:8px;border:1.5px solid #e0ded7;font-size:.78rem;font-weight:600;color:#696267;background:#fff;cursor:pointer;text-align:center;transition:all .2s;line-height:1.35}
+.tab.active{background:#014040;border-color:#014040;color:#fff}
+.tab:focus-visible{outline:3px solid #038C8C;outline-offset:2px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+@media(max-width:520px){.layout{grid-template-columns:1fr}}
+.timeline-panel{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1rem;overflow:hidden}
+.panel-title{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#696267;margin-bottom:.75rem}
+.event{position:relative;padding-left:1.5rem;margin-bottom:.1rem;cursor:pointer}
+.event::before{content:'';position:absolute;left:.4rem;top:0;bottom:-2px;width:2px;background:#e0ded7}
+.event:last-child::before{display:none}
+.event-dot{position:absolute;left:0;top:.65rem;width:10px;height:10px;border-radius:50%;border:2px solid #e0ded7;background:#fff;transition:all .2s;z-index:1}
+.event-card{border-radius:8px;border:1.5px solid #f1efe8;padding:.55rem .7rem;margin-bottom:.4rem;transition:all .2s;background:#fff}
+.event-card:hover{border-color:#15C7C7}
+.event.active .event-dot{background:#038C8C;border-color:#038C8C}
+.event.active .event-card{border-color:#038C8C;background:#FAFFFD}
+.event.past .event-dot{background:#E1F5EE;border-color:#15C7C7}
+.event.past .event-card{background:#FAFFFD;border-color:#9FE1CB}
+/* Irreversible event dot */
+.event.irr-event .event-dot{border-color:#9C2E8B}
+.event.irr-event.active .event-dot{background:#9C2E8B;border-color:#9C2E8B;box-shadow:0 0 0 3px rgba(156,46,139,.15)}
+.event.irr-event.active .event-card{border-color:#9C2E8B;background:#FFF8FE}
+.event-age{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#696267}
+.event-title{font-size:.86rem;font-weight:700;color:#111;margin:.1rem 0 .2rem}
+.event-desc{font-size:.78rem;color:#5F5E5A;line-height:1.45;display:none}
+.event.active .event-desc{display:block}
+.ponr-tag{display:inline-flex;align-items:center;gap:.3rem;background:#9C2E8B;color:#fff;font-size:.67rem;font-weight:700;padding:2px 7px;border-radius:4px;margin-bottom:.3rem;letter-spacing:.03em}
+.record-panel{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1rem}
+.record-field{margin-bottom:.65rem;padding:.6rem .75rem;border-radius:8px;border-left:3px solid #e0ded7;background:#f8f7f4;transition:all .3s}
+.record-field.updated{border-left-color:#038C8C;background:#E1F5EE}
+.record-field.action-needed{border-left-color:#9C2E8B;background:#FFF8FE}
+.record-field.permanent{border-left-color:#9C2E8B;background:#FFF8FE;border:1.5px solid #9C2E8B}
+.rf-label{font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#696267;margin-bottom:.2rem}
+.rf-value{font-size:.84rem;color:#333;font-weight:600;line-height:1.4}
+.rf-note{font-size:.75rem;color:#696267;margin-top:.15rem;line-height:1.35}
+.action-tag{display:inline-block;background:#9C2E8B;color:#fff;font-size:.67rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-bottom:.25rem;letter-spacing:.03em}
+/* Judgment moment */
+.judgment{background:#FFF0F0;border:2px solid #9C2E8B;border-radius:12px;padding:1rem;margin-top:.8rem}
+.j-hdr{font-size:.8rem;font-weight:700;color:#9C2E8B;margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem}
+.j-scenario{font-size:.82rem;color:#5F5E5A;line-height:1.5;margin-bottom:.65rem;padding:.55rem .7rem;background:#f8f7f4;border-radius:7px;border-left:2px solid #9C2E8B}
+.j-q{font-size:.86rem;font-weight:700;color:#111;margin-bottom:.6rem}
+.jopts{display:flex;flex-direction:column;gap:.35rem}
+.jopt{display:flex;align-items:flex-start;gap:.55rem;padding:.65rem .75rem;border-radius:8px;border:1.5px solid #e8e6e0;cursor:pointer;font-size:.81rem;color:#111;background:#fff;text-align:left;width:100%;transition:all .15s;line-height:1.4}
+.jopt:focus-visible{outline:3px solid #9C2E8B;outline-offset:2px}
+.jopt:hover:not(:disabled){border-color:#9C2E8B;background:#FFF8FE}
+.jletter{width:20px;height:20px;border-radius:50%;background:#f1efe8;display:flex;align-items:center;justify-content:center;font-size:.69rem;font-weight:700;color:#696267;flex-shrink:0}
+.jopt.correct{border-color:#038C8C;background:#E1F5EE}.jopt.correct .jletter{background:#038C8C;color:#fff}
+.jopt.wrong{border-color:#9C2E8B;background:#FFF8FE}.jopt.wrong .jletter{background:#9C2E8B;color:#fff}
+.jopt.partial{border-color:#F0C040;background:#FFFBEA}.jopt.partial .jletter{background:#F0C040;color:#633806}
+.jopt:disabled{cursor:default}
+.jfb{border-radius:8px;padding:.7rem .85rem;margin-top:.55rem;font-size:.81rem;line-height:1.55;display:none}
+.jfb.show{display:block}
+.jfb.correct{background:#E1F5EE;border:1px solid #038C8C;color:#014040}
+.jfb.wrong{background:#FFF8FE;border:1px solid #9C2E8B;color:#4a0a3d}
+.jfb.partial{background:#FFFBEA;border:1px solid #F0C040;color:#633806}
+.jfb strong{display:block;margin-bottom:.25rem}
+.oliver-boundary{background:#f1efe8;border-radius:10px;padding:.65rem .85rem;margin-top:.75rem;font-size:.78rem;color:#696267;line-height:1.45}
+.oliver-boundary strong{color:#333;font-weight:600}
+.nav-btns{display:flex;gap:.45rem;margin-top:.75rem}
+.nav-btn{flex:1;padding:.55rem;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;transition:background .2s}
+.nav-back{background:#f1efe8;color:#696267}.nav-back:hover:not(:disabled){background:#e8e6e0}
+.nav-back:disabled{opacity:.35;cursor:default}
+.nav-next{background:#038C8C;color:#fff}.nav-next:hover:not(:disabled){background:#014040}
+.nav-next:disabled{background:#b4b2a9;cursor:default}
+.nav-btn:focus-visible{outline:3px solid #014040;outline-offset:2px}
+.wb{background:#8CFFDF;border-radius:10px;padding:.65rem .85rem;font-size:.79rem;color:#174538;margin-top:.75rem;display:flex;gap:.4rem;line-height:1.5}
+.wb strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="intro"><strong>🧠 Life events and beneficiary outcomes</strong> — Step through life events and watch the Oliver record update. Some events are marked ⛔ — they are irreversible once processed. Scenario C includes an administrator judgment call.</div>
+  <div class="scenario-tabs" role="tablist">
+    <button class="tab active" role="tab" aria-selected="true" onclick="loadScenario(0)" id="tab0">Scenario A<br>Marriage → Divorce → Remarriage</button>
+    <button class="tab" role="tab" aria-selected="false" onclick="loadScenario(1)" id="tab1">Scenario B<br>Waiver → Spouse dies</button>
+    <button class="tab" role="tab" aria-selected="false" onclick="loadScenario(2)" id="tab2">Scenario C<br>Member dies + judgment call</button>
+  </div>
+  <div class="layout">
+    <div class="timeline-panel">
+      <div class="panel-title">Life events</div>
+      <div id="timeline"></div>
+      <div class="nav-btns">
+        <button class="nav-btn nav-back" id="btn-back" onclick="move(-1)">← Back</button>
+        <button class="nav-btn nav-next" id="btn-next" onclick="move(1)">Next →</button>
+      </div>
+    </div>
+    <div class="record-panel">
+      <div class="panel-title">Oliver record — current state</div>
+      <div id="record"></div>
+      <div class="oliver-boundary"><strong>🚫 What Oliver does not decide:</strong> Oliver records what the plan administrator instructs. It does not determine the legal validity of a waiver, calculate pension splits, or provide legal advice on court orders or estate matters.</div>
+    </div>
+  </div>
+  <div id="judgment-section" style="display:none">
+    <div class="judgment">
+      <div class="j-hdr">⚡ Administrator judgment — Scenario C</div>
+      <div class="j-scenario">The member has died. Their spouse is on record with no waiver. The survivor benefit package is ready to generate. However, 48 hours after the member's death, a person claiming to be the member's adult child from a previous relationship contacts the plan office. They say the member told them they were named as beneficiary. There is no waiver on file and no court order.</div>
+      <div class="j-q">What does the administrator do?</div>
+      <div class="jopts" role="group">
+        <button class="jopt" id="j0" onclick="judge(0)"><span class="jletter">A</span><span>Hold the survivor package, request documentation from both the spouse and the adult child, and await legal direction</span></button>
+        <button class="jopt" id="j1" onclick="judge(1)"><span class="jletter">B</span><span>Process the survivor benefit to the spouse immediately — no waiver means the spouse is the legal beneficiary</span></button>
+        <button class="jopt" id="j2" onclick="judge(2)"><span class="jletter">C</span><span>Split the benefit equally between the spouse and the adult child pending further investigation</span></button>
+      </div>
+      <div class="jfb" id="jfb" role="alert"></div>
+    </div>
+    <div class="wb"><span>📓</span><span><strong>Workbook — Section 7:</strong> Write one sentence on why the administrator should not split the benefit without a legal order — even if the claim seems credible.</span></div>
+  </div>
+</div>
+<script>
+const scenarios=[
+  {name:"A",events:[
+    {age:"Age 30",title:"Joins the plan — single",irr:false,
+     desc:"Member joins the pension plan as a single person. No spouse on record.",
+     record:{spouse:"None on record",waiver:"N/A",beneficiary:"None named — estate applies on death",limited:"None",action:null}},
+    {age:"Age 35",title:"Marries — spouse added",irr:false,
+     desc:"Member marries. Under Canadian pension law, the spouse is now the automatic default beneficiary. The administrator must update Oliver immediately.",
+     record:{spouse:"Spouse 1 — recorded (date of marriage: age 35)",waiver:"No waiver on file",beneficiary:"Spouse 1 — automatic by law",limited:"None",action:"Administrator must update Oliver with spouse name and date of marriage."}},
+    {age:"Age 45",title:"Divorces — court order divides pension",irr:true,
+     desc:"Member divorces. A court order under provincial family law divides the pension earned during the 10 years of marriage. The ex-spouse is assigned their portion as a limited member.",
+     ponr:"Once the pension split court order is recorded and the limited member record is created, the ex-spouse's entitlement to the portion earned during the marriage cannot be removed without a further court order.",
+     record:{spouse:"No current spouse on record",waiver:"N/A — divorce finalised",beneficiary:"No default beneficiary (no current spouse)",limited:"Ex-Spouse 1 — limited member. Entitled to portion earned during marriage (age 35–45).",action:"Administrator must record the court order and create the limited member record. Legal and actuarial input required to calculate the split.",permanent:true}},
+    {age:"Age 50",title:"Remarries — new spouse added",irr:false,
+     desc:"Member remarries. The new spouse becomes the automatic default beneficiary. The ex-spouse limited member record remains — they retain their entitlement.",
+     record:{spouse:"Spouse 2 — recorded (date of marriage: age 50)",waiver:"No waiver on file",beneficiary:"Spouse 2 — automatic by law for pension earned from age 50 onward",limited:"Ex-Spouse 1 — limited member record retained.",action:"Administrator must update Oliver with new spouse information. Both records must be maintained."}},
+    {age:"Age 65",title:"Retires",irr:false,
+     desc:"Member retires. Oliver generates the retirement package. The pension is split: Spouse 2 receives the remainder, Ex-Spouse 1 receives their court-ordered portion directly.",
+     record:{spouse:"Spouse 2 — on record, default beneficiary",waiver:"No waiver on file",beneficiary:"Spouse 2 for pension outside the first marriage period",limited:"Ex-Spouse 1 — receives their portion directly at retirement",action:null}},
+  ]},
+  {name:"B",events:[
+    {age:"Age 35",title:"Marries — spouse added",irr:false,
+     desc:"Member marries. Spouse is automatically the default pension beneficiary under pension law.",
+     record:{spouse:"Spouse on record",waiver:"No waiver on file",beneficiary:"Spouse — automatic by law",limited:"None",action:"Administrator must record spouse information in Oliver."}},
+    {age:"Age 40",title:"Spouse signs a waiver",irr:true,
+     desc:"The spouse signs a formal written waiver, giving up their default beneficiary rights. The member names their adult child as beneficiary.",
+     ponr:"Once the waiver is signed and recorded in Oliver, the spouse's default beneficiary rights are formally waived. The member may now name an alternative beneficiary. The waiver is a legal document — it cannot be undone by a phone call.",
+     record:{spouse:"Spouse on record",waiver:"Waiver on file — signed by spouse (age 40). DATE RECORDED.",beneficiary:"Adult child — named by member (waiver in place)",limited:"None",action:"Administrator must record the waiver with the date signed and update the named beneficiary in Oliver. Original waiver must be kept on file.",permanent:true}},
+    {age:"Age 52",title:"Spouse dies",irr:false,
+     desc:"The member's spouse passes away. The waiver is now void — the spouse is deceased. The named beneficiary (adult child) remains valid. If the member remarries, the new spouse acquires default rights automatically.",
+     record:{spouse:"Spouse deceased — removed from record",waiver:"Waiver is now void — spouse deceased",beneficiary:"Adult child — named beneficiary remains valid",limited:"None",action:"Administrator must update Oliver to record spouse's death. Review named beneficiary. If the member remarries, a new waiver will be required."}},
+    {age:"Age 65",title:"Retires — adult child receives benefit on death",irr:false,
+     desc:"Member retires. The adult child is on record as beneficiary. On the member's death, the adult child receives the applicable benefit.",
+     record:{spouse:"No current spouse on record",waiver:"Previous waiver voided by spouse's death — not applicable",beneficiary:"Adult child — valid named beneficiary, no current spouse to override",limited:"None",action:null}},
+  ]},
+  {name:"C",events:[
+    {age:"Age 42",title:"Member status at death",irr:false,
+     desc:"The member dies before retirement at age 42. They have been married for 12 years. Spouse is on record with no waiver. Entitlement: $68,000. Plan funded ratio: 88%.",
+     record:{spouse:"Spouse — on record, no waiver",waiver:"No waiver on file",beneficiary:"Spouse — automatic by law",limited:"None",action:null}},
+    {age:"Step 1",title:"Spouse is the default beneficiary",irr:false,
+     desc:"No waiver exists. Under pension law, the spouse is the automatic beneficiary. The member's verbal wishes or any informal arrangements do not override this — the law takes precedence.",
+     record:{spouse:"Spouse — confirmed default beneficiary",waiver:"No waiver on file — spouse rights in full effect",beneficiary:"Spouse — receives the full entitlement",limited:"None",action:"Administrator confirms spouse is on record and no waiver exists. Prepares survivor benefit package."}},
+    {age:"Step 2",title:"Solvency adjustment applied",irr:false,
+     desc:"The plan is 88% funded. Oliver applies the solvency adjustment: $68,000 × 88% = $59,840 immediate transfer. The remaining $8,160 is deferred.",
+     record:{spouse:"Spouse — entitlement confirmed",waiver:"No waiver",beneficiary:"Spouse receives: $59,840 immediately + $8,160 deferred",limited:"None",action:"Administrator generates survivor package in Oliver. Package shows solvency-adjusted amounts and deferred schedule."}},
+    {age:"Step 3",title:"Judgment call — competing claim received",irr:true,
+     desc:"48 hours after the member's death, a person claiming to be the member's adult child contacts the plan office. No waiver is on file. No court order exists.",
+     ponr:"Processing the survivor benefit to the spouse before any legal claim is adjudicated protects the plan from liability. Splitting without a court order or processing to a claimant without legal standing creates significant legal and fiduciary risk — for the plan and the administrator.",
+     record:{spouse:"Spouse — legal default beneficiary confirmed",waiver:"No waiver on file",beneficiary:"Spouse — no basis to deviate without court order",limited:"None",action:"⚡ Judgment call required — see below.",permanent:false}},
+  ]},
+];
+let scenarioIdx=0,cur=0,judged=false;
+function loadScenario(i){
+  scenarioIdx=i;cur=0;judged=false;
+  [0,1,2].forEach(j=>{
+    document.getElementById('tab'+j).className='tab'+(j===i?' active':'');
+    document.getElementById('tab'+j).setAttribute('aria-selected',j===i?'true':'false');
+  });
+  document.getElementById('judgment-section').style.display='none';
+  render();
+}
+function render(){
+  const s=scenarios[scenarioIdx];
+  const events=s.events;
+  document.getElementById('timeline').innerHTML=events.map((e,i)=>`
+    <div class="event ${i<cur?'past':i===cur?'active':''} ${e.irr?'irr-event':''}" onclick="jump(${i})" tabindex="0"
+         onkeydown="if(event.key==='Enter'||event.key===' '){jump(${i});event.preventDefault()}"
+         aria-label="${e.age}: ${e.title}">
+      <div class="event-dot" aria-hidden="true"></div>
+      <div class="event-card">
+        <div class="event-age">${e.age}${e.irr?' ⛔':''}</div>
+        <div class="event-title">${e.title}</div>
+        <div class="event-desc">
+          ${e.irr&&e.ponr?`<div class="ponr-tag">⛔ Point of no return</div><p style="font-size:.77rem;color:#9C2E8B;margin-bottom:.4rem;line-height:1.4">${e.ponr}</p>`:''}
+          ${e.desc}
+        </div>
+      </div>
+    </div>`).join('');
+  const ev=events[cur];
+  const r=ev.record;
+  document.getElementById('record').innerHTML=`
+    ${r.action?`<div class="action-tag">${r.action.startsWith('⚡')?'⚡ JUDGMENT REQUIRED':'⚡ ACTION REQUIRED'}</div>`:''}
+    <div class="record-field${r.permanent?' permanent':r.action?' action-needed':' updated'}">
+      <div class="rf-label">Current spouse on record</div>
+      <div class="rf-value">${r.spouse}</div>
+    </div>
+    <div class="record-field">
+      <div class="rf-label">Waiver on file</div>
+      <div class="rf-value">${r.waiver}</div>
+    </div>
+    <div class="record-field${r.action?' updated':''}">
+      <div class="rf-label">Beneficiary / pension recipient</div>
+      <div class="rf-value">${r.beneficiary}</div>
+    </div>
+    <div class="record-field">
+      <div class="rf-label">Limited member records (ex-spouse)</div>
+      <div class="rf-value">${r.limited}</div>
+    </div>
+    ${r.action?`<div class="record-field action-needed">
+      <div class="rf-label">Administrator must action</div>
+      <div class="rf-value" style="color:#9C2E8B">${r.action}</div>
+    </div>`:''}`;
+  document.getElementById('btn-back').disabled=cur===0;
+  const atEnd=cur===events.length-1;
+  const nb=document.getElementById('btn-next');
+  nb.disabled=atEnd;nb.textContent=atEnd?'End of scenario':'Next →';
+  // Show judgment section when Scenario C reaches last step
+  if(scenarioIdx===2&&cur===events.length-1){
+    document.getElementById('judgment-section').style.display='block';
+    setTimeout(()=>document.getElementById('judgment-section').scrollIntoView({behavior:'smooth',block:'nearest'}),200);
+  }
+}
+function move(d){cur=Math.max(0,Math.min(scenarios[scenarioIdx].events.length-1,cur+d));render();}
+function jump(i){cur=i;render();}
+const jfeedback=[
+  {cls:'partial',text:'<strong>⚠️ Holding is appropriate — but the framing matters.</strong> The administrator should not suggest to either party that the claim is valid or invalid. The correct action is to note the contact, not take any action on the benefit, and immediately escalate to the plan sponsor and legal counsel. The administrator should not be making legal determinations about competing claims — that is for legal and potentially the courts.'},
+  {cls:'correct',text:'<strong>✅ Correct — process to the spouse.</strong> No waiver is on file. No court order exists. The default spouse rule is a legislative requirement in all Canadian provinces. The administrator has no legal basis to deviate from it based on an unverified verbal claim. Processing to the spouse with full documentation protects the plan, the administrator, and the member\'s legal beneficiary. If the adult child believes they have a claim, they must pursue it through the courts — not through the plan administrator.'},
+  {cls:'wrong',text:'<strong>❌ The administrator cannot split without a legal order.</strong> There is no court order, no waiver, and no legal basis for splitting the benefit. Splitting without legal authority exposes the plan to liability and could result in the wrong amount being paid to the wrong person. The administrator\'s role is to apply the rules — not to improvise a resolution to a family dispute.'},
+];
+function judge(i){
+  if(judged)return;judged=true;
+  [0,1,2].forEach(j=>{const el=document.getElementById('j'+j);if(el)el.disabled=true;});
+  const el=document.getElementById('j'+i);if(el)el.classList.add(jfeedback[i].cls);
+  if(i!==1){const c=document.getElementById('j1');if(c)c.classList.add('correct');}
+  const fb=document.getElementById('jfb');
+  if(fb){fb.className='jfb show '+jfeedback[i].cls;fb.innerHTML=jfeedback[i].text;fb.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+loadScenario(0);
+</script>
+</body>
+</html>
