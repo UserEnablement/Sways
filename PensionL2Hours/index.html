@@ -10,7 +10,7 @@ body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;m
 .intro{background:#E1F5EE;border-radius:12px;padding:.8rem 1rem;font-size:.84rem;color:#014040;margin-bottom:1rem;line-height:1.5}
 .intro strong{font-weight:600}
 .card{background:#fff;border-radius:14px;border:1px solid #e8e6e0;padding:1.2rem;margin-bottom:.75rem}
-.card-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#696267;margin-bottom:.85rem}
+.card-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#696267;margin-bottom:.85rem}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.6rem}
 .field{display:flex;flex-direction:column;gap:.3rem}
 .field label{font-size:.79rem;font-weight:600;color:#333}
@@ -43,6 +43,14 @@ body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;m
 .proj-cell{background:#fff;border-radius:8px;padding:.6rem .75rem;text-align:center}
 .proj-cell .pnum{font-size:1.05rem;font-weight:700;color:#038C8C}
 .proj-cell .plbl{font-size:.71rem;color:#696267;margin-top:.15rem}
+/* Consequence panel — new */
+.consequence{border-radius:10px;padding:.85rem 1rem;margin-top:.7rem;font-size:.83rem;line-height:1.55;border:1.5px solid transparent;display:none;transition:all .3s}
+.consequence.show{display:block}
+.consequence.low{background:#f8f7f4;border-color:#e0ded7;color:#5F5E5A}
+.consequence.medium{background:#FAEEDA;border-color:#F0C040;color:#633806}
+.consequence.high{background:#FFF8FE;border-color:#9C2E8B;color:#4a0a3d}
+.consequence strong{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem}
+.consequence .emp-liability{margin-top:.5rem;padding:.5rem .65rem;background:rgba(255,255,255,0.6);border-radius:7px;font-size:.79rem}
 .conversion-note{background:#f8f7f4;border-radius:8px;padding:.65rem .85rem;margin-top:.65rem;font-size:.79rem;color:#5F5E5A;line-height:1.5}
 .conversion-note strong{color:#038C8C}
 .disclaimer{font-size:.73rem;color:#b4b2a9;margin-top:.65rem;text-align:center;line-height:1.4}
@@ -54,7 +62,7 @@ body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;m
 </head>
 <body>
 <div class="shell">
-  <div class="intro"><strong>🧠 Hours calculator</strong> — Adjust the inputs and watch the contribution amounts update in real time. Try switching between worked-hours and earned-hours plans to see the difference. The amber row shows you exactly what is at stake.</div>
+  <div class="intro"><strong>🧠 Hours calculator</strong> — Adjust the inputs and watch contributions update in real time. Switch between worked-hours and earned-hours plans. The amber row shows the monthly difference — and the consequence panel below shows what that difference means operationally.</div>
   <div class="card">
     <div class="card-title">Plan type</div>
     <div class="toggle-row">
@@ -76,6 +84,7 @@ body{font-family:system-ui,Arial,sans-serif;background:#f8f7f4;padding:1.25rem;m
     <div class="results" id="results"></div>
     <div class="conversion-note" id="conv-note"></div>
     <div class="projection" id="projection"></div>
+    <div class="consequence" id="consequence"></div>
     <div class="olive" id="olive-note"></div>
     <div class="disclaimer">All amounts are illustrative. Actual contributions are determined by the plan's collective agreement and applicable legislation.</div>
     <button class="reset-btn" onclick="resetDefaults()">↺ Reset to Olive's scenario</button>
@@ -92,57 +101,90 @@ function setMode(m){
   calc();
 }
 function fmt(n){return '$'+n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function fmtK(n){return n>=1000?'$'+Math.round(n/100)*100/1000+'k':'$'+Math.round(n);}
 function calc(){
   const reg=parseFloat(document.getElementById('reg').value)||0;
   const ot=parseFloat(document.getElementById('ot').value)||0;
   const dt=parseFloat(document.getElementById('dt').value)||0;
   const rate=parseFloat(document.getElementById('rate').value)||0;
   const workedTotal=reg+ot+dt;
-  const otEarned=ot*1.5;
-  const dtEarned=dt*2;
+  const otEarned=ot*1.5,dtEarned=dt*2;
   const earnedTotal=reg+otEarned+dtEarned;
   const contribW=workedTotal*rate;
   const contribE=earnedTotal*rate;
-  const diff=contribE-contribW;
-  const annualDiff=diff*12;
-  const career=annualDiff*30;
+  // Active plan uses the selected mode; comparison shows the other plan
+  const activeHours = mode==='e' ? earnedTotal : workedTotal;
+  const otherHours  = mode==='e' ? workedTotal : earnedTotal;
+  const activeContrib = mode==='e' ? contribE : contribW;
+  const otherContrib  = mode==='e' ? contribW : contribE;
+  const activeLabel = mode==='e' ? '💰 Earned hours' : '⏱ Worked hours';
+  const otherLabel  = mode==='e' ? '⏱ Worked hours plan would use' : '💰 Earned hours plan would use';
+  const activeColor = mode==='e' ? '#038C8C' : '#1D5F73';
+  const diff = activeContrib - otherContrib;
+  const absDiff=Math.abs(diff),absAnnual=Math.abs(diff*12),absCareer=Math.abs(diff*12*30);
 
-  // Results table
+  const fmt2=(n)=>n%1===0?String(n):n.toFixed(1);
+
+  // Hours rows: show OT/DT converted or raw depending on mode
+  const activeOT = mode==='e' ? otEarned : ot;
+  const activeDT = mode==='e' ? dtEarned : dt;
+
   document.getElementById('results').innerHTML=`
-    <div class="res-hdr"><div>Hour type</div><div style="color:#1D5F73">⏱ Worked</div><div style="color:#038C8C">💰 Earned</div></div>
-    <div class="res-row"><div class="res-label">Regular hours</div><div class="val-w">${reg}</div><div class="val-e">${reg}</div></div>
-    <div class="res-row"><div class="res-label">Overtime hours</div><div class="val-w">${ot}</div><div class="val-e">${otEarned % 1 === 0 ? otEarned : otEarned.toFixed(1)}</div></div>
-    <div class="res-row"><div class="res-label">Double-time hours</div><div class="val-w">${dt}</div><div class="val-e">${dtEarned % 1 === 0 ? dtEarned : dtEarned.toFixed(1)}</div></div>
-    <div class="res-row" style="background:#f8f7f4"><div class="res-label">Total hours</div><div class="val-w">${workedTotal % 1 === 0 ? workedTotal : workedTotal.toFixed(1)}</div><div class="val-e">${earnedTotal % 1 === 0 ? earnedTotal : earnedTotal.toFixed(1)}</div></div>
-    <div class="res-row"><div class="res-label">Contribution @ ${fmt(rate)}/hr</div><div class="val-w">${fmt(contribW)}</div><div class="val-e">${fmt(contribE)}</div></div>
-    <div class="diff-row"><div class="diff-label">⚠️ Monthly difference (earned – worked)</div><div class="diff-val">${diff>=0?'+':''}${fmt(diff)}</div></div>
-  `;
-
-  // Conversion note
-  let convText='';
-  if(ot>0)convText+=`${ot} OT hours × 1.5 = ${otEarned%1===0?otEarned:otEarned.toFixed(1)} earned hours`;
-  if(dt>0)convText+=(convText?' · ':'')+`${dt} DT hours × 2 = ${dtEarned%1===0?dtEarned:dtEarned.toFixed(1)} earned hours`;
-  document.getElementById('conv-note').innerHTML=convText?`<strong>Conversion applied:</strong> ${convText}. Total earned: ${earnedTotal%1===0?earnedTotal:earnedTotal.toFixed(1)} vs ${workedTotal%1===0?workedTotal:workedTotal.toFixed(1)} worked.`:'No overtime or double time entered — worked and earned hours are equal.';
-
-  // Projection
-  document.getElementById('projection').innerHTML=`
-    <strong>📈 What this means over time</strong>
-    If this difference occurs every month (${mode==='e'?'worked hours submitted on an earned-hours plan':'earned hours plan vs worked hours plan'}):
-    <div class="proj-nums">
-      <div class="proj-cell"><div class="pnum">${fmt(Math.abs(diff))}</div><div class="plbl">Per month</div></div>
-      <div class="proj-cell"><div class="pnum">${fmt(Math.abs(annualDiff))}</div><div class="plbl">Per year</div></div>
-      <div class="proj-cell"><div class="pnum">${fmt(Math.abs(career))}</div><div class="plbl">Over 30 years</div></div>
+    <div class="res-hdr" style="grid-template-columns:1.4fr 1fr 1fr">
+      <div>Hour type</div>
+      <div style="color:${activeColor}">${activeLabel}</div>
+      <div style="color:#888;font-size:.7rem">${otherLabel}</div>
     </div>
-  `;
+    <div class="res-row" style="grid-template-columns:1.4fr 1fr 1fr"><div class="res-label">Regular hours</div><div class="val-w" style="color:${activeColor};font-weight:700">${reg}</div><div style="color:#999;font-size:.83rem;padding:.65rem .75rem">${reg}</div></div>
+    <div class="res-row" style="grid-template-columns:1.4fr 1fr 1fr"><div class="res-label">Overtime hours</div><div class="val-w" style="color:${activeColor};font-weight:700">${fmt2(activeOT)}${mode==='e'&&ot>0?' (×1.5)':''}</div><div style="color:#999;font-size:.83rem;padding:.65rem .75rem">${fmt2(mode==='e'?ot:otEarned)}${mode==='w'&&ot>0?' (×1.5)':''}</div></div>
+    <div class="res-row" style="grid-template-columns:1.4fr 1fr 1fr"><div class="res-label">Double-time hours</div><div class="val-w" style="color:${activeColor};font-weight:700">${fmt2(activeDT)}${mode==='e'&&dt>0?' (×2)':''}</div><div style="color:#999;font-size:.83rem;padding:.65rem .75rem">${fmt2(mode==='e'?dt:dtEarned)}${mode==='w'&&dt>0?' (×2)':''}</div></div>
+    <div class="res-row" style="grid-template-columns:1.4fr 1fr 1fr;background:#f8f7f4"><div class="res-label">Total hours</div><div class="val-w" style="color:${activeColor};font-weight:700">${fmt2(activeHours)}</div><div style="color:#999;font-size:.83rem;padding:.65rem .75rem">${fmt2(otherHours)}</div></div>
+    <div class="res-row" style="grid-template-columns:1.4fr 1fr 1fr"><div class="res-label">Contribution @ ${fmt(rate)}/hr</div><div class="val-w" style="color:${activeColor};font-weight:700">${fmt(activeContrib)}</div><div style="color:#999;font-size:.83rem;padding:.65rem .75rem">${fmt(otherContrib)}</div></div>
+    <div class="diff-row"><div class="diff-label">⚠️ ${mode==='e'?'Earned plan contributes more by':'Worked plan contributes less by'}</div><div class="diff-val">${diff>0?'+':''}${fmt(diff)} / month vs ${mode==='e'?'worked':'earned'} plan</div></div>`;
 
-  // Olive note
-  document.getElementById('olive-note').innerHTML=`<span>👤</span><div><strong>Olive's scenario (default):</strong> 160 regular + 12 OT hours on an earned-hours plan at $6.05/hr. Her earned total is 178 hours vs 172 worked. If her employer submits 172 instead of 178, her monthly contribution is understated by ${fmt(contribE-workedTotal*rate<0?0:contribE-workedTotal*rate)} — every month, for the length of her career.</div>`;
+  let convText='';
+  if(mode==='e'){
+    if(ot>0)convText+=`${ot} OT × 1.5 = ${fmt2(otEarned)} earned`;
+    if(dt>0)convText+=(convText?' · ':'')+`${dt} DT × 2 = ${fmt2(dtEarned)} earned`;
+    if(convText)convText=`<strong>Conversion applied:</strong> ${convText}. Total: ${fmt2(earnedTotal)} earned vs ${fmt2(workedTotal)} worked.`;
+    else convText='No overtime or double time — worked and earned hours are equal on this plan.';
+  } else {
+    convText=`<strong>Worked hours plan:</strong> hours submitted as-is — ${fmt2(workedTotal)} total. No conversion applied.`;
+    if(ot>0||dt>0)convText+=` An earned-hours plan would convert these to ${fmt2(earnedTotal)} hours.`;
+  }
+  document.getElementById('conv-note').innerHTML=convText;
+
+  document.getElementById('projection').innerHTML=`
+    <strong>📈 What this difference means over time</strong>
+    <div class="proj-nums">
+      <div class="proj-cell"><div class="pnum">${fmt(absDiff)}</div><div class="plbl">Per month</div></div>
+      <div class="proj-cell"><div class="pnum">${fmt(absAnnual)}</div><div class="plbl">Per year</div></div>
+      <div class="proj-cell"><div class="pnum">${fmt(absCareer)}</div><div class="plbl">Over 30 years</div></div>
+    </div>`;
+
+  // Consequence panel — scales with difference size
+  const cons=document.getElementById('consequence');
+  if(absDiff<10){
+    cons.className='consequence';
+  } else if(absDiff<50){
+    cons.className='consequence show low';
+    cons.innerHTML=`<strong>⚠️ Operational consequence — low but real</strong>A ${fmt(absDiff)}/month difference compounds to ${fmt(absAnnual)} per year. Over a 30-year career: ${fmt(absCareer)}. At this level, the error is unlikely to trigger a member complaint — which is exactly why it can run undetected.`;
+  } else if(absDiff<150){
+    cons.className='consequence show medium';
+    cons.innerHTML=`<strong>⚠️ Operational consequence — material</strong>A ${fmt(absDiff)}/month difference is ${fmt(absAnnual)} per year. If this error runs for two years before discovery, the employer owes approximately ${fmt(absAnnual*2)} in arrears — plus interest. A retro correction requires reversals for every affected period.<div class="emp-liability">💼 Employer liability: the employer is responsible for the correct contribution amount regardless of what they submitted. The plan administrator must collect the arrears.</div>`;
+  } else {
+    cons.className='consequence show high';
+    cons.innerHTML=`<strong>⛔ Operational consequence — significant</strong>A ${fmt(absDiff)}/month difference crosses the threshold where members are likely to notice discrepancies in their annual statements. Over two years: approximately ${fmt(absAnnual*2)} in missing contributions plus interest. If discovered at retirement, the entitlement must be recalculated — delaying the member's pension start date.<div class="emp-liability">💼 Employer liability: arrears above certain thresholds may require regulator notification. Legal counsel may be needed if the employer disputes liability. This is recoverable — but only with significant administrative effort.</div>`;
+  }
+
+  const isOlive=reg===160&&ot===12&&dt===0&&mode==='e';
+  const os=document.getElementById('olive-note');
+  os.style.display=isOlive?'flex':'none';
+  if(isOlive)os.innerHTML=`<span>👤</span><div><strong>Olive's scenario (default):</strong> 160 regular + 12 OT hours on an earned-hours plan at $6.05/hr. Earned total: 178 hours vs 172 worked. If her employer submits 172 instead of 178, her monthly contribution is understated by ${fmt(contribE-workedTotal*rate<0?0:contribE-workedTotal*rate)} — every month, for the length of her career.</div>`;
 }
 function resetDefaults(){
-  document.getElementById('reg').value=160;
-  document.getElementById('ot').value=12;
-  document.getElementById('dt').value=0;
-  document.getElementById('rate').value=6.05;
+  document.getElementById('reg').value=160;document.getElementById('ot').value=12;
+  document.getElementById('dt').value=0;document.getElementById('rate').value=6.05;
   setMode('e');
 }
 calc();
